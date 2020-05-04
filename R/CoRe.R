@@ -3,11 +3,11 @@
 #' Calculate profile of number of fitness genes across fixed numbers of cell lines and cumulative sums.
 #'
 #' @description This function calculates the numbers (and cumulative numbers) of genes whose inactivation exerts a fitness effect in \emph{n} cell lines, varying \emph{n} from 1 to the number of cell lines in the dataset in input.
-#' @usage ADAM2.panessprofile(depMat,
+#' @usage CoRe.panessprofile(depMat,
 #'                    display=TRUE,
 #'                    main_suffix='fitness genes in at least 1 cell line',
 #'                    xlab='n. dependent cell lines')
-#' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
+#' @param depMat A binary dependency matrix, i.e. a binary matrix with genes on rows and samples on columns. A 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
 #' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
 #' @param main_suffix If display=TRUE, title suffix to give to plot of number of genes depleted in a give number of cell lines, default is 'genes depleted in at least 1 cell line'
 #' @param xlab If display=TRUE, label to give to x-axis of the plots, default is 'n. cell lines'
@@ -47,80 +47,85 @@ CoRe.panessprofile<-function(depMat,display=TRUE,
     }
     return(list(panessprof=panessprof,CUMsums=CUMsums))
 }
+#___________________________________________________________________________________
+
+#' Generate null profile of number of fitness genes across fixed numbers of cell lines and cumulative sums.
 #'
-#' #' Generate null profile of number of fitness genes across fixed numbers of cell lines and cumulative sums.
-#' #'
-#' #' @description This function randomly perturbs the binary dependency matrix to generate a null distribution of profiles of fitness genes across fixed number of cell lines, and corresponding null distribution of cumulative sums.
-#' #' @usage ADAM2.generateNullModel(depMat,
-#' #'                        ntrials=1000,
-#' #'                        display=TRUE)
-#' #' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' #' @param ntrials Integer, default =100. How many times to randomly perturb dependency matrix to generate the null distributions.
-#' #' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' #' @details For a number of trials specified in (\code{ntrials}) the inputted binary dependency matrix is randomised, keeping its column marginal sums. The profiles of fitness genes across fixed number of cell lines, and corresponding cumulative sums, are returned for each random perturbation.
-#' #' @return A list with the following two named vectors:
-#' #' \item{nullProf}{Matrix of number of fitness genes for fixed number of cell lines from. Each rows of matrix corresponds to a random trial.}
-#' #' \item{nullCumSum}{Matrix of profile of cumulative number of fitness genes in fixed number of cell lines. Each row of matrix is one random trial.}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleDepMat)
-#' #' pprofile <- ADAM2.generateNullModel(depMat = exampleDepMat,ntrials=1000)
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
+#' @description This function randomly perturbs a binary dependency matrix to generate a null distribution of profiles of fitness genes across fixed number of cell lines, and corresponding null distribution of cumulative sums.
+#' @usage CoRe.generateNullModel(depMat,
+#'                        ntrials=1000,
+#'                        display=TRUE)
+#' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
+#' @param ntrials Integer, default = 1000. How many times to randomly perturb dependency matrix to generate the null distributions.
+#' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
+#' @details For a number of trials specified in (\code{ntrials}) the inputted binary dependency matrix is randomised, keeping its column marginal sums. The profiles of fitness genes across fixed number of cell lines, and corresponding cumulative sums, are returned for each random perturbation.
+#' @return A list with the following two named vectors:
+#' \item{nullProf}{Matrix of number of fitness genes for fixed number of cell lines from. Each rows of matrix corresponds to a random trial.}
+#' \item{nullCumSum}{Matrix of profile of cumulative number of fitness genes in fixed number of cell lines. Each row of matrix is one random trial.}
+#' @author C. Pacini, E. Karakoc & F. Iorio
+#' @examples
+#' data(exampleDepMat)
+#' pprofile <- CoRe.generateNullModel(depMat = exampleDepMat,ntrials=1000)
+#' @keywords functions
+#' @export
+CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
+
+    set.seed(100812)
+    depMat<-depMat[which(rowSums(depMat)>0),]
+    nullProf<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,1:ncol(depMat)))
+    nullCumSUM<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,paste('≥',1:ncol(depMat),sep='')))
+    print('Generating null model...')
+    pb <- txtProgressBar(min=1,max=ntrials,style=3)
+
+    for (i in 1:ntrials){
+        setTxtProgressBar(pb, i)
+        rMat<-
+            CoRe.randomisedepMat(depMat)
+        Ret<-
+            CoRe.panessprofile(rMat,display = FALSE)
+        nullProf[i,]<-Ret$panessprof
+        nullCumSUM[i,]<-Ret$CUMsums
+    }
+    Sys.sleep(1)
+    close(pb)
+    print('')
+    print('Done')
+
+    if (display){
+
+        par(mfrow=c(2,1))
+        main=c(paste(ntrials,' randomised essentiality profiles of\n',nrow(depMat),' genes across ',ncol(depMat),' cell lines',
+                     sep=''))
+        boxplot(nullProf,las=2,xlab='n. cell lines',ylab='fitness genes in n cell lines',main=main)
+
+        colnames(nullCumSUM)<-paste(">=",1:ncol(nullCumSUM))
+        boxplot(log10(nullCumSUM+1),las=2,main='Cumulative sums',xlab='n. cell lines',
+                ylab='log10 [number of fitness genes + 1]',
+                cex.axis=0.8)
+    }
+
+    return(list(nullProf=nullProf,nullCumSUM=nullCumSUM))
+}
+#___________________________________________________________________________________
+
+#' Binary matrix randomisation preserving column totals
 #'
-#'     set.seed(100812)
-#'     depMat<-depMat[which(rowSums(depMat)>0),]
-#'     nullProf<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,1:ncol(depMat)))
-#'     nullCumSUM<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,paste('≥',1:ncol(depMat),sep='')))
-#'     print('Generating null model...')
-#'     pb <- txtProgressBar(min=1,max=ntrials,style=3)
-#'
-#'     for (i in 1:ntrials){
-#'         setTxtProgressBar(pb, i)
-#'         rMat<-
-#'             ADAM2.randomisedepMat(depMat)
-#'         Ret<-
-#'             ADAM2.panessprofile(rMat,display = FALSE)
-#'         nullProf[i,]<-Ret$panessprof
-#'         nullCumSUM[i,]<-Ret$CUMsums
-#'     }
-#'     Sys.sleep(1)
-#'     close(pb)
-#'     print('')
-#'     print('Done')
-#'
-#'     if (display){
-#'
-#'         par(mfrow=c(2,1))
-#'         main=c(paste(ntrials,' randomised essentiality profiles of\n',nrow(depMat),' genes across ',ncol(depMat),' cell lines',
-#'                      sep=''))
-#'         boxplot(nullProf,las=2,xlab='n. cell lines',ylab='genes depleted in n cell lines',main=main)
-#'
-#'         colnames(nullCumSUM)<-paste(">=",1:ncol(nullCumSUM))
-#'         boxplot(log10(nullCumSUM+1),las=2,main='Cumulative sums',xlab='n. cell lines',
-#'                 ylab='log10 [number of genes + 1]',
-#'                 cex.axis=0.8)
-#'     }
-#'
-#'     return(list(nullProf=nullProf,nullCumSUM=nullCumSUM))
-#' }
-#'
-#' #' Binary matrix randomisation preserving column totals
-#' #'
-#' #' @description This function takes in input a matrix and shuffles its entries column wisely. If the matrix is binary then then matrix resulting from this shuffling will have the same column marginal totals of the inpputted one.
-#' #' @usage ADAM2.randomisedepMat(depMat)
-#' #' @param depMat A numerical matrix.
-#' #' @return The matrix given in input with entries shuffled column wisely.
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleDepMat)
-#' #' rnd_exampleDepMat<-ADAM2.randomisedepMat(exampleDepMat)
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.randomisedepMat<-function(depMat){
-#'     rmat<-apply(depMat,2,sample)
-#' }
+#' @description This function takes in input a matrix and shuffles its entries column wisely. If the matrix is binary then then matrix resulting from this shuffling will have the same column marginal totals of the inpputted one.
+#' @usage CoRe.randomisedepMat(depMat)
+#' @param depMat A numerical matrix.
+#' @return The matrix given in input with entries shuffled column wisely.
+#' @author C. Pacini, E. Karakoc & F. Iorio
+#' @examples
+#' data(exampleDepMat)
+#' rnd_exampleDepMat<-CoRe.randomisedepMat(exampleDepMat)
+#' @keywords functions
+#' @export
+CoRe.randomisedepMat<-function(depMat){
+    rmat<-apply(depMat,2,sample)
+}
+#___________________________________________________________________________________
+
+
 #'
 #' #' Set reference set of predefined essential genes
 #' #'
