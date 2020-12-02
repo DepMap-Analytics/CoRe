@@ -13,6 +13,7 @@ export(CoRe.randomisedepMat)
 #export(CoRe.setEssentialGenes)
 #export(CoRe.tradeoffEO_TPR)
 #export(CoRe.truePositiveRate)
+
 import(mixdist)
 importFrom("grDevices", "dev.off", "jpeg")
 importFrom("graphics", "abline", "axis", "barplot", "boxplot", "hist","legend", "par", "plot", "points")
