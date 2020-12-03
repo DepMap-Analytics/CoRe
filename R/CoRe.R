@@ -1,25 +1,9 @@
 
 
-#' Calculate profile of number of fitness genes across fixed numbers of cell lines and cumulative sums.
-#'
-#' @description This function calculates the numbers (and cumulative numbers) of genes whose inactivation exerts a fitness effect in \emph{n} cell lines, varying \emph{n} from 1 to the number of cell lines in the dataset in input.
-#' @usage CoRe.panessprofile(depMat,
-#'                    display=TRUE,
-#'                    main_suffix='fitness genes in at least 1 cell line',
-#'                    xlab='n. dependent cell lines')
-#' @param depMat A binary dependency matrix, i.e. a binary matrix with genes on rows and samples on columns. A 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' @param main_suffix If display=TRUE, title suffix to give to plot of number of genes depleted in a give number of cell lines, default is 'genes depleted in at least 1 cell line'
-#' @param xlab If display=TRUE, label to give to x-axis of the plots, default is 'n. cell lines'
-#' @return A list with the following two named vectors:
-#' \item{panessprof}{Number of genes that are depleted for a number of cell lines}
-#' \item{CUMsums}{Cumulative number of genes depleted in at least x cell lines}
-#' @author C. Pacini, E. Karakoc & F. Iorio
-#' @examples
-#' data(exampleDepMat)
-#' pprofile <- ADAM2.panessprofile(depMat = exampleDepMat)
-#' @keywords functions
-#' @export
+## Exported
+## Non Documented
+
+## Documented
 CoRe.panessprofile<-function(depMat,display=TRUE,
                              main_suffix='fitness genes in at least 1 cell line',
                              xlab='n. dependent cell lines'){
@@ -47,27 +31,6 @@ CoRe.panessprofile<-function(depMat,display=TRUE,
     }
     return(list(panessprof=panessprof,CUMsums=CUMsums))
 }
-#___________________________________________________________________________________
-
-#' Generate null profile of number of fitness genes across fixed numbers of cell lines and cumulative sums.
-#'
-#' @description This function randomly perturbs a binary dependency matrix to generate a null distribution of profiles of fitness genes across fixed number of cell lines, and corresponding null distribution of cumulative sums.
-#' @usage CoRe.generateNullModel(depMat,
-#'                        ntrials=1000,
-#'                        display=TRUE)
-#' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' @param ntrials Integer, default = 1000. How many times to randomly perturb dependency matrix to generate the null distributions.
-#' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' @details For a number of trials specified in (\code{ntrials}) the inputted binary dependency matrix is randomised, keeping its column marginal sums. The profiles of fitness genes across fixed number of cell lines, and corresponding cumulative sums, are returned for each random perturbation.
-#' @return A list with the following two named vectors:
-#' \item{nullProf}{Matrix of number of fitness genes for fixed number of cell lines from. Each rows of matrix corresponds to a random trial.}
-#' \item{nullCumSum}{Matrix of profile of cumulative number of fitness genes in fixed number of cell lines. Each row of matrix is one random trial.}
-#' @author C. Pacini, E. Karakoc & F. Iorio
-#' @examples
-#' data(exampleDepMat)
-#' pprofile <- CoRe.generateNullModel(depMat = exampleDepMat,ntrials=1000)
-#' @keywords functions
-#' @export
 CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
 
     set.seed(100812)
@@ -106,42 +69,57 @@ CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
 
     return(list(nullProf=nullProf,nullCumSUM=nullCumSUM))
 }
-#___________________________________________________________________________________
-
-#' Binary matrix randomisation preserving column totals
-#'
-#' @description This function takes in input a matrix and shuffles its entries column wisely. If the matrix is binary then then matrix resulting from this shuffling will have the same column marginal totals of the inpputted one.
-#' @usage CoRe.randomisedepMat(depMat)
-#' @param depMat A numerical matrix.
-#' @return The matrix given in input with entries shuffled column wisely.
-#' @author C. Pacini, E. Karakoc & F. Iorio
-#' @examples
-#' data(exampleDepMat)
-#' rnd_exampleDepMat<-CoRe.randomisedepMat(exampleDepMat)
-#' @keywords functions
-#' @export
 CoRe.randomisedepMat<-function(depMat){
     rmat<-apply(depMat,2,sample)
 }
-#___________________________________________________________________________________
+
+## Non Documented
+#--- Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
+CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/binaryDepScores.tsv.zip'){
+  if(url.exists(URL)){
+    temp <- tempfile()
+    download.file(URL,temp)
+    X <- read.table(unz(temp,'binaryDepScores.tsv'),stringsAsFactors = FALSE,sep='\t',header=TRUE,row.names = 1)
+    colnames(X)<-str_replace_all(colnames(X),'[.]','-')
+    colnames(X)<-unlist(lapply(colnames(X),function(x){
+      if(str_sub(x,1,1)=='X'){
+        x<-str_replace(x,'X','')
+      }else{
+        x
+      }
+    }))
+  }else{
+    X <- NULL
+  }
+  return(X)
+}
+
+#--- Extracting Binary Dependency SubMatrix for a given tissue or cancer type, among those included
+#--- in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
+CoRe.extract_tissueType_BinDepMatrix<-function(fullBinDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
+  cmp<-read_csv('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
+  cls<-cmp$model_name[which(cmp$tissue==tissue_type | cmp$cancer_type==tissue_type)]
+  cls<-intersect(cls,colnames(fullBinDepMat))
+  return(fullBinDepMat[,cls])
+}
+
+#--- Empirical odds of number of fitness genes per number of cell lines
+CoRe.empiricalOdds<-function(observedCumSum,simulatedCumSum){
+  nsamples<-length(observedCumSum)
+  ntrials<-nrow(simulatedCumSum)
+  odds<-rep(NA,1,nsamples)
+  names(odds)<-paste('≥',1:nsamples,sep='')
+  for (i in 1:nsamples){
+    PDF<-density(simulatedCumSum[,i])
+    odds[i]<- log10(observedCumSum[i]/mean(simulatedCumSum[,i]))
+  }
+  return(odds)
+}
 
 
-#'
-#' #' Set reference set of predefined essential genes
-#' #'
-#' #' @description This function takes in input a filename that contains the predefined essential sets that are used for calculating true positive rates
-#' #' @usage ADAM2.setEssentialGenes(reffile)
-#' #' @param reffile A text file that contains a gene name per line. These genes are predefined essential genes.
-#' #' @return vector of predefined reference genes that can be used in ADAM.truePositiveRate function
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.setEssentialGenes<-function(reffile){
-#'   essentialGenes <- read.table(file=reffile,header=FALSE)
-#' }
-#'
-#'
-#' #' Empirical odds of number of fitness genes per number of cell lines
+
+
+
 #' #'
 #' #' @description This function calculates log10 odd ratios of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
 #' #' @usage ADAM2.empiricalOdds(observedCumSum,
@@ -160,23 +138,24 @@ CoRe.randomisedepMat<-function(depMat){
 #' #' @seealso ADAM2.panessprofile, ADAM2.generateNullModel
 #' #' @keywords functions
 #' #' @export
-#' ADAM2.empiricalOdds<-function(observedCumSum,simulatedCumSum){
+
+
 #'
-#'     nsamples<-length(observedCumSum)
-#'     ntrials<-nrow(simulatedCumSum)
-#'
-#'     odds<-rep(NA,1,nsamples)
-#'     names(odds)<-paste('≥',1:nsamples,sep='')
-#'     for (i in 1:nsamples){
-#'
-#'         PDF<-density(simulatedCumSum[,i])
-#'
-#'
-#'         odds[i]<- log10(observedCumSum[i]/mean(simulatedCumSum[,i]))
-#'
-#'     }
-#'     return(odds)
+#' #' Set reference set of predefined essential genes
+#' #'
+#' #' @description This function takes in input a filename that contains the predefined essential sets that are used for calculating true positive rates
+#' #' @usage ADAM2.setEssentialGenes(reffile)
+#' #' @param reffile A text file that contains a gene name per line. These genes are predefined essential genes.
+#' #' @return vector of predefined reference genes that can be used in ADAM.truePositiveRate function
+#' #' @author C. Pacini, E. Karakoc & F. Iorio
+#' #' @keywords functions
+#' #' @export
+#' ADAM2.setEssentialGenes<-function(reffile){
+#'   essentialGenes <- read.table(file=reffile,header=FALSE)
 #' }
+#'
+#'
+
 #'
 #'
 #' #' Profile of True Positive Rates

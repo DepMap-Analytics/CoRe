@@ -25,8 +25,20 @@ This function randomly perturbs the binary dependency matrix to generate a null 
 For a number of trials specified in (\code{ntrials}) the inputted binary dependency matrix is randomised, keeping its column marginal sums. The profiles of fitness genes across fixed number of cell lines, and corresponding cumulative sums, are returned for each random perturbation.
 }
 \examples{
-data(exampleDepMat)
-pprofile <- CoRe.generateNullModel(depMat = exampleDepMat)
+## Downloading dependency matrix
+## for > 300 cancer cell lines from [1]
+BinDepMat<-CoRe.download_BinaryDepMatrix()
+
+## Extracting dependency submatrix for
+## Non-Small Cell Lung Carcinoma cell lines only
+LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
+
+## Simulating Null model for the number of fitness genes
+## across numbers of cell lines and their cumulative sums
+pprofile <- CoRe.generateNullModel(depMat = LungDepMap)
+}
+\references{
+[1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
 }
 \author{
 C. Pacini, E. Karakoc & F. Iorio
