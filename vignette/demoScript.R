@@ -16,14 +16,16 @@ pprofile<-CoRe.panessprofile(depMat=LungDepMap)
 # cumulative sums by perturbing observed data.
 nullmodel<-CoRe.generateNullModel(depMat=LungDepMap,ntrials = 1000)
 
-#load a reference set of essential genes
-data(BAGEL_essential)
-
 # Calculate log10 odd ratios of observed/expected profiles of cumulative number of fitness genes in fixed number of cell lines
 EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,
                        simulatedCumSum =nullmodel$nullCumSUM)
 
+#load a reference set of essential genes
+data(BAGEL_essential)
 
+# Calculate True positive rates for fitness genes in at least n cell lines in the observed dependency matrix,
+# with positive cases from a reference set of essential genes
+TPR<-ADAM.truePositiveRate(exampleDepMat,curated_BAGEL_essential)
 
 
 ############################################################################################################

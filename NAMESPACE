@@ -11,6 +11,7 @@ export(CoRe.panessprofile)
 export(CoRe.generateNullModel)
 export(CoRe.randomisedepMat)
 export(CoRe.empiricalOdds)
+export(CoRe.truePositiveRate)
 
 #export(CoRe.setEssentialGenes)
 #export(CoRe.tradeoffEO_TPR)
