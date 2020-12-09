@@ -1,6 +1,6 @@
 library(CRISPRcleanR)
 
-## Downloading dependency matrix
+## Downloading binary dependency matrix
 ## for > 300 cancer cell lines from Project Score [1]
 BinDepMat<-CoRe.download_BinaryDepMatrix()
 
