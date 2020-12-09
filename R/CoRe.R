@@ -161,11 +161,11 @@ CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
 CoRe.AdAM<-function(depMat,display=TRUE,
                                  main_suffix='fitness genes in at least 1 cell line',
                                  xlab='n. dependent cell lines',
-                                 ntrials=1000,verbose=TRUE){
+                                 ntrials=1000,verbose=TRUE,TruePositives){
 
      if(verbose){
      print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')}
-     pprofile<-CoRe.panessprofile(depMat=depMat,display = display)
+     pprofile<-CoRe.panessprofile(depMat=depMat,display = display,xlab = xlab,main_suffix = main_suffix)
      if(verbose){print('+ Done!')
      print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')}
      nullmodel<-CoRe.generateNullModel(depMat=depMat,ntrials = ntrials,verbose = verbose,display = display)
@@ -174,7 +174,7 @@ CoRe.AdAM<-function(depMat,display=TRUE,
      EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM)
      if(verbose){print('+ Done')
      print('- Profiling true positive rates')}
-     TPR<-CoRe.truePositiveRate(depMat,BAGEL_essential)
+     TPR<-CoRe.truePositiveRate(depMat,TruePositives)
      if(verbose){print('- Done!')
      print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
      crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
@@ -224,7 +224,7 @@ CoRe.CS_AdAM<-function(pancan_depMat,
                        display=TRUE,
                        main_suffix='fitness genes in at least 1 cell line',
                        xlab='n. dependent cell lines',
-                       ntrials=1000,verbose=TRUE){
+                       ntrials=1000,verbose=TRUE,TruePositives){
 
   cls<-clannotation$model_name[clannotation$tissue==tissue_ctype | clannotation$cancer_type==tissue_ctype]
   cls<-intersect(colnames(pancan_depMat),cls)
@@ -234,8 +234,43 @@ CoRe.CS_AdAM<-function(pancan_depMat,
                    main_suffix = main_suffix,
                    xlab=xlab,
                    ntrials=ntrials,
-                   verbose=verbose))
+                   verbose=verbose,TruePositives = TruePositives))
 }
+
+#--- Execute AdAM on tissue or cancer type specifc dependency submatrix
+CoRe.PanCancer_AdAM<-function(pancan_depMat,
+                              tissues_ctypes,
+                              clannotation = NULL,
+                              display=TRUE,
+                              ntrials=1000,verbose=TRUE,TruePositives){
+
+
+  systematic_CS_AdAM_res<-lapply(tissues_ctypes,function(x){
+      if(display){
+        print(paste('Running AdAM for',x))
+      }
+      CoRe.CS_AdAM(pancan_depMat,tissue_ctype = x,
+                   clannotation,display = display,
+                   ntrials = ntrials,
+                   verbose=verbose,TruePositives = TruePositives)
+    })
+
+  all_TS_CF_genes<-sort(unique(unlist(systematic_CS_AdAM_res)))
+
+  TS_CF_matrix<-
+    do.call(cbind,lapply(systematic_CS_AdAM_res,function(x){is.element(all_TS_CF_genes,x)+0}))
+
+  rownames(TS_CF_matrix)<-all_TS_CF_genes
+  colnames(TS_CF_matrix)<-tissues_ctypes
+
+  CoRe.AdAM(depMat = TS_CF_matrix,
+            main_suffix = 'genes predicted to be core fitness for at least 1 tissue/cancer-type',
+            xlab = 'n. tissue/cancer-type',verbose = FALSE,TruePositives = TruePositives)
+
+
+}
+
+
 
 
 #'
