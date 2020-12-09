@@ -25,20 +25,27 @@ data(BAGEL_essential)
 
 # Calculate True positive rates for fitness genes in at least n cell lines in the observed dependency matrix,
 # with positive cases from a reference set of essential genes
-TPR<-ADAM.truePositiveRate(exampleDepMat,curated_BAGEL_essential)
-
-
-############################################################################################################
-
-
-# Calculate True positive rates for fitness genes in at least n cell lines in the observed dependency matrix,
-# with positive cases from a reference set of essential genes
-TPR<-ADAM.truePositiveRate(exampleDepMat,curated_BAGEL_essential)
-
+TPR<-CoRe.truePositiveRate(LungDepMap,BAGEL_essential)
 
 # Calculate minimum number of cell lines a gene needs to be a fitness gene in order to be considered
 # as a core-fitness gene
-crossoverpoint<-ADAM.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential')
+crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'BAGEL essential')
 
 #coreFitnessGenes is the list of genes predicted as core-fitness by AdAM.
-coreFitnessGenes<-rownames(exampleDepMat)[rowSums(exampleDepMat)>=crossoverpoint]
+coreFitnessGenes<-CoRe.coreFitnessGenes(LungDepMap,crossoverpoint)
+
+#======================================================================
+#Reperform all the analyses but with a single call to the AdAM wrapper
+coreFitnessGenes<-CoRe.AdAM(LungDepMap)
+
+#======================================================================
+#Reperform all the analyses but on different tissues/cancer-types
+clannotation<-CELLector.CMPs_getModelAnnotation()
+
+SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',clannotation)
+BRCA_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Breast',clannotation)
+CRC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Large Intestine',clannotation)
+
+
+
+
