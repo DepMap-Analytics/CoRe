@@ -31,17 +31,18 @@ CoRe.panessprofile<-function(depMat,display=TRUE,
     }
     return(list(panessprof=panessprof,CUMsums=CUMsums))
 }
-CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
+CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE,verbose=TRUE){
 
     set.seed(100812)
     depMat<-depMat[which(rowSums(depMat)>0),]
     nullProf<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,1:ncol(depMat)))
     nullCumSUM<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,paste('≥',1:ncol(depMat),sep='')))
-    print('Generating null model...')
-    pb <- txtProgressBar(min=1,max=ntrials,style=3)
-
+    if(verbose){
+      print('Generating null model...')
+      pb <- txtProgressBar(min=1,max=ntrials,style=3)
+    }
     for (i in 1:ntrials){
-        setTxtProgressBar(pb, i)
+      if(verbose){setTxtProgressBar(pb, i)}
         rMat<-
             CoRe.randomisedepMat(depMat)
         Ret<-
@@ -49,10 +50,12 @@ CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE){
         nullProf[i,]<-Ret$panessprof
         nullCumSUM[i,]<-Ret$CUMsums
     }
-    Sys.sleep(1)
-    close(pb)
-    print('')
-    print('Done')
+    if(verbose){
+      Sys.sleep(1)
+      close(pb)
+      print('')
+      print('Done')
+    }
 
     if (display){
 
@@ -83,6 +86,106 @@ CoRe.empiricalOdds<-function(observedCumSum,simulatedCumSum){
   }
   return(odds)
 }
+CoRe.truePositiveRate<-function(depMat,essentialGeneSet){
+  nsamples<-ncol(depMat)
+
+  essentialGeneSet<-intersect(essentialGeneSet,rownames(depMat))
+
+  TPR<-rep(NA,1,nsamples)
+  names(TPR)<-paste('≥',1:nsamples,sep='')
+
+  ncells<-rowSums(depMat)
+
+  TP<-rep(NA,1,nsamples)
+  names(TP)<-paste('≥',1:nsamples,sep='')
+
+  P<-rep(NA,1,nsamples)
+  names(P)<-paste('≥',1:nsamples,sep='')
+
+  for (i in nsamples:1){
+    positiveSet<-names(which(ncells>=i))
+    P[i]<-length(positiveSet)
+    truepositives<-intersect(positiveSet,essentialGeneSet)
+    TP[i]<-length(truepositives)
+    TPR[i]<-TP[i]/length(essentialGeneSet)
+  }
+
+  return(list(P=P,TP=TP,TPR=TPR))
+}
+CoRe.tradeoffEO_TPR<-function(EO,TPR,test_set_name,display=TRUE){
+  x<-EO
+  x[x==Inf]<-max(x[x<Inf])
+  x<-(x-min(x))/(max(x)-min(x))
+
+  y<-TPR
+  y<-(y-min(y))/(max(y)-min(y))
+
+  orEO<-EO
+  orEO[orEO==Inf]<-max(orEO[orEO<Inf])
+  orTPR<-TPR
+
+  EO<-x
+  TPR<-y
+  point<-min(which(!y>x))
+
+  if(display){
+    CCOL<-'red'
+    par(mar=c(4,4,4,4))
+    par(mfrow=c(1,1))
+    MAIN<-c('log10 (obs/Expct) n.genes [red, left]',
+            paste('% covered ',test_set_name,' [blue, right]',sep=''))
+    plot(EO,type='l',xlab='genes depleted in >= # cell lines',ylab='',axes=FALSE,lwd=4,main=MAIN,col=CCOL,cex.main=0.8,
+         xlim=c(0,length(EO)))
+    axis(2,at = seq(0,1,0.2),format(seq(min(orEO),max(orEO),(max(orEO)-min(orEO))/5),digits=2))
+    axis(1)
+    par(new=TRUE)
+    plot(TPR,type='l',xlab='',ylab='',axes=FALSE,lwd=4,col='blue',ylim=c(0,1),xlim=c(0,length(EO)))
+    axis(4,at = seq(0,1,0.2),format(seq(min(orTPR),max(orTPR),(max(orTPR)-min(orTPR))/5),digits=2))
+
+
+
+    abline(v=point)
+    abline(h=y[point],lty=2)
+
+    points(point,y[point],pch=16,cex=2)
+
+    legend('top',paste(format(100*orTPR[point],digits=2),'% covered',sep=''),bg = NULL,bty = 'n')
+  }
+
+  return(point)
+}
+CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
+  coreFitnessGenes<-rownames(depMat)[rowSums(depMat)>=crossoverpoint]
+  return (coreFitnessGenes)
+}
+CoRe.AdAM<-function(depMat,display=TRUE,
+                                 main_suffix='fitness genes in at least 1 cell line',
+                                 xlab='n. dependent cell lines',
+                                 ntrials=1000,verbose=TRUE){
+
+     if(verbose){
+     print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')}
+     pprofile<-CoRe.panessprofile(depMat=depMat,display = display)
+     if(verbose){print('+ Done!')
+     print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')}
+     nullmodel<-CoRe.generateNullModel(depMat=depMat,ntrials = ntrials,verbose = verbose,display = display)
+     if(verbose){print('+ Done!')
+     print('- Computing empirical odds of numbers of fitness genes per number of cell lines')}
+     EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM)
+     if(verbose){print('+ Done')
+     print('- Profiling true positive rates')}
+     TPR<-CoRe.truePositiveRate(depMat,BAGEL_essential)
+     if(verbose){print('- Done!')
+     print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
+     crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
+     if(verbose){print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
+     print('- Done!')
+     print('+ Estimating set of core fitness genes')}
+     coreFitnessGenes<-CoRe.coreFitnessGenes(depMat,crossoverpoint)
+     if(verbose){print('- Done!')}
+     return (coreFitnessGenes)
+     }
+
 
 ## Non Documented
 #--- Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
@@ -114,198 +217,27 @@ CoRe.extract_tissueType_BinDepMatrix<-function(fullBinDepMat,tissue_type="Non-Sm
   return(fullBinDepMat[,cls])
 }
 
-#'
-#'
-#' #' Profile of True Positive Rates
-#' #'
-#' #' @description This function calculates a profile of True Positive Rates for fitness genes in at least n cell lines, with positive cases from a reference set of essential genes.
-#' #' @usage ADAM2.truePositiveRate(depMat,
-#' #'                       essentialGeneSet)
-#' #' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' #' @param essentialGeneSet Reference set of predefined essential genes. This is used to define positive cases.
-#' #' @details This function calculates true positive rates for fitness genes in at least n cell lines (for each n). First, this function calculates the number of cell lines each gene is a fitness gene. Second, for a given number of cell lines, the set of genes that are fitness genes in at least that number of cell lines is determined. Finally, this set of genes is then compared to the reference set of essential genes to calculate a true positive rate.
-#' #' @return A list of the following vectors:
-#' #' \item{P}{Vector of number of genes that are depleted for a number of cell lines.}
-#' #' \item{TP}{Vector of number of genes in sets of P are true positives, i.e. in the essentialGeneSet.}
-#' #' \item{TPR}{TP divided by number of genes in set essentialGeneSet to give the true positive rate.}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleDepMat)
-#' #' pprofile<-ADAM2.panessprofile(depMat=exampleDepMat)
-#' #' nullmodel<-ADAM2.generateNullModel(depMat=exampleDepMat,ntrials = 1000)
-#' #' data(curated_BAGEL_essential)
-#' #' EO<-ADAM2.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM )
-#' #' TPR<-ADAM2.truePositiveRate(exampleDepMat,curated_BAGEL_essential)
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.truePositiveRate<-function(depMat,essentialGeneSet){
-#'     nsamples<-ncol(depMat)
-#'
-#'     essentialGeneSet<-intersect(essentialGeneSet,rownames(depMat))
-#'
-#'     TPR<-rep(NA,1,nsamples)
-#'     names(TPR)<-paste('≥',1:nsamples,sep='')
-#'
-#'     ncells<-rowSums(depMat)
-#'
-#'     TP<-rep(NA,1,nsamples)
-#'     names(TP)<-paste('≥',1:nsamples,sep='')
-#'
-#'     P<-rep(NA,1,nsamples)
-#'     names(P)<-paste('≥',1:nsamples,sep='')
-#'
-#'     for (i in nsamples:1){
-#'         positiveSet<-names(which(ncells>=i))
-#'         P[i]<-length(positiveSet)
-#'         truepositives<-intersect(positiveSet,essentialGeneSet)
-#'         TP[i]<-length(truepositives)
-#'         TPR[i]<-TP[i]/length(essentialGeneSet)
-#'     }
-#'
-#'     return(list(P=P,TP=TP,TPR=TPR))
-#' }
-#'
-#'
-#' #' Calculate ADAM model threshold
-#' #'
-#' #' @description This function finds the minimum number of cell lines in which a gene needs to be fitness in order to be called core-fitness. This is defined as the \emph{n} providing the best trade-off between i) coverage of priori-known essential genes in the resulting set of predicted core-fitness genes, i.e. fitness in at least \emph{n} cell lines, and ii) deviance from expectation of the number of fitness genes in \emph{n} cell lines.
-#' #' @usage ADAM2.tradeoffEO_TPR(EO,
-#' #'                     TPR,
-#' #'                     test_set_name)
-#' #' @param EO Profile of empirical odds values. Computed with the \code{ADAM2.empiricalOdds} function.
-#' #' @param TPR Profile of True positive rates for across number of cell line. Computed with the \code{ADAM2.truePositiveRate} function.
-#' #' @param test_set_name Name to give to the analysis, used for plotting titles.
-#' #' @details Compare and plot the log10 odds ratios with the true positive rates to find the cross over point where the true positive rate falls below the odds ratio.
-#' #' @return ADAM model threshold:
-#' #' \item{point}{Number of cell lines for which a gene needs to be a fitness gene in order to be predicted as core-fitness gene.}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @seealso \code{\link{ADAM2.empiricalOdds}},
-#' #' \code{\link{ADAM2.truePositiveRate}}
-#' #' @examples
-#' #' #load in example binary depletion matrix
-#' #' data(exampleDepMat)
-#' #'
-#' #' # Generate the profiles of number of fitness genes across number of cell lines from
-#' #' # observed data and corresponding comulative sums.
-#' #' pprofile<-ADAM2.panessprofile(depMat=exampleDepMat)
-#' #'
-#' #' # Generate a set of random profiles of number of genes depleted for a number of cell lines
-#' #' # and corresponding cumulative sums by perturbing observed data.
-#' #' nullmodel<-ADAM2.generateNullModel(depMat=exampleDepMat,ntrials = 1000)
-#' #'
-#' #' #load a reference set of essential genes
-#' #' data(curated_BAGEL_essential)
-#' #'
-#' #' # Calculate log10 odd ratios of observed/expected profiles of cumulative number of fitness
-#' #' # genes in fixed number of cell lines.
-#' #' # Observed values are from the ADAM.panessprofile function and expected are the average of
-#' #' # random set from ADAM2.generateNullModel
-#' #' EO<-ADAM2.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM )
-#' #'
-#' #' # Calculate True positive rates for fitness genes in at least n cell lines in the observed
-#' #' # dependency matrix, with positive cases from a reference set of essential genes
-#' #' TPR<-ADAM2.truePositiveRate(exampleDepMat,curated_BAGEL_essential)
-#' #'
-#' #' # Calculate minimum number of cell lines a gene needs to be a fitness gene in order to
-#' #' # be considered as a core-fitness gene
-#' #' crossoverpoint<-ADAM2.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential')
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.tradeoffEO_TPR<-function(EO,TPR,test_set_name){
-#'
-#'     CCOL<-'red'
-#'
-#'     x<-EO
-#'     x[x==Inf]<-max(x[x<Inf])
-#'     x<-(x-min(x))/(max(x)-min(x))
-#'
-#'     y<-TPR
-#'     y<-(y-min(y))/(max(y)-min(y))
-#'
-#'     orEO<-EO
-#'     orEO[orEO==Inf]<-max(orEO[orEO<Inf])
-#'     orTPR<-TPR
-#'
-#'     EO<-x
-#'     TPR<-y
-#'     par(mar=c(4,4,4,4))
-#'     MAIN<-c('log10 (obs/Expct) n.genes [red, left]',
-#'             paste('% covered ',test_set_name,' [blue, right]',sep=''))
-#'     plot(EO,type='l',xlab='genes depleted in >= # cell lines',ylab='',axes=FALSE,lwd=4,main=MAIN,col=CCOL,cex.main=0.8,
-#'          xlim=c(0,length(EO)))
-#'     axis(2,at = seq(0,1,0.2),format(seq(min(orEO),max(orEO),(max(orEO)-min(orEO))/5),digits=2))
-#'     axis(1)
-#'     par(new=TRUE)
-#'     plot(TPR,type='l',xlab='',ylab='',axes=FALSE,lwd=4,col='blue',ylim=c(0,1),xlim=c(0,length(EO)))
-#'     axis(4,at = seq(0,1,0.2),format(seq(min(orTPR),max(orTPR),(max(orTPR)-min(orTPR))/5),digits=2))
-#'
-#'
-#'     point<-min(which(!y>x))
-#'
-#'     abline(v=point)
-#'     abline(h=y[point],lty=2)
-#'
-#'     points(point,y[point],pch=16,cex=2)
-#'
-#'     legend('top',paste(format(100*orTPR[point],digits=2),'% covered',sep=''),bg = NULL,bty = 'n')
-#'
-#'     return(point)
-#' }
-#'
-#'
-#' #' Calculate the Core Fitness genes, starting from the binary dependency matrix.
-#' #'
-#' #' @description This function identifies the Core Fitness genes using the Adaptive Daisy Model (implemented ADAM) starting from a binary dependency matrix.
-#' #' @usage ADAM2.coreFitnessGenesWrapper(depMat,
-#' #'                       display=TRUE,
-#' #'                       main_suffix='fitness genes in at least 1 cell line',
-#' #'                       xlab='n. dependent cell lines',
-#' #'                       ntrials=1000)
-#' #' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' #' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' #' @param main_suffix If display=TRUE, title suffix to give to plot of number of genes depleted in a give number of cell lines, default is 'genes depleted in at least 1 cell line'
-#' #' @param xlab label to give to x-axis of the plots, default is 'n. cell lines'
-#' #' @param ntrials Integer, default =1000. How many times to randomly perturb dependency matrix to generate the null distributions.
-#' #' @details This function calculates the Core Fitness essential genes based on the calculated minimum number of cell lines that optimizes the True positive rates with log10 odds ratios. log10 odd ratios are calculated of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
-#' #' @return A vector that containing the Core Fitness Genes:
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleDepMat)
-#' #' cfgenes <- ADAM2.coreFitnessGenesWrapper(depMat=exampleDepMat,ntrials=1000)
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.coreFitnessGenesWrapper<-function(depMat,display=TRUE,
-#'                                 main_suffix='fitness genes in at least 1 cell line',
-#'                                 xlab='n. dependent cell lines',
-#'                                 ntrials=1000){
-#'     pprofile<-ADAM2.panessprofile(depMat=depMat)
-#'     nullmodel<-ADAM2.generateNullModel(depMat=depMat,ntrials = ntrials)
-#'     EO<-ADAM2.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM )
-#'     TPR<-ADAM2.truePositiveRate(depMat,curated_BAGEL_essential)
-#'     crossoverpoint<-ADAM2.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential')
-#'     coreFitnessGenes<-rownames(exampleDepMat)[rowSums(exampleDepMat)>=crossoverpoint]
-#'     return (coreFitnessGenes)
-#' }
-#'
-#' #' Calculate the Core Fitness genes given the binary dependency matrix and the minimal number of cell line threshold.
-#' #'
-#' #' @description This function identifies the Core Fitness genes using the Adaptive Daisy Model (implemented ADAM) starting from a binary dependency matrix.
-#' #' @usage ADAM2.coreFitnessGenes(depMat,
-#' #'                               crossoverpoint)
-#' #' @param depMat Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.
-#' #' @param crossoverpoint minimum number of cell lines in which a gene needs to be fitness in order to be called core-fitness
-#' #' @details This function calculates the Core Fitness essential genes based on the calculated minimum number of cell lines that optimizes the True positive rates with log10 odds ratios. log10 odd ratios are calculated of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
-#' #' @return A vector that containing the Core Fitness Genes:
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleDepMat)
-#' #' cfgenes <- ADAM2.coreFitnessGenes(depMat=exampleDepMat,crossoverpoint=3800)
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.coreFitnessGenes<-function(depMat,crossoverpoint){
-#'   coreFitnessGenes<-rownames(depMat)[rowSums(depMat)>=crossoverpoint]
-#'   return (coreFitnessGenes)
-#' }
+#--- Execute AdAM on tissue or cancer type specifc dependency submatrix
+CoRe.CS_AdAM<-function(pancan_depMat,
+                       tissue_ctype = 'Non-Small Cell Lung Carcinoma',
+                       clannotation = NULL,
+                       display=TRUE,
+                       main_suffix='fitness genes in at least 1 cell line',
+                       xlab='n. dependent cell lines',
+                       ntrials=1000,verbose=TRUE){
+
+  cls<-clannotation$model_name[clannotation$tissue==tissue_ctype | clannotation$cancer_type==tissue_ctype]
+  cls<-intersect(colnames(pancan_depMat),cls)
+  cs_depmat<-pancan_depMat[,cls]
+
+  return(CoRe.AdAM(cs_depmat,display=display,
+                   main_suffix = main_suffix,
+                   xlab=xlab,
+                   ntrials=ntrials,
+                   verbose=verbose))
+}
+
+
 #'
 #' #' Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from Quantative knockout screen dependency matrix.
 #' #'

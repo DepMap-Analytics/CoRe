@@ -2,8 +2,7 @@
 #export(CoRe.PercentileAverageCF)
 #export(CoRe.PercentileCF)
 #export(CoRe.SlopeCF)
-#export(CoRe.coreFitnessGenes)
-#export(CoRe.coreFitnessGenesWrapper)
+
 
 export(CoRe.download_BinaryDepMatrix)
 export(CoRe.extract_tissueType_BinDepMatrix)
@@ -12,10 +11,12 @@ export(CoRe.generateNullModel)
 export(CoRe.randomisedepMat)
 export(CoRe.empiricalOdds)
 export(CoRe.truePositiveRate)
+export(CoRe.tradeoffEO_TPR)
+export(CoRe.coreFitnessGenes)
+export(CoRe.AdAM)
+export(CoRe.CS_AdAM)
 
-#export(CoRe.setEssentialGenes)
-#export(CoRe.tradeoffEO_TPR)
-#export(CoRe.truePositiveRate)
+
 
 import(mixdist)
 importFrom("stringr","str_replace_all","str_replace","str_sub")

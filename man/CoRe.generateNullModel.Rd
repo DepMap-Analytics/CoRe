@@ -4,7 +4,8 @@
 \usage{
 CoRe.generateNullModel(depMat,
                        ntrials=1000,
-                       display=TRUE)
+                       display=TRUE,
+                       verbose=TRUE)
 }
 \arguments{
 \item{depMat}{Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.}
@@ -12,6 +13,7 @@ CoRe.generateNullModel(depMat,
 \item{ntrials}{Integer, default = 1000. How many times to randomly perturb dependency matrix to generate the null distributions.}
 
 \item{display}{Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted}
+\item{verbose}{Boolean, default is TRUE. Should a progress bar be displayed}
 }
 \value{
 A list with the following two named vectors:
