@@ -54,6 +54,8 @@ CRC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Large Intestine',clannotati
 
 ## Downloading binary dependency matrix
 ## for > 300 cancer cell lines from Project Score [1]
+library(CELLector)
+
 BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 tissues_ctypes<-c("Haematopoietic and Lymphoid",
@@ -70,13 +72,14 @@ tissues_ctypes<-c("Haematopoietic and Lymphoid",
                   "Stomach",
                   "Breast")
 
-clannotation<-CELLector.CMPs_getModelAnnotation()
+clannotation<-
+  CELLector.CMPs_getModelAnnotation('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
 
-data(BAGEL_essential)
+data(curated_BAGEL_essential)
 PanCacer_CF_genes<-
   CoRe.PanCancer_AdAM(pancan_depMat = BinDepMat,
                       tissues_ctypes = tissues_ctypes,
-                      clannotation = clannotation,TruePositives = BAGEL_essential)
+                      clannotation = clannotation,TruePositives = curated_BAGEL_essential,display = FALSE)
 
 
 
