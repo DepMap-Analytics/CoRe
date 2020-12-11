@@ -76,34 +76,39 @@ clannotation<-
   CELLector.CMPs_getModelAnnotation('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
 
 data(curated_BAGEL_essential)
-PanCacer_CF_genes<-
+PanCancer_CF_genes<-
   CoRe.PanCancer_AdAM(pancan_depMat = BinDepMat,
                       tissues_ctypes = tissues_ctypes,
                       clannotation = clannotation,
                       TruePositives = curated_BAGEL_essential,
                       display = FALSE)
 
-RES<-systematic_CS_AdAM_res<-lapply(tissues_ctypes[8],function(x){
-  cls<-clannotation$model_name[clannotation$tissue==x | clannotation$cancer_type==x]
-  cls<-intersect(colnames(pancan_depMat),cls)
-  cs_depmat<-pancan_depMat[,cls]
+#======================================================================
+# Benchmarking the identified PanCancer Core fitness genes against
+# prior known essential genes
 
-  res<-lapply(10:length(cls),function(x){
-    print(x)
-    do.call(rbind,lapply(1:100,function(y){
-      print(y)
-      ss<-sample(cls,x)
-      CFs<-CoRe.AdAM(cs_depmat[,ss],display = FALSE,verbose = FALSE,
-                     TruePositives = curated_BAGEL_essential)
+library(CRISPRcleanR)
+data(EssGenes.DNA_REPLICATION_cons)
+data(EssGenes.HISTONES)
+data(EssGenes.KEGG_rna_polymerase)
+data(EssGenes.PROTEASOME_cons)
+data(EssGenes.SPLICEOSOME_cons)
+data(EssGenes.ribosomalProteins)
 
-      atLeastOne<-names(which(rowSums(cs_depmat[,ss])>0))
-      CS<-length(setdiff(atLeastOne,CFs))
+signatures<-list(DNA_REPLICATION=EssGenes.DNA_REPLICATION_cons,
+                 HISTONES=EssGenes.HISTONES,
+                 RNA_POLYMERASE=EssGenes.KEGG_rna_polymerase,
+                 PROTEASOME=EssGenes.PROTEASOME_cons,
+                 SPLICEOSOME=EssGenes.SPLICEOSOME_cons,
+                 RIBOSOMAL_PROTS=EssGenes.ribosomalProteins)
 
-      return(data.frame(nCF=length(CFs),nCS=CS))
-      }))
-  })
-  CSspec<-setdiff(names(which(rowSums(cs_depmat)>0)),CFs)
-  return(list(ncls=length(cls),CFs=CFs,CSs=CSspec))
-})
+CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),priorKnownSignatures = signatures)
+
+
+
+
+
+
+
 
 

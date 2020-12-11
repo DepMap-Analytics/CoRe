@@ -237,7 +237,7 @@ CoRe.CS_AdAM<-function(pancan_depMat,
                    verbose=verbose,TruePositives = TruePositives))
 }
 
-#--- Execute AdAM on tissue or cancer type specifc dependency submatrix
+#--- Execute AdAM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
 CoRe.PanCancer_AdAM<-function(pancan_depMat,
                               tissues_ctypes,
                               clannotation = NULL,
@@ -246,7 +246,7 @@ CoRe.PanCancer_AdAM<-function(pancan_depMat,
 
 
   systematic_CS_AdAM_res<-lapply(tissues_ctypes,function(x){
-      if(display){
+      if(verbose){
         print(paste('Running AdAM for',x))
       }
       CoRe.CS_AdAM(pancan_depMat,tissue_ctype = x,
@@ -270,9 +270,79 @@ CoRe.PanCancer_AdAM<-function(pancan_depMat,
 
 }
 
+#--- Computes recall and other ROC indicators for identified core fitness genes
+#--- with respect to pre-defined signatures of essential genes
+CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures){
+
+  memb<-do.call(rbind,lapply(priorKnownSignatures,function(x){
+    is.element(testedGenes,x)
+  }))
+
+  colnames(memb)<-testedGenes
+
+  totals<-unlist(lapply(priorKnownSignatures,function(x){
+      length(intersect(x,background))
+  }))
+
+  memb<-MExMaS.HeuristicMutExSorting(memb)
+
+  pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,col=c('white','blue'),show_colnames = FALSE,
+           main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
+           width = 5,height = 3)
 
 
+  TPRs<-rowSums(memb)/totals[rownames(memb)]
 
+  x<-rowSums(memb)
+  N<-length(background)
+  n<-length(testedGenes)
+  k<-totals
+
+  ps<-phyper(x-1,n,N-n,k,lower.tail=FALSE)[rownames(memb)]
+
+  par(mfrow=c(1,2))
+  par(mar=c(5,1,0,1))
+  barplot(100*rev(TPRs),horiz = TRUE,names.arg = NA,xlab='% covered genes',border=FALSE)
+  abline(v=0)
+  abline(v=c(20,40,60,80,100),lty=2,col='gray',lwd=2)
+  ps[ps==0]<-min(ps[ps>0]/10)
+  barplot(rev(-log10(ps)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
+  abline(v=1)
+  abline(v=seq(10,200,20),lty=2,col='gray',lwd=2)
+
+  return(data.frame(Recall=TPRs,EnrichPval=ps))
+}
+
+rearrangeMatrix<-function(patterns,GENES){
+
+  remainingSamples<-colnames(patterns)
+
+  toAdd<-NULL
+
+  for (g in GENES){
+    remainingGenes<-setdiff(GENES,g)
+
+    P1<-matrix(c(patterns[g,remainingSamples]),length(g),length(remainingSamples),dimnames = list(g,remainingSamples))
+    P2<-matrix(c(patterns[remainingGenes,remainingSamples]),length(remainingGenes),length(remainingSamples),
+               dimnames=list(remainingGenes,remainingSamples))
+
+    if(length(remainingGenes)>1){
+      DD<-colnames(P1)[order(P1-colSums(P2),decreasing=TRUE)]
+    }else{
+      DD<-colnames(P1)[order(P1-P2,decreasing=TRUE)]
+    }
+
+    toAdd<-c(toAdd,names(which(patterns[g,DD]>0)))
+    remainingSamples<-setdiff(remainingSamples,toAdd)
+    if(length(remainingSamples)==0){
+      break
+    }
+  }
+
+  toAdd<-c(toAdd,remainingSamples)
+
+  return(toAdd)
+}
 #'
 #' #' Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from Quantative knockout screen dependency matrix.
 #' #'
