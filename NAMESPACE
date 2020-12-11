@@ -16,6 +16,7 @@ export(CoRe.coreFitnessGenes)
 export(CoRe.AdAM)
 export(CoRe.CS_AdAM)
 export(CoRe.PanCancer_AdAM)
+export(CoRe.CF_Benchmark)
 
 
 
