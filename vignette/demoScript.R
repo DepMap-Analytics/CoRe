@@ -1,5 +1,9 @@
 library(CRISPRcleanR)
 library(CELLector)
+library(MutExMatSorting)
+library(pheatmap)
+library(magrittr)
+
 
 ## Downloading binary dependency matrix
 ## for > 300 cancer cell lines from Project Score [1]
@@ -7,7 +11,7 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
+LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat,tissue_type="Non-Small Cell Lung Carcinoma")
 
 # Generate the profiles of number of fitness genes across number of cell lines from observed data and
 # corresponding comulative sums.
@@ -22,11 +26,11 @@ EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,
                        simulatedCumSum =nullmodel$nullCumSUM)
 
 #load a reference set of essential genes
-data(BAGEL_essential)
+data(curated_BAGEL_essential)
 
 # Calculate True positive rates for fitness genes in at least n cell lines in the observed dependency matrix,
 # with positive cases from a reference set of essential genes
-TPR<-CoRe.truePositiveRate(LungDepMap,BAGEL_essential)
+TPR<-CoRe.truePositiveRate(LungDepMap,curated_BAGEL_essential)
 
 # Calculate minimum number of cell lines a gene needs to be a fitness gene in order to be considered
 # as a core-fitness gene
@@ -43,9 +47,15 @@ coreFitnessGenes<-CoRe.AdAM(LungDepMap,TruePositives=BAGEL_essential)
 #Reperform all the analyses but on different tissues or cancer-types
 clannotation<-CELLector.CMPs_getModelAnnotation()
 
-SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',clannotation)
-BRCA_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Breast',clannotation)
-CRC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Large Intestine',clannotation)
+SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',
+                             clannotation = clannotation,
+                             TruePositives = curated_BAGEL_essential)
+BRCA_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Breast',
+                            clannotation = clannotation,
+                            TruePositives = curated_BAGEL_essential)
+CRC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Large Intestine',
+                           clannotation = clannotation,
+                           TruePositives = curated_BAGEL_essential)
 
 #======================================================================
 # Identifying pan-cancer core-fitness genes with the AdAM model, as
@@ -105,6 +115,16 @@ signatures<-list(DNA_REPLICATION=EssGenes.DNA_REPLICATION_cons,
 CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),priorKnownSignatures = signatures)
 
 
+#======================================================================
+# Percentile Method
+
+## Downloading quantitative dependency matrix
+## from Project Score [1]
+depMat<-CoRe.download_DepMatrix(scaled = FALSE)
+
+CFgenes<-CoRe.PercentileCF(depMat)
+
+CoRe.CF_Benchmark(CFgenes$cfgenes,background = rownames(BinDepMat),priorKnownSignatures = signatures)
 
 
 
