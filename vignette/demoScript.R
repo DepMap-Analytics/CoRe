@@ -3,6 +3,7 @@ library(CELLector)
 library(MutExMatSorting)
 library(pheatmap)
 library(magrittr)
+library(mixdist)
 
 
 ## Downloading binary dependency matrix
@@ -105,6 +106,8 @@ data(EssGenes.PROTEASOME_cons)
 data(EssGenes.SPLICEOSOME_cons)
 data(EssGenes.ribosomalProteins)
 
+data(BAGEL_essential)
+
 signatures<-list(DNA_REPLICATION=EssGenes.DNA_REPLICATION_cons,
                  HISTONES=EssGenes.HISTONES,
                  RNA_POLYMERASE=EssGenes.KEGG_rna_polymerase,
@@ -112,7 +115,8 @@ signatures<-list(DNA_REPLICATION=EssGenes.DNA_REPLICATION_cons,
                  SPLICEOSOME=EssGenes.SPLICEOSOME_cons,
                  RIBOSOMAL_PROTS=EssGenes.ribosomalProteins)
 
-CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),priorKnownSignatures = signatures)
+FPs<-CoRe.AssembleFPs()
+AdAMperf<-CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),priorKnownSignatures = signatures,falsePositives=FPs)
 
 
 #======================================================================
@@ -120,11 +124,157 @@ CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),priorKnown
 
 ## Downloading quantitative dependency matrix
 ## from Project Score [1]
-depMat<-CoRe.download_DepMatrix(scaled = FALSE)
+depMat<-CoRe.download_DepMatrix(scaled = TRUE)
 
-CFgenes<-CoRe.PercentileCF(depMat)
+CFgenes<-CoRe.PercentileCF(depMat,method = 'fixed',thresholding='localMin')
+CFgenesAVG<-CoRe.PercentileCF(depMat,method = 'average',thresholding='localMin')
+CFgenesSLOPE<-CoRe.PercentileCF(depMat,method = 'slope',thresholding='localMin')
 
-CoRe.CF_Benchmark(CFgenes$cfgenes,background = rownames(BinDepMat),priorKnownSignatures = signatures)
+CFgenes_BFs<-CoRe.PercentileCF(depMat,method = 'fixed',thresholding='BFs')
+CFgenesAVG_BFs<-CoRe.PercentileCF(depMat,method = 'average',thresholding='BFs')
+CFgenesSLOPE_BFs<-CoRe.PercentileCF(depMat,method = 'slope',thresholding='BFs')
+
+
+HARTperf<-CoRe.CF_Benchmark(testedGenes = BAGEL_essential,
+                              background = rownames(depMat),
+                              priorKnownSignatures = signatures,
+                              falsePositives=FPs)
+
+Perc90perf<-CoRe.CF_Benchmark(testedGenes = CFgenes$cfgenes,
+                  background = rownames(depMat),
+                  priorKnownSignatures = signatures,
+                  falsePositives=FPs)
+
+Perc90AVGperf<-CoRe.CF_Benchmark(testedGenes = CFgenesAVG$cfgenes,
+                              background = rownames(depMat),
+                              priorKnownSignatures = signatures,
+                              falsePositives=FPs)
+
+Perc90SLOPEperf<-CoRe.CF_Benchmark(testedGenes = CFgenesSLOPE$cfgenes,
+                                 background = rownames(depMat),
+                                 priorKnownSignatures = signatures,
+                                 falsePositives=FPs)
+
+Perc90_BFs_perf<-CoRe.CF_Benchmark(testedGenes = CFgenes_BFs$cfgenes,
+                              background = rownames(depMat),
+                              priorKnownSignatures = signatures,
+                              falsePositives=FPs)
+
+Perc90AVG_BFs_perf<-CoRe.CF_Benchmark(testedGenes = CFgenesAVG_BFs$cfgenes,
+                                 background = rownames(depMat),
+                                 priorKnownSignatures = signatures,
+                                 falsePositives=FPs)
+
+Perc90SLOPE_BFs_perf<-CoRe.CF_Benchmark(testedGenes = CFgenesSLOPE_BFs$cfgenes,
+                                   background = rownames(depMat),
+                                   priorKnownSignatures = signatures,
+                                   falsePositives=FPs)
+
+
+barplot(rbind(length(BAGEL_essential),
+              length(PanCancer_CF_genes),
+              length(CFgenes$cfgenes),
+              length(CFgenes_BFs$cfgenes),
+              length(CFgenesAVG$cfgenes),
+              length(CFgenesAVG_BFs$cfgenes),
+              length(CFgenesSLOPE$cfgenes),
+              length(CFgenesSLOPE_BFs$cfgenes)),
+              beside = TRUE,
+              ylab='n. genes',col=c('black',
+                                                '#D81B60',
+                                                '#1E88E5','#1EDAE5',
+                                                '#FF8A07','#FFC107',
+                                                '#004D40','#009C40'),border = FALSE)
+
+barplot(rbind(HARTperf$TPRs$Recall,
+  AdAMperf$TPRs$Recall,
+              Perc90perf$TPRs$Recall,
+              Perc90_BFs_perf$TPRs$Recall,
+              Perc90AVGperf$TPRs$Recall,
+              Perc90AVG_BFs_perf$TPRs$Recall,
+              Perc90SLOPEperf$TPRs$Recall,
+              Perc90SLOPE_BFs_perf$TPRs$Recall),beside = TRUE,ylab='Recall',
+        names.arg = names(signatures),las=2,ylim=c(0,1),col=c('black','#D81B60',
+                                                              '#1E88E5','#1EDAE5',
+                                                              '#FF8A07','#FFC107',
+                                                              '#004D40','#009C40'),border = FALSE)
+
+barplot(rbind(1-HARTperf$PPV,
+              1-AdAMperf$PPV,
+              1-Perc90perf$PPV,
+              1-Perc90_BFs_perf$PPV,
+              1-Perc90AVGperf$PPV,
+              1-Perc90AVG_BFs_perf$PPV,
+              1-Perc90SLOPEperf$PPV,
+              1-Perc90SLOPE_BFs_perf$PPV),beside = TRUE,
+        ylab='ratio of potential novel hits (1-PPV)',
+        las=2,ylim=c(0,1),col=c('black',
+          '#D81B60',
+                                '#1E88E5','#1EDAE5',
+                                '#FF8A07','#FFC107',
+                                '#004D40','#009C40'),border = FALSE)
+
+barplot(rbind(HARTperf$FPR,
+  AdAMperf$FPR,
+              Perc90perf$FPR,
+              Perc90_BFs_perf$FPR,
+              Perc90AVGperf$FPR,
+              Perc90AVG_BFs_perf$FPR,
+              Perc90SLOPEperf$FPR,
+              Perc90SLOPE_BFs_perf$FPR),beside = TRUE,
+        ylab='not expressed genes (FPR)',
+        las=2,col=c('black','#D81B60',
+                    '#1E88E5','#1EDAE5',
+                    '#FF8A07','#FFC107',
+                    '#004D40','#009C40'),border = FALSE)
+
+plot(rbind(1-HARTperf$PPV,
+           1-AdAMperf$PPV,
+            1-Perc90perf$PPV,
+            1-Perc90_BFs_perf$PPV,
+            1-Perc90AVGperf$PPV,
+            1-Perc90AVG_BFs_perf$PPV,
+            1-Perc90SLOPEperf$PPV,
+            1-Perc90SLOPE_BFs_perf$PPV),
+      rbind(HARTperf$FPR,
+            AdAMperf$FPR,
+            Perc90perf$FPR,
+            Perc90_BFs_perf$FPR,
+            Perc90AVGperf$FPR,
+            Perc90AVG_BFs_perf$FPR,
+            Perc90SLOPEperf$FPR,
+            Perc90SLOPE_BFs_perf$FPR),
+     xlab='n. potential novel hits (1 - PPV)',
+     ylab='Recall of known core fitness genes',
+     xlim=c(0,1),ylim=c(0,1))
+
+plot(rbind(1-HARTperf$PPV,
+           1-AdAMperf$PPV,
+           1-Perc90perf$PPV,
+           1-Perc90_BFs_perf$PPV,
+           1-Perc90AVGperf$PPV,
+           1-Perc90AVG_BFs_perf$PPV,
+           1-Perc90SLOPEperf$PPV,
+           1-Perc90SLOPE_BFs_perf$PPV),
+     rbind(mean(HARTperf$TPRs$Recall),
+           mean(AdAMperf$TPRs$Recall),
+           mean(Perc90perf$TPRs$Recall),
+           mean(Perc90_BFs_perf$TPRs$Recall),
+           mean(Perc90AVGperf$TPRs$Recall),
+           mean(Perc90AVG_BFs_perf$TPRs$Recall),
+           mean(Perc90SLOPEperf$TPRs$Recall),
+           mean(Perc90SLOPE_BFs_perf$TPRs$Recall)),
+     xlab='n. potential novel hits (1 - PPV)',
+     ylab='Recall of known core fitness genes',
+     xlim=c(0,1),ylim=c(0,1))
+
+abline(0,1)
+
+
+
+
+
+
 
 
 

@@ -255,7 +255,7 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 
 ## Non Documented
 #--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
-CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip', scaled=TRUE){
+CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip', scaled=FALSE){
   if(url.exists(URL)){
     dir.create(tmp <- tempfile())
     dir.create(file.path(tmp, "mydir"))
@@ -362,7 +362,10 @@ CoRe.PanCancer_AdAM<-function(pancan_depMat,
 
 #--- Computes recall and other ROC indicators for identified core fitness genes
 #--- with respect to pre-defined signatures of essential genes
-CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures){
+CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePositives,displayBar=FALSE){
+
+  priorKnownSignatures<-lapply(priorKnownSignatures,function(x){intersect(x,background)})
+  falsePositives<-intersect(falsePositives,background)
 
   memb<-do.call(rbind,lapply(priorKnownSignatures,function(x){
     is.element(testedGenes,x)
@@ -390,299 +393,170 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures){
 
   ps<-phyper(x-1,n,N-n,k,lower.tail=FALSE)[rownames(memb)]
 
-  par(mfrow=c(1,2))
-  par(mar=c(5,1,0,1))
-  barplot(100*rev(TPRs),horiz = TRUE,names.arg = NA,xlab='% covered genes',border=FALSE)
-  abline(v=0)
-  abline(v=c(20,40,60,80,100),lty=2,col='gray',lwd=2)
-  ps[ps==0]<-min(ps[ps>0]/10)
-  barplot(rev(-log10(ps)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
-  abline(v=1)
-  abline(v=seq(10,200,20),lty=2,col='gray',lwd=2)
+  if(displayBar){
+    par(mfrow=c(1,2))
+    par(mar=c(5,1,0,1))
+    barplot(100*rev(TPRs),horiz = TRUE,names.arg = NA,xlab='% covered genes',border=FALSE)
+    abline(v=0)
+    abline(v=c(20,40,60,80,100),lty=2,col='gray',lwd=2)
+    ps[ps==0]<-min(ps[ps>0]/10)
+    barplot(rev(-log10(ps+10)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
+    abline(v=1)
+    abline(v=seq(10,200,20),lty=2,col='gray',lwd=2)
+  }
 
-  return(data.frame(Recall=TPRs,EnrichPval=ps))
+
+  FPR<-length(intersect(falsePositives,testedGenes))/length(falsePositives)
+  PPV<-length(intersect(testedGenes,unlist(priorKnownSignatures)))/length(testedGenes)
+
+  TPRs<-TPRs[order(names(TPRs))]
+  ps<-ps[order(names(ps))]
+
+  return(list(TPRs=data.frame(Recall=TPRs,EnrichPval=ps),PPV=PPV,FPR=FPR))
 }
 
 #--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
 #--- Quantative knockout screen dependency matrix.
-CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='Fixed'){
+CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',thresholding='localMin'){
 
   depMat<-as.matrix(depMat)
 
-  rankCL<-t(apply(depMat,1,function(x){sx<-sort(x)
-                                       x<-match(x,sx)}))
+  rankCL<-t(apply(depMat,1,function(x){sx<-order(x)
+                                       x<-match(1:length(x),sx)}))
+
   rownames(rankCL)<- rownames(depMat)
   colnames(rankCL)<- colnames(depMat)
 
-  rankG<-apply(depMat,2,function(x){sx<-sort(x)
-                                    x<-match(x,sx)})
+  rankG<-apply(depMat,2,function(x){sx<-order(x)
+                                    x<-match(1:length(x),sx)})
 
   rownames(rankG)<- rownames(depMat)
   colnames(rankG)<- colnames(depMat)
 
+  CLnumber<-ncol(depMat)
   threshold = as.integer(CLnumber*percentile)
 
   nG<-nrow(rankG)
+  nCL<-ncol(rankG)
 
-  LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
-  rownames(LeastDependentdf)<-rownames(rankG)
+  if(method=='fixed'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
+    Label = "Gene rank in 90th perc. least dep cell line"
+  }
 
+  if(method=='average'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){mean(rankG[x,names(which(rankCL[x,]>=threshold))])}))
+    Label = "Gene average rank in ≥ 90th perc. of least dep cell lines"
+  }
+
+  if(method=='slope'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){
+      a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
+      b<-as.data.frame(a)
+      p<-lm(a ~ seq(1:nCL) , data=b)
+      coef(p)[2]
+    }))
+    Label = "Slope of gene ranks across ranked dep cell lines"
+  }
+
+  names(LeastDependentdf)<-rownames(rankG)
   doR <- density(LeastDependentdf, bw = "nrd0")
 
   if (display){
     par(mfrow=c(2,1))
-    hist(LeastDependentdf,breaks = 100,xlab="Rank",main="Distribution of gene ranks in their 90th percentile least depleting lines")
+    hist(LeastDependentdf,breaks = 100,xlab="Rank",main=Label)
     plot(doR,main="Gaussian Kernel Density Estimation",xlab="Rank")
-  }
-  else{
-    filename<-paste0("./",prefix,".jpeg")
-    jpeg(filename, width = 8, height = 8, units = 'in', res = 600)
-    par(mfrow=c(2,1))
-    hist(LeastDependent90df$Value,breaks = 100,xlab="Rank",main="Distribution of gene ranks in their 90th percentile least depleting lines")
-    plot(doR,main="Gaussian Kernel Density Estimation",xlab="Rank")
-    dev.off()
+
   }
 
-  localmin <- which(diff(-1*sign(diff(doR$y)))==-2)+1
+  cfBFs<-CoRe.CalculateBayesianfactor(RankDistribution = LeastDependentdf,display=FALSE)
+
+  localmin <- which(diff(-1*sign(diff(doR$y)))==-2)[1]+1
   myranks<- doR$x
   rankthreshold <- as.integer(myranks[localmin])+1
 
-  cfgenes <- rownames(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
-  return(list(cfgenes=cfgenes,LeastDependent=LeastDependentdf,threshold=rankthreshold[1]))
+  if(display){
+    abline(v=rankthreshold,col='red')
+    legend('topleft',legend='Discriminative Threshold',cex=0.7,col='red',lty=1)
+  }
+
+  if(thresholding=='localMin'){
+    cfgenes <- names(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
+  }else{
+    cfgenes <- names(which(cfBFs>=10))
+  }
+
+  return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1],cfBFs=cfBFs))
 }
 
+#--- Assemble expression based false positives
+CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
+  dir.create(tmp <- tempfile())
+  dir.create(file.path(tmp, "mydir"))
+  print('Downloading zipped CCLE expression data from DepMap portal')
+  download.file(URL,file.path(tmp, "mydir","CCLE_expression.csv"))
+  print('...done')
 
+  print('Reading Expression data matrix...')
+  X <- read.csv(file.path(tmp,'mydir','CCLE_expression.csv'),
+                  stringsAsFactors = FALSE,
+                  header=TRUE,
+                  row.names = 1)
 
+  gnames<-rownames(X)
+  clnames<-colnames(X)
 
+  numdata<-as.matrix(X)
 
-#'
-#'
-#' #' Calculate the Core Fitness genes using the Average 90th-percentile least dependent cell line from Quantative knockout screen dependency matrix.
-#' #'
-#' #' @description This function identifies the Core Fitness genes from a given Quantative knockout screen dependency matrix where each row is gene and each column the cell line. The function uses all the cell lines and identifies the genes that are essential in majority of the cell lines.
-#' #' @usage ADAM2.PercentileAverageCF(depMat,
-#' #'                     display=TRUE,
-#' #'                     percentile=0.9,
-#' #'                     prefix='PercentileAverageMethod')
-#' #' @param depMat Quantative knockout screen dependency matrix where rows are genes and columns are samples. A real number in position \emph{[i,j]} represents the strength of dependency which indicates the amaount of loss of fitness in the \emph{j}-th sample in case of the inactivation of the \emph{i}-th gene. Higher strength of dependency indicates higher probability of beign a core fitness gene. These values are used for ranking the genes in terms of their dependecy strength.
-#' #' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' #' @param percentile percentage of the cell lines where the given gene should show depletion. The default value is 0.9 indicating least dependent 90th percentile cell line.
-#' #' @param prefix if the display is false the plots are generated in the working directory using the prefix.
-#' #' @details This function implements the idea that if a gene is essential then it should fall in the top Z most depleted genes in at least 90% of cell lines. Here the threshold Z is calculated in a data driven way.
-#' #' For a given gene, we can rank its gene effect score in each cell line, then arrange cell lines in order of increasing gene effect score for that gene. The average ranks of the genes in the 90th percentile of least depleted genes are calculated.
-#' #' Z is choosen as the minimum density between the two gaussian distributions that are estimated from these average rankings. All genes with average rank less than this threshold in their 90th percentile least depleted cell lines are reported.
-#' #' @return A list of the following vectors:
-#' #' \item{cfgenes}{Vector of number of genes that are core fitness genes}
-#' #' \item{LeastDependent}{A dataframe where each row corresponds to a gene.There are two columns: \emph{Value} stores the average rank of the gene at the \emph{N}-th percentile least dependent cell lines and the \emph{Gene} stores the gene name}
-#' #' \item{threshold}{The rank threshold for core fitness genes}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleSBFData)
-#' #' results <- ADAM2.PercentileAverageCF(depMat=exampleSBFData)
-#' #' cfgenes <- results$cfgenes
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.PercentileAverageCF<-function(depMat,display=TRUE,percentile=0.9,prefix='PercentileAverageMethod'){
-#'
-#'   mydata_transpose<-t(depMat)
-#'   mydata_transpose_df <- as.data.frame(mydata_transpose)
-#'   CLnames <-rownames(mydata_transpose_df)
-#'   Genenames <- colnames(mydata_transpose_df)
-#'   CLnumber <- length(CLnames)
-#'   Genenumber <- length(Genenames)
-#'
-#'   rankCL <- data.frame(matrix(nrow=Genenumber,ncol=CLnumber))
-#'   rankCL<-t(apply(-depMat,1,order))
-#'   rownames(rankCL)<-Genenames
-#'   colnames(rankCL)<-seq(1,CLnumber)
-#'
-#'   rankGene<- data.frame(matrix(nrow=CLnumber,ncol=Genenumber))
-#'   rankGene<-t(apply(-mydata_transpose_df,1,rank))
-#'   rownames(rankGene)<-CLnames
-#'   colnames(rankGene)<-Genenames
-#'
-#'   threshold = as.integer(CLnumber*percentile)
-#'   Dependentdf <- data.frame(matrix(nrow=Genenumber,ncol=2))
-#'   count=1
-#'   for (i in Genenames){
-#'     Dependentdf[count,1] <- mean(rankGene[,i][unlist(rankCL[i,threshold:CLnumber])])
-#'     Dependentdf[count,2] <- i
-#'     count=count+1
-#'   }
-#'   rownames(Dependentdf)<-Genenames
-#'   colnames(Dependentdf)<-c("Value","Gene")
-#'
-#'   doR <- density(Dependentdf$Value, bw = "nrd0")
-#'
-#'   if (display){
-#'     par(mfrow=c(2,1))
-#'     hist(Dependentdf$Value,breaks = 100,xlab="Rank",main="Distribution of gene ranks in their 90th percentile least depleting lines")
-#'     plot(doR,main="Gaussian Kernel Density Estimation",xlab="Rank")
-#'   }
-#'   else{
-#'     filename<-paste0("./",prefix,".jpeg")
-#'     jpeg(filename, width = 8, height = 8, units = 'in', res = 600)
-#'     par(mfrow=c(2,1))
-#'     hist(Dependentdf$Value,breaks = 100,xlab="Rank",main="Distribution of gene ranks in their 90th percentile least depleting lines")
-#'     plot(doR,main="Gaussian Kernel Density Estimation",xlab="Rank")
-#'     dev.off()
-#'   }
-#'
-#'   localmin <- which(diff(-1*sign(diff(doR$y)))==-2)+1
-#'   myranks<- doR$x
-#'   rankthreshold <- as.integer(myranks[localmin])+1
-#'
-#'   cfgenes <- Dependentdf[which(Dependentdf$Value < rankthreshold[1]),]$Gene
-#'   return(list(cfgenes=cfgenes,LeastDependent=Dependentdf,threshold=rankthreshold[1]))
-#' }
-#'
-#'
-#' #' Calculate the Core Fitness genes using linear modeling of the ranks of genes in all cell lines ordered wrt to their gene score effects
-#' #'
-#' #' @description This function identifies the Core Fitness genes from a given Quantative knockout screen dependency matrix where each row is gene and each column the cell line. The function uses all the cell lines and identifies the genes that are essential in majority of the cell lines.
-#' #' @usage ADAM2.SlopeCF(depMat,
-#' #'                 display=TRUE,
-#' #'                 prefix='SlopeMethod')
-#' #' @param depMat Quantative knockout screen dependency matrix where rows are genes and columns are samples. A real number in position \emph{[i,j]} represents the strength of dependency which indicates the amount of loss of fitness in the \emph{j}-th sample in case of the inactivation of the \emph{i}-th gene. Higher strength of dependency indicates higher probability of beign a core fitness gene. These values are used for ranking the genes wrt to gene effect scores.
-#' #' @param display Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted
-#' #' @param prefix if the display is false the plots are generated in the working directory using the prefix.
-#' #' @details This function implements the idea that if a gene is essential then it should have ranked better in all cell lines including the least dependent cell lines. Instead of calculating rank threshold the ranks are modeled as a linear relation.
-#' #' For a given gene, we can rank its gene effect score in each cell line, then arrange cell lines in order of increasing gene effect score for that gene. The ranks of the genes in these cell lines are fitted to a linear model where smaller slope values indicates higher dependency in all the cell lines.
-#' #' A slope threshold is choosen as the minimum density between the two gaussian distributions that are estimated from the distribution of slopes. All genes with a slope less than this threshold is reported. Notice that we do not need to put a constraint such as 90th percentile least depleated cell lines.
-#' #' @return A list of the following vectors:
-#' #' \item{cfgenes}{Vector of number of genes that are core fitness genes}
-#' #' \item{LeastDependent}{A dataframe where each row corresponds to a gene.There are two columns: \emph{Value} stores the slope of linear model that fits the rank of the gene in allcell lines and the \emph{Gene} stores the gene name}
-#' #' \item{threshold}{The slope threshold for core fitness genes}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleSBFData)
-#' #' results <- ADAM2.SlopeCF(depMat=exampleSBFData)
-#' #' cfgenes <- results$cfgenes
-#' #' @keywords functions
-#' #' @export
-#' ADAM2.SlopeCF<-function(depMat,display=TRUE,prefix='SlopeMethod'){
-#'
-#'   mydata_transpose<-t(depMat)
-#'   mydata_transpose_df <- as.data.frame(mydata_transpose)
-#'   CLnames <-rownames(mydata_transpose_df)
-#'   Genenames <- colnames(mydata_transpose_df)
-#'   CLnumber <- length(CLnames)
-#'   Genenumber <- length(Genenames)
-#'
-#'   rankCL <- data.frame(matrix(nrow=Genenumber,ncol=CLnumber))
-#'   rankCL<-t(apply(-depMat,1,order))
-#'   rownames(rankCL)<-Genenames
-#'   colnames(rankCL)<-seq(1,CLnumber)
-#'
-#'   rankGene<- data.frame(matrix(nrow=CLnumber,ncol=Genenumber))
-#'   rankGene<-t(apply(-mydata_transpose_df,1,rank))
-#'   rownames(rankGene)<-CLnames
-#'   colnames(rankGene)<-Genenames
-#'
-#'   Dependentdf <- data.frame(matrix(nrow=Genenumber,ncol=2))
-#'   count=1
-#'
-#'   for (i in Genenames){
-#'     a <- rankGene[,i][unlist(rankCL[i,])]
-#'     b<-as.data.frame(a)
-#'     p<-lm(a ~ seq(1:CLnumber) , data=b)
-#'     Dependentdf[count,1] <- coef(p)[2]
-#'     Dependentdf[count,2] <- i
-#'     count=count+1
-#'   }
-#'   rownames(Dependentdf)<-Genenames
-#'   colnames(Dependentdf)<-c("Value","Gene")
-#'
-#'   doR <- density(Dependentdf$Value, bw = "nrd0")
-#'
-#'   if (display){
-#'     par(mfrow=c(2,1))
-#'     hist(Dependentdf$Value,breaks = 100,xlab="Slope",main="Distribution of slopes of the ranks of genes in all cell lines")
-#'     plot(doR,main="Gaussian Kernel Density Estimation",xlab="Slope")
-#'   }
-#'   else{
-#'     filename<-paste0("./",prefix,".jpeg")
-#'     jpeg(filename, width = 8, height = 8, units = 'in', res = 600)
-#'     par(mfrow=c(2,1))
-#'     hist(Dependentdf$Value,breaks = 100,xlab="Slope",main="Distribution of slopes of the ranks of genes in all cell lines")
-#'     plot(doR,main="Gaussian Kernel Density Estimation",xlab="Slope")
-#'     dev.off()
-#'   }
-#'
-#'   localmin <- which(diff(-1*sign(diff(doR$y)))==-2)+1
-#'   myranks<- doR$x
-#'   rankthreshold <- myranks[localmin+1]
-#'
-#'   cfgenes <- Dependentdf[which(Dependentdf$Value < rankthreshold[1]),]$Gene
-#'   return(list(cfgenes=cfgenes,LeastDependent=Dependentdf,threshold=rankthreshold[1]))
-#' }
-#'
-#' #' Calculate the Log transformed Bayesian Factor given a bimodal distribution of gene ranks or slopes of the linear fit of ranks.
-#' #'
-#' #' @description This function calculates the log transformed bayesian factor between essential and non-essential genes, by fitting two normal distributins to the bimodal distribution of the ranks of genes in their \emph{N}-th percentile least dependent cell lines ordered wrt gene effect score/estimated slopes from linear fitting of the ordered ranks of genes in cell lines. The function fits a two normal distributions on the bimodal distribution and estimates the mean the standard deviation of these distributions. Based on the estimations the bayesian factor is calculated for each gene using the probabilities of genes coming from essential or non-essential distributions.
-#' #' @usage ADAM2.CalculateBayesianfactor(RankDistribution,
-#' #'                 display=TRUE,
-#' #'                 prefix='BayesianFactor')
-#' #' @param RankDistribution Quantative knockout screen dependency matrix where rows are genes and columns are samples. A real number in position \emph{[i,j]} represents the strength of dependency which indicates the amaount of loss of fitness in the \emph{j}-th sample in case of the inactivation of the \emph{i}-th gene. Higher strength of dependency indicates higher probability of beign a core fitness gene. These values are used for ranking the genes in terms of their dependecy strength.
-#' #' @param display Boolean, default is TRUE. Should plots of the bimodal normal distribution fitting
-#' #' @param prefix if the display is false the plots are generated in the working directory using the prefix.
-#' #' @details This function is using the mixdist R library to fit the given data into a distribution that can be represented as a mixture of two normal distributions. The mean and the standard deviations for each normal distribution is estimated
-#' #' Each normal distribution corresponds to the essential and non-essential genes. For each gene a bayesian factor is calculated which can be defined as the Prob(gene|essential)/Prob(gene|non-essential). The log transformed bayesian factors are reported by this function.
-#' #' @return A data frame with the following columns:
-#' #' \item{Gene}{Gene name}
-#' #' \item{logBF}{Log of the Bayesian Factor}
-#' #' @author C. Pacini, E. Karakoc & F. Iorio
-#' #' @examples
-#' #' data(exampleSBFData)
-#' #' results <- ADAM2.SlopeCF(depMat=exampleSBFData,display=TRUE)
-#' #' bfresults <- ADAM2.CalculateBayesianfactor(RankDistribution=results$LeastDependent)
-#' #' @keywords functions
-#' #' @import mixdist
-#' #' @export
-#' ADAM2.CalculateBayesianfactor<-function(RankDistribution,display=TRUE,prefix='BayesianFactor'){
-#'   his<-hist(RankDistribution$Value,breaks=100)
-#'   df<-data.frame(mid=his$mids, cou=his$counts)
-#'
-#'   doR <- density(RankDistribution$Value, bw = "nrd0")
-#'   localmax <- which(diff(sign(diff(doR$y)))==-2)+1
-#'   myranks<- doR$x
-#'   rankthreshold <- as.integer(myranks[localmax])+1
-#'
-#'   estimate_m1 <- rankthreshold[1]
-#'   estimate_m2 <- tail(rankthreshold,n=1)
-#'
-#'   estimate_sd = estimate_m2-estimate_m1 / 5;
-#'
-#'
-#'   fitpro <- mix(as.mixdata(df), mixparam(mu=c(estimate_m1,estimate_m2), sigma=c(estimate_sd,3*estimate_sd)), dist="norm")
-#'
-#'   if (display){
-#'     par(mfrow=c(2,1))
-#'     hist(RankDistribution$Value,breaks = 100,xlab="Value",main="Bimodal Distribution")
-#'     plot(fitpro)
-#'   }
-#'   else{
-#'     filename<-paste0("./",prefix,".jpeg")
-#'     jpeg(filename, width = 8, height = 8, units = 'in', res = 600)
-#'     par(mfrow=c(2,1))
-#'     hist(RankDistribution$Value,breaks = 100,xlab="Value",main="Bimodal Distribution")
-#'     plot(fitpro)
-#'     dev.off()
-#'   }
-#'
-#'   m1 <- fitpro$parameters$mu[1]
-#'   m2 <- fitpro$parameters$mu[2]
-#'
-#'   s1 <- fitpro$parameters$sigma[1]
-#'   s2 <- fitpro$parameters$sigma[2]
-#'
-#'   m<-matrix(data=RankDistribution$Value)
-#'
-#'   bak<-cbind(RankDistribution$Gene,apply(m,1, function(x) log(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2))))
-#'   colnames(bak) <- c('Gene','logBF')
-#'   bak_df <- as.data.frame(bak)
-#'
-#'   return(bak_df)
-#' }
+  numdata<-log2(numdata+1)
+  numdata<-t(numdata)
+  print('Done')
+  print('Selecting overall lowly expressed genes...')
 
+  LowlyExpr<-CoRe.PercentileCF(depMat = numdata,percentile = 0.9,display = FALSE)$cfgenes
 
+  LowlyExpr<-strsplit(LowlyExpr,'[..]')
+
+  LowlyExpr<-sort(unlist(lapply(LowlyExpr,function(x){x[1][1]})))
+
+  print('Done')
+  return(LowlyExpr)
+
+}
+
+CoRe.CalculateBayesianfactor<-function(RankDistribution,display=TRUE,prefix='BayesianFactor'){
+  his<-hist(RankDistribution,breaks=100,plot = display)
+  df<-data.frame(mid=his$mids, cou=his$counts)
+
+  doR <- density(RankDistribution, bw = "nrd0")
+  localmax <- which(diff(sign(diff(doR$y)))==-2)+1
+  myranks<- doR$x
+  rankthreshold <- as.integer(myranks[localmax])+1
+
+  if(display){
+    abline(v=rankthreshold)
+  }
+
+  estimate_m1 <- rankthreshold[1]
+  estimate_m2 <- tail(rankthreshold,n=1)
+
+  estimate_sd = (estimate_m2-estimate_m1)/5;
+
+  fitpro <- mix(as.mixdata(df),
+                mixparam(mu=c(estimate_m1,estimate_m2),
+                         sigma=c(estimate_sd,3*estimate_sd)), dist="norm")
+  if (display){
+    plot(fitpro)
+  }
+
+  m1 <- fitpro$parameters$mu[1]
+  m2 <- fitpro$parameters$mu[2]
+
+  s1 <- fitpro$parameters$sigma[1]
+  s2 <- fitpro$parameters$sigma[2]
+
+  m<-RankDistribution
+  bak<-apply(m,1, function(x) log(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
+  names(bak)<-names(m)
+  return(bak)
+}
