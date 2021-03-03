@@ -18,6 +18,17 @@ export(CoRe.CS_AdAM)
 export(CoRe.PanCancer_AdAM)
 export(CoRe.CF_Benchmark)
 
+export(CoRe.download_DepMatrix)
+export(CoRe.PercentileCF)
+export(CoRe.AssembleFPs)
+export(CoRe.CalculateBayesianfactor)
+export(CoRe.VisCFness)
+
+
+
+
+
+
 
 import(mixdist)
 importFrom("stringr","str_replace_all","str_replace","str_sub")

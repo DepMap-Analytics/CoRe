@@ -560,3 +560,60 @@ CoRe.CalculateBayesianfactor<-function(RankDistribution,display=TRUE,prefix='Bay
   names(bak)<-names(m)
   return(bak)
 }
+
+CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MAP2K1',gg){
+  depMat<-as.matrix(depMat)
+
+  rankCL<-t(apply(depMat,1,function(x){
+      sx<-order(x)
+      x<-match(1:length(x),sx)
+      }))
+
+  rownames(rankCL)<- rownames(depMat)
+  colnames(rankCL)<- colnames(depMat)
+
+  rankG<-apply(depMat,2,function(x){
+    sx<-order(x)
+    x<-match(1:length(x),sx)})
+
+  rownames(rankG)<- rownames(depMat)
+  colnames(rankG)<- colnames(depMat)
+
+  nG<-nrow(rankG)
+  nCL<-ncol(rankG)
+
+  plot(rankG[negControl,names(sort(rankCL[negControl,]))],
+       col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
+       pch=16,ylim=c(0,nrow(depMat)),
+       xlab='cell line dependency ranks',ylab='gene dependency rank in x dependant cell line')
+  points(rankG[posControl,names(sort(rankCL[posControl,]))],pch=16,
+         col=rgb(0,200,100,alpha = 180,maxColorValue = 255))
+
+  points(rankG[gg,names(sort(rankCL[gg,]))],pch=16,
+         col=rgb(0,0,100,alpha = 180,maxColorValue = 255))
+
+  threshold = as.integer(CLnumber*percentile)
+
+  abline(v=threshold,lty=2)
+
+  LeastDependentdf<-unlist(lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
+  Label = "Gene rank in 90th perc. least dep cell line"
+  names(LeastDependentdf)<-rownames(rankG)
+
+  hist(LeastDependentdf,main=Label)
+  abline(v = LeastDependentdf[negControl],lwd=4,col=rgb(150,0,0,alpha = 180,maxColorValue = 255))
+  abline(v = LeastDependentdf[posControl],lwd=4,col=rgb(0,200,100,alpha = 180,maxColorValue = 255))
+  abline(v = LeastDependentdf[gg],lwd=4,col=rgb(0,0,100,alpha = 180,maxColorValue = 255))
+
+  doR <- density(LeastDependentdf, bw = "nrd0")
+
+  localmin <- which(diff(-1*sign(diff(doR$y)))==-2)[1]+1
+  myranks<- doR$x
+  rankthreshold <- as.integer(myranks[localmin])+1
+
+  abline(v = rankthreshold,
+         lwd=3,
+         col='darkgrey',
+         lty=2)
+
+}
