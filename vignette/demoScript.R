@@ -134,6 +134,31 @@ CFgenes_BFs<-CoRe.PercentileCF(depMat,method = 'fixed',thresholding='BFs')
 CFgenesAVG_BFs<-CoRe.PercentileCF(depMat,method = 'average',thresholding='BFs')
 CFgenesSLOPE_BFs<-CoRe.PercentileCF(depMat,method = 'slope',thresholding='BFs')
 
+daisyModel_50<-names(which(rowSums(BinDepMat)>=(ncol(BinDepMat)/2)))
+daisyModel_75<-names(which(rowSums(BinDepMat)>=(0.75*ncol(BinDepMat))))
+daisyModel_90<-names(which(rowSums(BinDepMat)>=(0.90*ncol(BinDepMat))))
+daisyModel_100<-names(which(rowSums(BinDepMat)==ncol(BinDepMat)))
+
+
+daisyModel_50perf<-CoRe.CF_Benchmark(testedGenes = daisyModel_50,
+                                     background = rownames(depMat),
+                                     priorKnownSignatures = signatures,
+                                     falsePositives=FPs)
+
+daisyModel_75perf<-CoRe.CF_Benchmark(testedGenes = daisyModel_75,
+                                     background = rownames(depMat),
+                                     priorKnownSignatures = signatures,
+                                     falsePositives=FPs)
+
+daisyModel_90perf<-CoRe.CF_Benchmark(testedGenes = daisyModel_90,
+                                     background = rownames(depMat),
+                                     priorKnownSignatures = signatures,
+                                     falsePositives=FPs)
+
+daisyModel_100perf<-CoRe.CF_Benchmark(testedGenes = daisyModel_100,
+                                     background = rownames(depMat),
+                                     priorKnownSignatures = signatures,
+                                     falsePositives=FPs)
 
 HARTperf<-CoRe.CF_Benchmark(testedGenes = BAGEL_essential,
                               background = rownames(depMat),
@@ -171,7 +196,11 @@ Perc90SLOPE_BFs_perf<-CoRe.CF_Benchmark(testedGenes = CFgenesSLOPE_BFs$cfgenes,
                                    falsePositives=FPs)
 
 
-barplot(rbind(length(BAGEL_essential),
+barplot(rbind(length(daisyModel_50),
+              length(daisyModel_75),
+              length(daisyModel_90),
+              length(daisyModel_100),
+              length(BAGEL_essential),
               length(PanCancer_CF_genes),
               length(CFgenes$cfgenes),
               length(CFgenes_BFs$cfgenes),
@@ -180,13 +209,19 @@ barplot(rbind(length(BAGEL_essential),
               length(CFgenesSLOPE$cfgenes),
               length(CFgenesSLOPE_BFs$cfgenes)),
               beside = TRUE,
-              ylab='n. genes',col=c('black',
+              ylab='n. genes',col=c('gray','gray','gray','gray',
+                                    'black',
                                                 '#D81B60',
                                                 '#1E88E5','#1EDAE5',
                                                 '#FF8A07','#FFC107',
                                                 '#004D40','#009C40'),border = FALSE)
 
-barplot(rbind(HARTperf$TPRs$Recall,
+barplot(rbind(
+  daisyModel_50perf$TPRs$Recall,
+  daisyModel_75perf$TPRs$Recall,
+  daisyModel_90perf$TPRs$Recall,
+  daisyModel_100perf$TPRs$Recall,
+  HARTperf$TPRs$Recall,
   AdAMperf$TPRs$Recall,
               Perc90perf$TPRs$Recall,
               Perc90_BFs_perf$TPRs$Recall,
@@ -194,12 +229,17 @@ barplot(rbind(HARTperf$TPRs$Recall,
               Perc90AVG_BFs_perf$TPRs$Recall,
               Perc90SLOPEperf$TPRs$Recall,
               Perc90SLOPE_BFs_perf$TPRs$Recall),beside = TRUE,ylab='Recall',
-        names.arg = names(signatures),las=2,ylim=c(0,1),col=c('black','#D81B60',
+        names.arg = names(signatures),las=2,ylim=c(0,1),col=c('gray','gray','gray','gray',
+                                                              'black','#D81B60',
                                                               '#1E88E5','#1EDAE5',
                                                               '#FF8A07','#FFC107',
                                                               '#004D40','#009C40'),border = FALSE)
 
-barplot(rbind(1-HARTperf$PPV,
+barplot(rbind(1-daisyModel_50perf$PPV,
+              1-daisyModel_75perf$PPV,
+              1-daisyModel_90perf$PPV,
+              1-daisyModel_100perf$PPV,
+              1-HARTperf$PPV,
               1-AdAMperf$PPV,
               1-Perc90perf$PPV,
               1-Perc90_BFs_perf$PPV,
@@ -208,13 +248,20 @@ barplot(rbind(1-HARTperf$PPV,
               1-Perc90SLOPEperf$PPV,
               1-Perc90SLOPE_BFs_perf$PPV),beside = TRUE,
         ylab='ratio of potential novel hits (1-PPV)',
-        las=2,ylim=c(0,1),col=c('black',
+        las=2,ylim=c(0,1),col=c(
+          'gray','gray','gray','gray',
+          'black',
           '#D81B60',
                                 '#1E88E5','#1EDAE5',
                                 '#FF8A07','#FFC107',
                                 '#004D40','#009C40'),border = FALSE)
 
-barplot(rbind(HARTperf$FPR,
+barplot(rbind(
+  daisyModel_50perf$FPR,
+  daisyModel_75perf$FPR,
+  daisyModel_90perf$FPR,
+  daisyModel_100perf$FPR,
+  HARTperf$FPR,
   AdAMperf$FPR,
               Perc90perf$FPR,
               Perc90_BFs_perf$FPR,
@@ -223,12 +270,18 @@ barplot(rbind(HARTperf$FPR,
               Perc90SLOPEperf$FPR,
               Perc90SLOPE_BFs_perf$FPR),beside = TRUE,
         ylab='not expressed genes (FPR)',
-        las=2,col=c('black','#D81B60',
+        las=2,col=c('gray','gray','gray','gray',
+          'black','#D81B60',
                     '#1E88E5','#1EDAE5',
                     '#FF8A07','#FFC107',
                     '#004D40','#009C40'),border = FALSE)
 
-plot(rbind(1-HARTperf$PPV,
+plot(rbind(
+  1-daisyModel_50perf$PPV,
+  1-daisyModel_75perf$PPV,
+  1-daisyModel_90perf$PPV,
+  1-daisyModel_100perf$PPV,
+           1-HARTperf$PPV,
            1-AdAMperf$PPV,
             1-Perc90perf$PPV,
             1-Perc90_BFs_perf$PPV,
@@ -236,7 +289,12 @@ plot(rbind(1-HARTperf$PPV,
             1-Perc90AVG_BFs_perf$PPV,
             1-Perc90SLOPEperf$PPV,
             1-Perc90SLOPE_BFs_perf$PPV),
-      rbind(HARTperf$FPR,
+      rbind(
+        daisyModel_50perf$FPR,
+        daisyModel_75perf$FPR,
+        daisyModel_90perf$FPR,
+        daisyModel_100perf$FPR,
+        HARTperf$FPR,
             AdAMperf$FPR,
             Perc90perf$FPR,
             Perc90_BFs_perf$FPR,
