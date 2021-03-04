@@ -94,6 +94,11 @@ PanCancer_CF_genes<-
                       TruePositives = curated_BAGEL_essential,
                       display = FALSE)
 
+hist(rowSums(BinDepMat[PanCancer_CF_genes,])/ncol(BinDepMat),100)
+
+hist(rowSums(BinDepMat[setdiff(rownames(BinDepMat),PanCancer_CF_genes),])/ncol(BinDepMat),100)
+
+
 #======================================================================
 # Benchmarking the identified PanCancer Core fitness genes against
 # prior known essential genes

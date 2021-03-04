@@ -459,6 +459,14 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
     Label = "Slope of gene ranks across ranked dep cell lines"
   }
 
+  if(method=='AUC'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){
+      a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
+      sum(a)
+    }))
+    Label = "AUC of gene ranks across ranked dep cell lines"
+  }
+
   names(LeastDependentdf)<-rownames(rankG)
   doR <- density(LeastDependentdf, bw = "nrd0")
 
@@ -582,6 +590,14 @@ CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MA
   nG<-nrow(rankG)
   nCL<-ncol(rankG)
 
+  plot(depMat[posControl,names(sort(rankCL[posControl,]))],
+       col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
+       pch=16,ylim=c(-3,1),
+       xlab='cell line dependency ranks',ylab='gene dependency rank in x dependant cell line')
+  points(depMat[negControl,names(sort(rankCL[negControl,]))],
+       col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
+       pch=16)
+
   plot(rankG[negControl,names(sort(rankCL[negControl,]))],
        col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
        pch=16,ylim=c(0,nrow(depMat)),
@@ -592,7 +608,7 @@ CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MA
   points(rankG[gg,names(sort(rankCL[gg,]))],pch=16,
          col=rgb(0,0,100,alpha = 180,maxColorValue = 255))
 
-  threshold = as.integer(CLnumber*percentile)
+  threshold = as.integer(nCL*percentile)
 
   abline(v=threshold,lty=2)
 
