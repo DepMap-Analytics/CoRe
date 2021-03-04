@@ -15,7 +15,10 @@ A named vector:
 \item{odds}{log base 10 odd ratios of observed versus expected cumulative sums of number of fitness genes across fixed numbers of cell lines.}
 }
 \description{
-This function calculates log10 odd ratios of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
+This function calculates log10 odd ratios of observed vs expected profiles of cumulative number of fitness genes in fixed number of cell lines.
+}
+\details{
+This function calculates log10 odd ratios of observed vs expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
 }
 \examples{
 ## Downloading dependency matrix
@@ -42,6 +45,6 @@ logOdds
 CoRe.panessprofile, CoRe.generateNullModel
 }
 \author{
-C. Pacini, E. Karakoc & F. Iorio
+C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
 }
 \keyword{functions}

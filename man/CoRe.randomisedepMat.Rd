@@ -11,7 +11,7 @@ CoRe.randomisedepMat(depMat)
 The matrix given in input with entries shuffled column wisely.
 }
 \description{
-This function takes in input a matrix and shuffles its entries column wisely. Then matrix resulting from this shuffling will have the same column marginal totals of the inpputted one.
+This function takes in input a matrix and shuffles its entries column-wise. Then matrix resulting from this shuffling will have the same column marginal totals of the inputted one.
 }
 \examples{
 
@@ -28,7 +28,7 @@ rnd_exampleDepMat<-CoRe.randomisedepMat(LungDepMap)
 
 }
 \author{
-C. Pacini, E. Karakoc & F. Iorio
+C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.

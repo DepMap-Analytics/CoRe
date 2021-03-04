@@ -4,7 +4,8 @@
 \usage{
 CoRe.tradeoffEO_TPR(EO,
                     TPR,
-                    test_set_name)
+                    test_set_name,
+                    display = TRUE)
 }
 \arguments{
 \item{EO}{Profile of empirical odds values. Computed with the \code{CoRe.empiricalOdds} function.}
@@ -12,6 +13,7 @@ CoRe.tradeoffEO_TPR(EO,
 \item{TPR}{Profile of True positive rates for across number of cell line. Computed with the \code{CoRe.truePositiveRate} function.}
 
 \item{test_set_name}{Name to give to the analysis, used for plotting titles.}
+\item{display}{Boolean, default is TRUE. Should AdAM tradeoff strategy be plotted.}
 }
 \value{
 ADAM model threshold:
@@ -31,7 +33,7 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
+LungDepMat<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat,tissue_type="Non-Small Cell Lung Carcinoma")
 
 ## Loading a reference set of essential genes from
 ## from the CRISPRcleanR package, derived from [2]
@@ -39,14 +41,11 @@ data(BAGEL_essential)
 
 # Generate the profiles of number of fitness genes across number of cell lines from
 # observed data and corresponding comulative sums.
-pprofile<-CoRe.panessprofile(depMat=LungDepMap)
+pprofile<-CoRe.panessprofile(depMat=LungDepMat)
 
 # Generate a set of random profiles of number of genes depleted for a number of cell lines
 # and corresponding cumulative sums by perturbing observed data.
 nullmodel<-CoRe.generateNullModel(depMat=LungDepMat,ntrials = 1000)
-
-#load a reference set of essential genes from [2]
-data(BAGEL_essential)
 
 # Calculate log10 odd ratios of observed/expected profiles of cumulative number of fitness
 # genes in fixed number of cell lines.
@@ -56,11 +55,12 @@ EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmo
 
 # Calculate True positive rates for fitness genes in at least n cell lines in the observed
 # dependency matrix, with positive cases from a reference set of essential genes
-TPR<-CoRe.truePositiveRate(LungDepMap,BAGEL_essential)
+TPR<-CoRe.truePositiveRate(LungDepMat,BAGEL_essential)
 
 # Calculate minimum number of cell lines a gene needs to be a fitness gene in order to
 # be considered as a core-fitness gene
 crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'BAGEL essential')
+crossoverpoint
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
@@ -72,6 +72,6 @@ crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'BAGEL essential'
 \code{\link{CoRe.truePositiveRate}}
 }
 \author{
-C. Pacini, E. Karakoc & F. Iorio
+C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
 }
 \keyword{functions}
