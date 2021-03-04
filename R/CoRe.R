@@ -266,7 +266,10 @@ CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 }
 
 #--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
-CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip', scaled=FALSE){
+CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
+                                  scaled=FALSE,
+                                  ess,
+                                  noness){
   if(url.exists(URL)){
     dir.create(tmp <- tempfile())
     dir.create(file.path(tmp, "mydir"))
@@ -298,9 +301,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
     print('...done')
 
     if(scaled){
-        data(curated_BAGEL_essential)
-        data(curated_BAGEL_nonEssential)
-        X<-scale_to_essentials(X,curated_BAGEL_essential,curated_BAGEL_nonEssential)
+      X<-scale_to_essentials(X,ess,noness)
     }
 
   }else{
