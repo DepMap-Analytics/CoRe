@@ -36,10 +36,10 @@ LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
 ## Computing number of fitness genes across fixed numbers
 ## of cell lines and its cumulative sums
 pprofile <- CoRe.panessprofile(depMat = LungDepMap)
-pprofile
+head(pprofile)
 }
 \author{
-C. Pacini, E. Karakoc & F. Iorio
+C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.

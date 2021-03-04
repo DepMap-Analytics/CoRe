@@ -42,7 +42,11 @@ pprofile <- CoRe.generateNullModel(depMat = LungDepMap)
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
 }
+\seealso{
+\code{\link{CoRe.randomisedepMat}}
+\code{\link{CoRe.panessprofile}}
+}
 \author{
-C. Pacini, E. Karakoc & F. Iorio
+C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
 }
 \keyword{functions}
