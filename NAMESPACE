@@ -1,0 +1,40 @@
+#export(CoRe.CalculateBayesianfactor)
+#export(CoRe.PercentileAverageCF)
+#export(CoRe.PercentileCF)
+#export(CoRe.SlopeCF)
+
+
+export(CoRe.download_BinaryDepMatrix)
+export(CoRe.extract_tissueType_BinDepMatrix)
+export(CoRe.panessprofile)
+export(CoRe.generateNullModel)
+export(CoRe.randomisedepMat)
+export(CoRe.empiricalOdds)
+export(CoRe.truePositiveRate)
+export(CoRe.tradeoffEO_TPR)
+export(CoRe.coreFitnessGenes)
+export(CoRe.AdAM)
+export(CoRe.CS_AdAM)
+export(CoRe.PanCancer_AdAM)
+export(CoRe.CF_Benchmark)
+
+export(CoRe.download_DepMatrix)
+export(CoRe.PercentileCF)
+export(CoRe.AssembleFPs)
+export(CoRe.CalculateBayesianfactor)
+export(CoRe.VisCFness)
+
+
+
+
+
+
+
+import(mixdist)
+importFrom("stringr","str_replace_all","str_replace","str_sub")
+importFrom("readr","read_csv")
+importFrom("RCurl","url.exists")
+importFrom("grDevices", "dev.off", "jpeg")
+importFrom("graphics", "abline", "axis", "barplot", "boxplot", "hist","legend", "par", "plot", "points")
+importFrom("stats", "coef", "density", "dnorm", "lm")
+importFrom("utils", "read.table", "setTxtProgressBar", "tail","txtProgressBar")
