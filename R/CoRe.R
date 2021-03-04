@@ -254,6 +254,17 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 }
 
 ## Non Documented
+
+#--- Downloading Cell Passport models annotation file
+CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
+  if(url.exists(URL)){
+    X <- read_csv(URL)
+  }else{
+    X <- NULL
+  }
+  return(X)
+}
+
 #--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip', scaled=FALSE){
   if(url.exists(URL)){
