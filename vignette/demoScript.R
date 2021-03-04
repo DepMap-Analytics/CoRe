@@ -1,9 +1,6 @@
-library(CRISPRcleanR)
-library(CELLector)
-library(MutExMatSorting)
 library(pheatmap)
 library(magrittr)
-library(mixdist)
+library(mixtools)
 
 
 ## Downloading binary dependency matrix
@@ -46,7 +43,7 @@ coreFitnessGenes<-CoRe.AdAM(LungDepMap,TruePositives=BAGEL_essential)
 
 #======================================================================
 #Reperform all the analyses but on different tissues or cancer-types
-clannotation<-CELLector.CMPs_getModelAnnotation()
+clannotation<-CoRe.download_AnnotationModel
 
 SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                              clannotation = clannotation,
@@ -124,7 +121,10 @@ AdAMperf<-CoRe.CF_Benchmark(PanCancer_CF_genes,background = rownames(BinDepMat),
 
 ## Downloading quantitative dependency matrix
 ## from Project Score [1]
-depMat<-CoRe.download_DepMatrix(scaled = TRUE)
+data(curated_BAGEL_essential)
+data(curated_BAGEL_nonEssential)
+
+depMat<-CoRe.download_DepMatrix(scaled = TRUE, ess = curated_BAGEL_essential, noness = curated_BAGEL_nonEssential)
 
 CFgenes<-CoRe.PercentileCF(depMat,method = 'fixed',thresholding='localMin')
 CFgenesAVG<-CoRe.PercentileCF(depMat,method = 'average',thresholding='localMin')
@@ -327,16 +327,3 @@ plot(rbind(1-HARTperf$PPV,
      xlim=c(0,1),ylim=c(0,1))
 
 abline(0,1)
-
-
-
-
-
-
-
-
-
-
-
-
-
