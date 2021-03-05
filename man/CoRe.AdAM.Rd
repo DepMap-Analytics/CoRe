@@ -11,26 +11,27 @@ CoRe.AdAM(depMat,
           TruePositives)
 }
 \arguments{
-\item{depMat}{Binary dependency matrix, rows are genes and columns are samples. 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.}
+\item{depMat}{Binary dependency matrix, rows are genes and columns are samples (screens, cell-cell lines). A 1 in position \emph{[i,j]} indicates that inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th sample, 0 otherwise.}
 
-\item{display}{Boolean, default is TRUE. Should bar plots of the dependency profiles be plotted.}
+\item{display}{Boolean, default is TRUE. Should bars indicating dependency profiles and boxes for estimated null models be plotte.}
 
-\item{main_suffix}{If display=TRUE, title suffix to give to plot of number of genes depleted in a give number of cell lines, default is 'genes depleted in at least 1 cell line'.}
+\item{main_suffix}{If display=TRUE, title suffix to be give to the plots.}
 
-\item{xlab}{label to give to x-axis of the plots, default is 'n. cell lines'.}
+\item{xlab}{label to be used in the x-axis of the plots, default is 'n. cell lines'.}
 
-\item{ntrials}{Integer, default =1000. How many times to randomly perturb dependency matrix to generate the null distributions.}
+\item{ntrials}{Integer, default =1000. How many times to randomly perturb dependency matrix to generate null distributions of number of genes called essentials in fixed number of cell lines.}
 \item{verbose}{Boolean, default is TRUE. Should the computation progress be monitored.}
-\item{TruePositives}{Vector of gene symbols to be used as prior known essential genes.}
+\item{TruePositives}{Vector of gene symbols to be used as reference prior known essential genes.}
 }
 \value{
-\item{coreFitnessGenes}{A vector of string with Core Fitness Genes' symbols.}
+\item{coreFitnessGenes}{A vector of strings with estimated Core Fitness Genes' symbols.}
 }
 \description{
-This function identifies the Core Fitness genes using the Adaptive Daisy Model [1] starting from a binary dependency matrix.
+This function estimates Core Fitness essential genes using the Adaptive Daisy Model [1] starting from a binary gene dependency matrix.
 }
 \details{
-This function calculates the Core Fitness essential genes based on the calculated minimum number of cell lines that optimizes the True positive rates with log10 odds ratios. log10 odd ratios are calculated of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the observed binary matrix.
+This function identifies Core Fitness essential genes from the joint analysis of multiple CRISPR-Cas9 viability screens performed on different cell-lines / models. It works with binary gene x cell-line essantial/non-essential matrices and it estimates the minimal number \eqn{n} of cell-lines in which a gene should be called as essential in order to be considered as a core-fitness essential gene for the tissue of origin of the screened cell-lines. This threshold is computed in a semi-supervised way and it is defined as that maximising the deviance from expectation of the number of genes that are essential in \eqn{n} cell-lines and their
+true positive rates computed with respect to a set of prior known core-fitness essential genes (to be provided in input).
 }
 \examples{
 ## Downloading dependency matrix
