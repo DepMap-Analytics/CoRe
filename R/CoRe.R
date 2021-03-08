@@ -47,6 +47,70 @@ rearrangeMatrix<-function(patterns,GENES){
 
 
 ## Exported
+## Documentation Revised
+CoRe.AdAM<-function(depMat,display=TRUE,
+                    main_suffix='fitness genes in at least 1 cell line',
+                    xlab='n. dependent cell lines',
+                    ntrials=1000,verbose=TRUE,TruePositives){
+
+  if(verbose){
+    print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')}
+  pprofile<-CoRe.panessprofile(depMat=depMat,display = display,xlab = xlab,main_suffix = main_suffix)
+  if(verbose){print('+ Done!')
+    print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')}
+  nullmodel<-CoRe.generateNullModel(depMat=depMat,ntrials = ntrials,verbose = verbose,display = display)
+  if(verbose){print('+ Done!')
+    print('- Computing empirical odds of numbers of fitness genes per number of cell lines')}
+  EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM)
+  if(verbose){print('+ Done')
+    print('- Profiling true positive rates')}
+  TPR<-CoRe.truePositiveRate(depMat,TruePositives)
+  if(verbose){print('- Done!')
+    print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
+  crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
+  if(verbose){print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
+    print('- Done!')
+    print('+ Estimating set of core fitness genes')}
+  coreFitnessGenes<-CoRe.coreFitnessGenes(depMat,crossoverpoint)
+  if(verbose){print('- Done!')}
+  return (coreFitnessGenes)
+}
+
+#--- Assemble expression based false positives
+CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
+  dir.create(tmp <- tempfile())
+  dir.create(file.path(tmp, "mydir"))
+  print('Downloading zipped CCLE expression data from DepMap portal')
+  download.file(URL,file.path(tmp, "mydir","CCLE_expression.csv"))
+  print('...done')
+
+  print('Reading Expression data matrix...')
+  X <- read.csv(file.path(tmp,'mydir','CCLE_expression.csv'),
+                stringsAsFactors = FALSE,
+                header=TRUE,
+                row.names = 1)
+
+  gnames<-rownames(X)
+  clnames<-colnames(X)
+
+  numdata<-as.matrix(X)
+
+  numdata<-log2(numdata+1)
+  numdata<-t(numdata)
+  print('Done')
+  print('Selecting overall lowly expressed genes...')
+
+  LowlyExpr<-CoRe.PercentileCF(depMat = numdata,percentile = 0.9,display = FALSE)$cfgenes
+
+  LowlyExpr<-strsplit(LowlyExpr,'[..]')
+
+  LowlyExpr<-sort(unlist(lapply(LowlyExpr,function(x){x[1][1]})))
+
+  print('Done')
+  return(LowlyExpr)
+
+}
+
 
 ## Documented
 CoRe.panessprofile<-function(depMat,display=TRUE,
@@ -203,33 +267,6 @@ CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
   coreFitnessGenes<-rownames(depMat)[rowSums(depMat)>=crossoverpoint]
   return (coreFitnessGenes)
 }
-CoRe.AdAM<-function(depMat,display=TRUE,
-                                 main_suffix='fitness genes in at least 1 cell line',
-                                 xlab='n. dependent cell lines',
-                                 ntrials=1000,verbose=TRUE,TruePositives){
-
-     if(verbose){
-     print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')}
-     pprofile<-CoRe.panessprofile(depMat=depMat,display = display,xlab = xlab,main_suffix = main_suffix)
-     if(verbose){print('+ Done!')
-     print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')}
-     nullmodel<-CoRe.generateNullModel(depMat=depMat,ntrials = ntrials,verbose = verbose,display = display)
-     if(verbose){print('+ Done!')
-     print('- Computing empirical odds of numbers of fitness genes per number of cell lines')}
-     EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM)
-     if(verbose){print('+ Done')
-     print('- Profiling true positive rates')}
-     TPR<-CoRe.truePositiveRate(depMat,TruePositives)
-     if(verbose){print('- Done!')
-     print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
-     crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
-     if(verbose){print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
-     print('- Done!')
-     print('+ Estimating set of core fitness genes')}
-     coreFitnessGenes<-CoRe.coreFitnessGenes(depMat,crossoverpoint)
-     if(verbose){print('- Done!')}
-     return (coreFitnessGenes)
-     }
 
 ## not Documented
 
@@ -507,41 +544,6 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
   }
 
   return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1],cfBFs=cfBFs))
-}
-
-#--- Assemble expression based false positives
-CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
-  dir.create(tmp <- tempfile())
-  dir.create(file.path(tmp, "mydir"))
-  print('Downloading zipped CCLE expression data from DepMap portal')
-  download.file(URL,file.path(tmp, "mydir","CCLE_expression.csv"))
-  print('...done')
-
-  print('Reading Expression data matrix...')
-  X <- read.csv(file.path(tmp,'mydir','CCLE_expression.csv'),
-                  stringsAsFactors = FALSE,
-                  header=TRUE,
-                  row.names = 1)
-
-  gnames<-rownames(X)
-  clnames<-colnames(X)
-
-  numdata<-as.matrix(X)
-
-  numdata<-log2(numdata+1)
-  numdata<-t(numdata)
-  print('Done')
-  print('Selecting overall lowly expressed genes...')
-
-  LowlyExpr<-CoRe.PercentileCF(depMat = numdata,percentile = 0.9,display = FALSE)$cfgenes
-
-  LowlyExpr<-strsplit(LowlyExpr,'[..]')
-
-  LowlyExpr<-sort(unlist(lapply(LowlyExpr,function(x){x[1][1]})))
-
-  print('Done')
-  return(LowlyExpr)
-
 }
 
 CoRe.CalculateBayesianfactor<-function(RankDistribution,display=TRUE,prefix='BayesianFactor'){
