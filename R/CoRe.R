@@ -560,7 +560,7 @@ CoRe.CF_Benchmark<-function(testedGenes,
   falsePositives<-intersect(falsePositives,background)
 
   memb<-do.call(rbind,lapply(priorKnownSignatures,function(x){
-    is.element(testedGenes,x)
+    is.element(testedGenes,x)+0
   }))
 
   colnames(memb)<-testedGenes
@@ -570,11 +570,6 @@ CoRe.CF_Benchmark<-function(testedGenes,
   }))
 
   memb<-HeuristicMutExSorting(memb)
-
-  pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,color = c('white','blue'),show_colnames = FALSE,
-           main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
-           width = 5,height = 3)
-
 
   TPRs<-rowSums(memb)/totals[rownames(memb)]
 
@@ -586,13 +581,17 @@ CoRe.CF_Benchmark<-function(testedGenes,
   ps<-phyper(x-1,n,N-n,k,lower.tail=FALSE)[rownames(memb)]
 
   if(displayBar){
+    pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,color = c('white','blue'),show_colnames = FALSE,
+             main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
+             width = 5,height = 3)
+
     par(mfrow=c(1,2))
     par(mar=c(5,1,0,1))
     barplot(100*rev(TPRs),horiz = TRUE,names.arg = NA,xlab='% covered genes',border=FALSE)
     abline(v=0)
     abline(v=c(20,40,60,80,100),lty=2,col='gray',lwd=2)
     ps[ps==0]<-min(ps[ps>0]/10)
-    barplot(rev(-log10(ps+10)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
+    barplot(rev(-log10(ps)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
     abline(v=1)
     abline(v=seq(10,200,20),lty=2,col='gray',lwd=2)
   }
@@ -742,7 +741,7 @@ CoRe.CalculateBayesianfactor<-function(RankDistribution,
   }
 
   m<-RankDistribution
-  bak<-apply(m,1, function(x) log(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
+  bak<-apply(m,1, function(x) log2(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
   names(bak)<-rownames(m)
   return(bak)
 }
@@ -783,7 +782,7 @@ CoRe.VisCFness<-function(depMat,
   points(rankG[gg,names(sort(rankCL[gg,]))],pch=16,
          col=rgb(0,0,100,alpha = 180,maxColorValue = 255))
 
-  threshold = as.integer(CLnumber*percentile)
+  threshold = as.integer(nCL*percentile)
 
   abline(v=threshold,lty=2)
 
