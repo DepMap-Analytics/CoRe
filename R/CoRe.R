@@ -1,11 +1,8 @@
-## Not Exported
-## Not Documented
+## not exported
 
-## Implement CERES scaling on CRISPR-Cas9 data in order to have median of essential genes (curated BAGEL essential)
-## equals to -1 and median of non-essential genes (curated BAGEL non-essential) equals to 0 for each cell lines.
-scale_to_essentials <- function(ge_fit,
-                                ess_genes,
-                                noness_genes){
+## Apply CERES scaling on cell line fold change scores using two reference sets of essential and non-essential
+## genes
+scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
   essential_indices <- which(row.names(ge_fit) %in% ess_genes)
   nonessential_indices <- which(row.names(ge_fit) %in% noness_genes)
 
@@ -166,10 +163,10 @@ rearrangeMatrix<-function(patterns,
   return(toAdd)
 }
 
+
 ## Exported
 
-## Calculate the number (and cumulative number) of genes whose inactivation exerts a fitness effect in n cell lines,
-## varying n from 1 to the number of cell lines in the dataset in input.
+## Documented
 CoRe.panessprofile<-function(depMat,display=TRUE,
                              main_suffix='fitness genes in at least 1 cell line',
                              xlab='n. dependent cell lines'){
@@ -197,18 +194,12 @@ CoRe.panessprofile<-function(depMat,display=TRUE,
   }
   return(list(panessprof=panessprof,CUMsums=CUMsums))
 }
-
-## Randomly perturb the binary dependency matrix to generate a null distribution of profiles of fitness genes across fixed number of cell lines,
-## and corresponding null distribution of cumulative sums.
-CoRe.generateNullModel<-function(depMat,
-                                 ntrials=1000,
-                                 display=TRUE,
-                                 verbose=TRUE){
+CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE,verbose=TRUE){
 
   set.seed(100812)
   depMat<-depMat[which(rowSums(depMat)>0),]
   nullProf<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,1:ncol(depMat)))
-  nullCumSUM<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,paste('>=',1:ncol(depMat),sep='')))
+  nullCumSUM<-matrix(NA,ntrials,ncol(depMat),dimnames = list(1:ntrials,paste('≥',1:ncol(depMat),sep='')))
   if(verbose){
     print('Generating null model...')
     pb <- txtProgressBar(min=1,max=ntrials,style=3)
@@ -244,46 +235,35 @@ CoRe.generateNullModel<-function(depMat,
 
   return(list(nullProf=nullProf,nullCumSUM=nullCumSUM))
 }
-
-## Take in input a matrix and shuffles its entries column-wise.
-## Then matrix resulting from this shuffling will have the same column marginal totals of the inputted one.
 CoRe.randomisedepMat<-function(depMat){
   rmat<-apply(depMat,2,sample)
 }
-
-## Calculate log10 odd ratios of observed vs. expected profiles of cumulative number of fitness genes in fixed number of cell lines.
-## Expected values are the mean of those observed across randomised version of the observed binary matrix.
-CoRe.empiricalOdds<-function(observedCumSum,
-                             simulatedCumSum){
+CoRe.empiricalOdds<-function(observedCumSum,simulatedCumSum){
   nsamples<-length(observedCumSum)
   ntrials<-nrow(simulatedCumSum)
   odds<-rep(NA,1,nsamples)
-  names(odds)<-paste('>=',1:nsamples,sep='')
+  names(odds)<-paste('≥',1:nsamples,sep='')
   for (i in 1:nsamples){
     PDF<-density(simulatedCumSum[,i])
     odds[i]<- log10(observedCumSum[i]/mean(simulatedCumSum[,i]))
   }
   return(odds)
 }
-
-## Calculate a profile of True Positive Rates for fitness genes in at least n cell lines,
-## with positive cases from a reference set of essential genes.
-CoRe.truePositiveRate<-function(depMat,
-                                essentialGeneSet){
+CoRe.truePositiveRate<-function(depMat,essentialGeneSet){
   nsamples<-ncol(depMat)
 
   essentialGeneSet<-intersect(essentialGeneSet,rownames(depMat))
 
   TPR<-rep(NA,1,nsamples)
-  names(TPR)<-paste('>=',1:nsamples,sep='')
+  names(TPR)<-paste('≥',1:nsamples,sep='')
 
   ncells<-rowSums(depMat)
 
   TP<-rep(NA,1,nsamples)
-  names(TP)<-paste('>=',1:nsamples,sep='')
+  names(TP)<-paste('≥',1:nsamples,sep='')
 
   P<-rep(NA,1,nsamples)
-  names(P)<-paste('>=',1:nsamples,sep='')
+  names(P)<-paste('≥',1:nsamples,sep='')
 
   for (i in nsamples:1){
     positiveSet<-names(which(ncells>=i))
@@ -295,13 +275,7 @@ CoRe.truePositiveRate<-function(depMat,
 
   return(list(P=P,TP=TP,TPR=TPR))
 }
-
-## Compare and plot the log10 odds ratios with the true positive rates to find the cross over point
-## where the true positive rate falls below the odds ratio.
-CoRe.tradeoffEO_TPR<-function(EO,
-                              TPR,
-                              test_set_name,
-                              display=TRUE){
+CoRe.tradeoffEO_TPR<-function(EO,TPR,test_set_name,display=TRUE){
   x<-EO
   x[x==Inf]<-max(x[x<Inf])
   x<-(x-min(x))/(max(x)-min(x))
@@ -343,76 +317,41 @@ CoRe.tradeoffEO_TPR<-function(EO,
 
   return(point)
 }
-
-## Identify as Core Fitness the genes that are fitness in a number of cell lines at least equal to the inputted threshold
-CoRe.coreFitnessGenes<-function(depMat,
-                                crossoverpoint){
+CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
   coreFitnessGenes<-rownames(depMat)[rowSums(depMat)>=crossoverpoint]
   return (coreFitnessGenes)
 }
-
-## Identify the Core Fitness genes using the ADaM starting from a binary dependency matrix
-CoRe.AdAM<-function(depMat,
-                    display=TRUE,
+CoRe.AdAM<-function(depMat,display=TRUE,
                     main_suffix='fitness genes in at least 1 cell line',
                     xlab='n. dependent cell lines',
-                    ntrials=1000,
-                    verbose=TRUE,
-                    TruePositives){
+                    ntrials=1000,verbose=TRUE,TruePositives){
 
   if(verbose){
-    print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')
-  }
+    print('- Profiling of number of fitness genes across fixed numbers of cell lines and its cumulative sums')}
   pprofile<-CoRe.panessprofile(depMat=depMat,display = display,xlab = xlab,main_suffix = main_suffix)
-
   if(verbose){print('+ Done!')
-    print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')
-  }
+    print('- Null modeling numbers of fitness genes across numbers of cell lines and their cumulative sums')}
   nullmodel<-CoRe.generateNullModel(depMat=depMat,ntrials = ntrials,verbose = verbose,display = display)
-
-  if(verbose){
-    print('+ Done!')
-    print('- Computing empirical odds of numbers of fitness genes per number of cell lines')
-  }
+  if(verbose){print('+ Done!')
+    print('- Computing empirical odds of numbers of fitness genes per number of cell lines')}
   EO<-CoRe.empiricalOdds(observedCumSum = pprofile$CUMsums,simulatedCumSum =nullmodel$nullCumSUM)
-
-  if(verbose){
-    print('+ Done')
-    print('- Profiling true positive rates')
-  }
+  if(verbose){print('+ Done')
+    print('- Profiling true positive rates')}
   TPR<-CoRe.truePositiveRate(depMat,TruePositives)
-
-  if(verbose){
-    print('- Done!')
-    print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')
-  }
+  if(verbose){print('- Done!')
+    print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
   crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
-
-  if(verbose){
-    print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
+  if(verbose){print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
     print('- Done!')
-    print('+ Estimating set of core fitness genes')
-  }
+    print('+ Estimating set of core fitness genes')}
   coreFitnessGenes<-CoRe.coreFitnessGenes(depMat,crossoverpoint)
-
-  if(verbose){
-    print('- Done!')
-  }
-
+  if(verbose){print('- Done!')}
   return (coreFitnessGenes)
 }
 
-## Downloading Cell Passport models annotation file
-CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
-  if(url.exists(URL)){
-    X <- read_csv(URL)
-  }else{
-    X <- NULL
-  }
-  return(X)
-}
+## not Documented
 
-## Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
+#--- Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/binaryDepScores.tsv.zip'){
   if(url.exists(URL)){
     temp <- tempfile()
@@ -432,7 +371,19 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
   return(X)
 }
 
-## Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
+## Non Documented
+
+#--- Downloading Cell Passport models annotation file
+CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
+  if(url.exists(URL)){
+    X <- read_csv(URL)
+  }else{
+    X <- NULL
+  }
+  return(X)
+}
+
+#--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
                                   scaled=FALSE,
                                   ess,
@@ -477,50 +428,41 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   return(X)
 }
 
-## Extracting Binary Dependency SubMatrix for a given tissue or cancer type, among those included
-## in the latest model annotation file on the cell model passports
-CoRe.extract_tissueType_BinDepMatrix<-function(fullBinDepMat,
-                                               tissue_type="Non-Small Cell Lung Carcinoma"){
+#--- Extracting Dependency SubMatrix for a given tissue or cancer type, among those included
+#--- in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
+CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
   cmp<-read_csv('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
   cls<-cmp$model_name[which(cmp$tissue==tissue_type | cmp$cancer_type==tissue_type)]
-  cls<-intersect(cls,colnames(fullBinDepMat))
-  cs_depmat<-fullBinDepMat[,cls]
-  return(cs_depmat)
+  cls<-intersect(cls,colnames(fullDepMat))
+  return(fullDepMat[,cls])
 }
 
-## Execute AdAM on tissue or cancer type specific dependency submatrix
+#--- Execute AdAM on tissue or cancer type specifc dependency submatrix
 CoRe.CS_AdAM<-function(pancan_depMat,
                        tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                        clannotation = NULL,
                        display=TRUE,
                        main_suffix='fitness genes in at least 1 cell line',
                        xlab='n. dependent cell lines',
-                       ntrials=1000,
-                       verbose=TRUE,
-                       TruePositives){
+                       ntrials=1000,verbose=TRUE,TruePositives){
 
   cls<-clannotation$model_name[clannotation$tissue==tissue_ctype | clannotation$cancer_type==tissue_ctype]
   cls<-intersect(colnames(pancan_depMat),cls)
   cs_depmat<-pancan_depMat[,cls]
 
-  coreFitnessGenes <- CoRe.AdAM(cs_depmat,
-                                display=display,
-                                main_suffix = main_suffix,
-                                xlab=xlab,
-                                ntrials=ntrials,
-                                verbose=verbose,
-                                TruePositives = TruePositives)
-  return(coreFitnessGenes)
+  return(CoRe.AdAM(cs_depmat,display=display,
+                   main_suffix = main_suffix,
+                   xlab=xlab,
+                   ntrials=ntrials,
+                   verbose=verbose,TruePositives = TruePositives))
 }
 
-## Execute AdAM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
+#--- Execute AdAM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
 CoRe.PanCancer_AdAM<-function(pancan_depMat,
                               tissues_ctypes,
                               clannotation = NULL,
                               display=TRUE,
-                              ntrials=1000,
-                              verbose=TRUE,
-                              TruePositives){
+                              ntrials=1000,verbose=TRUE,TruePositives){
 
 
   systematic_CS_AdAM_res<-lapply(tissues_ctypes,function(x){
@@ -541,20 +483,16 @@ CoRe.PanCancer_AdAM<-function(pancan_depMat,
   rownames(TS_CF_matrix)<-all_TS_CF_genes
   colnames(TS_CF_matrix)<-tissues_ctypes
 
-  PanCancer_CF_genes <- CoRe.AdAM(depMat = TS_CF_matrix,
-                                  main_suffix = 'genes predicted to be core fitness for at least 1 tissue/cancer-type',
-                                  xlab = 'n. tissue/cancer-type',verbose = FALSE,TruePositives = TruePositives)
+  CoRe.AdAM(depMat = TS_CF_matrix,
+            main_suffix = 'genes predicted to be core fitness for at least 1 tissue/cancer-type',
+            xlab = 'n. tissue/cancer-type',verbose = FALSE,TruePositives = TruePositives)
 
-  return(PanCancer_CF_genes)
+
 }
 
-## Computes recall and other ROC indicators for identified core fitness genes
-## with respect to pre-defined signatures of essential genes
-CoRe.CF_Benchmark<-function(testedGenes,
-                            background,
-                            priorKnownSignatures,
-                            falsePositives,
-                            displayBar=FALSE){
+#--- Computes recall and other ROC indicators for identified core fitness genes
+#--- with respect to pre-defined signatures of essential genes
+CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePositives,displayBar=TRUE){
 
   priorKnownSignatures<-lapply(priorKnownSignatures,function(x){intersect(x,background)})
   falsePositives<-intersect(falsePositives,background)
@@ -581,7 +519,7 @@ CoRe.CF_Benchmark<-function(testedGenes,
   ps<-phyper(x-1,n,N-n,k,lower.tail=FALSE)[rownames(memb)]
 
   if(displayBar){
-    pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,color = c('white','blue'),show_colnames = FALSE,
+    pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,col=c('white','blue'),show_colnames = FALSE,
              main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
              width = 5,height = 3)
 
@@ -606,13 +544,9 @@ CoRe.CF_Benchmark<-function(testedGenes,
   return(list(TPRs=data.frame(Recall=TPRs,EnrichPval=ps),PPV=PPV,FPR=FPR))
 }
 
-## Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
-## Quantative knockout screen dependency matrix.
-CoRe.PercentileCF<-function(depMat,
-                            display=TRUE,
-                            percentile=0.9,
-                            method='fixed',
-                            thresholding='localMin'){
+#--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
+#--- Quantative knockout screen dependency matrix.
+CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',thresholding='localMin'){
 
   depMat<-as.matrix(depMat)
 
@@ -641,7 +575,7 @@ CoRe.PercentileCF<-function(depMat,
 
   if(method=='average'){
     LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){mean(rankG[x,names(which(rankCL[x,]>=threshold))])}))
-    Label = "Gene average rank in >= 90th perc. of least dep cell lines"
+    Label = "Gene average rank in ≥ 90th perc. of least dep cell lines"
   }
 
   if(method=='slope'){
@@ -678,13 +612,14 @@ CoRe.PercentileCF<-function(depMat,
   if(thresholding=='localMin'){
     cfgenes <- rownames(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
   }else{
-    cfgenes <- names(which(cfBFs>=10))
+    medianBFs <- median(cfBFs[which(cfBFs > 0)])
+    cfgenes <- rownames(LeastDependentdf)[which(cfBFs>=medianBFs)]
   }
 
   return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1],cfBFs=cfBFs))
 }
 
-## Assemble expression-based false positives
+#--- Assemble expression based false positives
 CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
   dir.create(tmp <- tempfile())
   dir.create(file.path(tmp, "mydir"))
@@ -698,11 +633,13 @@ CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'
                 header=TRUE,
                 row.names = 1)
 
+  gnames<-rownames(X)
+  clnames<-colnames(X)
+
   numdata<-as.matrix(X)
 
   numdata<-log2(numdata+1)
   numdata<-t(numdata)
-
   print('Done')
   print('Selecting overall lowly expressed genes...')
 
@@ -746,12 +683,7 @@ CoRe.CalculateBayesianfactor<-function(RankDistribution,
   return(bak)
 }
 
-## Visualization of CFness of a gene
-CoRe.VisCFness<-function(depMat,
-                         gene,
-                         percentile=0.9,
-                         posControl='RPL12',
-                         negControl='MAP2K1'){
+CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MAP2K1',gg){
   depMat<-as.matrix(depMat)
 
   rankCL<-t(apply(depMat,1,function(x){
