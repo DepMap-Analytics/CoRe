@@ -426,8 +426,8 @@ CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 #--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
                                   scaled=FALSE,
-                                  ess,
-                                  noness){
+                                  ess=NULL,
+                                  noness=NULL){
   if(url.exists(URL)){
     dir.create(tmp <- tempfile())
     dir.create(file.path(tmp, "mydir"))
