@@ -10,10 +10,9 @@ By default this will point to an entry on the data download page of the Project 
 \value{
 A binary Dependency Matrix (from [1]) where rows are genes and columns are cell lines. A 1 in position [i,j] indicates that the inactivation of the i-th gene exerts a significant loss of fitness in the j-th sample, 0 otherwise.
 }
-}
 \description{Downloading Binary Dependency Matrix introduced in [1] from the Project Score portal [2].}
 \details{
-If URL link exists this functiondownload Binary Dependency Matrix.
+If the URL points to a valid online location this function downloads a Binary Dependency Matrix.
 }
 \examples{
 ## Downloading Binary Dependency Matrix
