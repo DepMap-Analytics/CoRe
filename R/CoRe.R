@@ -585,7 +585,7 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
 
 #--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
 #--- Quantative knockout screen dependency matrix.
-CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',thresholding='localMin'){
+CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
 
   depMat<-as.matrix(depMat)
 
@@ -645,8 +645,6 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
 
   }
 
-  cfBFs<-CoRe.CalculateBayesianfactor(RankDistribution = LeastDependentdf,display=FALSE)
-
   localmin <- which(diff(-1*sign(diff(doR$y)))==-2)[1]+1
   myranks<- doR$x
   rankthreshold <- as.integer(myranks[localmin])+1
@@ -656,43 +654,9 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
     legend('topleft',legend='Discriminative Threshold',cex=0.7,col='red',lty=1)
   }
 
-  if(thresholding=='localMin'){
-    cfgenes <- rownames(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
-  }else{
-    medianBFs <- median(cfBFs[which(cfBFs > 0)])
-    cfgenes <- rownames(LeastDependentdf)[which(cfBFs>=medianBFs)]
-  }
+  cfgenes <- rownames(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
 
-  return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1],cfBFs=cfBFs))
-}
-
-## Compute Bayesian Factors based on gene score rank distribution
-CoRe.CalculateBayesianfactor<-function(RankDistribution,
-                                       display=TRUE){
-  his<-hist(RankDistribution,breaks=100,plot = display)
-
-  fitpro <- normalmixEM(RankDistribution, k=2)
-
-  m1 <- fitpro$mu[1]
-  m2 <- fitpro$mu[2]
-
-  s1 <- fitpro$sigma[1]
-  s2 <- fitpro$sigma[2]
-
-  if (display){
-    est_distr <- density(c(rnorm(1e7,m1,s1),rnorm(1e7,m2,s2)))
-
-    densCut <- min(est_distr$y[which(est_distr$x > m1 & est_distr$x < m2)])
-    rankthreshold <- est_distr$x[which(est_distr$y == densCut)]
-
-    plot(est_distr, main = 'Mixture model output')
-    abline(v=rankthreshold, col="red")
-  }
-
-  m<-RankDistribution
-  bak<-apply(m,1, function(x) log2(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
-  names(bak)<-rownames(m)
-  return(bak)
+  return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1]))
 }
 
 CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MAP2K1',gg){
