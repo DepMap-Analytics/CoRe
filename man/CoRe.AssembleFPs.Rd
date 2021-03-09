@@ -1,14 +1,14 @@
 \name{CoRe.AssembleFPs}
 \alias{CoRe.AssembleFPs}
-\title{Assemble expression-based false positives}
+\title{Assembling expression-based false positives}
 \usage{CoRe.AssembleFPs(URL='https://ndownloader.figshare.com/files/26261476')}
 \arguments{
 \item{URL}{URL of the CCLE gene expression dataset.}
 }
 \value{
-\item{LowlyExpr}{A vector of strings with symbols of genes that are lowly expressed across ~1,300 cell lines to be used as false positive for benchmarcking function.}
+\item{LowlyExpr}{A vector of strings with symbols of genes that are lowly expressed across ~1,300 cell lines to be used as false positive by the benchmarking function.}
 }
-\description{Assemble a set of lowly expressed genes in cancer cell lines from the CCLE [1].}
+\description{Assembling a set of lowly expressed genes cancer cell lines from the CCLE [1].}
 \details{
 This function download CCLE gene expression data from DepMap portal [1]  then it estimates a set of overall lowly expressed genes as detailed in [2].
 }
