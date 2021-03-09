@@ -4,11 +4,11 @@
 #export(CoRe.SlopeCF)
 
 
-export(CoRe.AdAM)
+export(CoRe.ADaM)
 export(CoRe.AssembleFPs)
 export(CoRe.CF_Benchmark)
-export(CoRe.CS_AdAM)
-export(CoRe.PanCancer_AdAM)
+export(CoRe.CS_ADaM)
+export(CoRe.PanCancer_ADaM)
 export(CoRe.PercentileCF)
 export(CoRe.coreFitnessGenes)
 export(CoRe.download_AnnotationModel)
