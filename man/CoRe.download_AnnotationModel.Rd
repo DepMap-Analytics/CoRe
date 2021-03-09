@@ -4,18 +4,15 @@
 \usage{CoRe.download_AnnotationModel(
 URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')}
 \arguments{
-\item{URL}{url link to download Cell Model Passport annotation file.}
+\item{URL}{The URL specifying the online location of the annotation file. Default value points to the most up-to-date version of the Cell Model Passports annotation file (which is kept updated).}
 }
 \value{
-\item{X}{Cell Model Passport annotation file.}
+A data frame with one row per model and one colum per annotation entry.
 }
 \description{Downloading Cell Model Passport annotation file [1].}
-\details{
-If URL link exists download Binary Dependency Matrix.
-}
 \examples{
 ## Downloading Cell Model Passport annotation file
-modelAnn<-CoRe.download_AnnotationModel('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
+modelAnn<-CoRe.download_AnnotationModel()
 
 head(modelAnn)
 }
