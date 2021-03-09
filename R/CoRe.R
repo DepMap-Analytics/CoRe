@@ -1,6 +1,7 @@
-
-
 ## not exported
+
+## Apply CERES scaling on cell line fold change scores using two reference sets of essential and non-essential
+## genes
 scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
   essential_indices <- which(row.names(ge_fit) %in% ess_genes)
   nonessential_indices <- which(row.names(ge_fit) %in% noness_genes)
@@ -14,27 +15,144 @@ scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
 
   return(scaled_ge_fit)
 }
-rearrangeMatrix<-function(patterns,GENES){
+
+## This function implements an heuristic algrorithm that takes in input a sparse binary matrix and sorts its rows
+## and column in a way that the patterns of non null entries have a minimal overlap across rows.
+HeuristicMutExSorting<-function(mutPatterns){
+
+  mutPatterns<-sign(mutPatterns)
+
+  ngenes<-nrow(mutPatterns)
+  nsamples<-ncol(mutPatterns)
+
+  if (is.null(rownames(mutPatterns))){
+    rownames(mutPatterns) <- 1:ngenes
+  }
+
+  if (is.null(colnames(mutPatterns))){
+    colnames(mutPatterns) <- 1:nsamples
+  }
+
+  if (nrow(mutPatterns)>1 & ncol(mutPatterns)>1){
+
+    RowNull<-names(which(rowSums(mutPatterns)==0))
+    RowNonNull<-which(rowSums(mutPatterns)>0)
+
+    ColNull<-names(which(colSums(mutPatterns)==0))
+    ColNonNull<-which(colSums(mutPatterns)>0)
+
+    mutPatterns<-matrix(c(mutPatterns[RowNonNull,ColNonNull]),
+                        length(RowNonNull),length(ColNonNull),
+                        dimnames=list(rownames(mutPatterns)[RowNonNull],colnames(mutPatterns)[ColNonNull]))
+
+    if (nrow(mutPatterns)>1 & ncol(mutPatterns)>1){
+
+      coveredGenes<-NA
+      uncoveredGenes<-rownames(mutPatterns)
+
+      coveredSamples<-NA
+      uncoveredSamples<-colnames(mutPatterns)
+      BS<-NA
+
+      while(length(uncoveredGenes)>0 & length(uncoveredSamples)>0){
+
+        patterns<-matrix(c(mutPatterns[uncoveredGenes,uncoveredSamples]),
+                         nrow = length(uncoveredGenes),
+                         ncol = length(uncoveredSamples),
+                         dimnames = list(uncoveredGenes,uncoveredSamples))
+
+        if(length(uncoveredGenes)>1){
+          bestInClass<-findBestInClass(patterns)
+        }else{
+          bestInClass<-uncoveredGenes
+        }
+
+        if(is.na(BS[1])){
+          BS<-bestInClass
+        }else{
+          BS<-c(BS,bestInClass)
+        }
+
+        if(is.na(coveredGenes[1])){
+          coveredGenes<-bestInClass
+        }else{
+          coveredGenes<-c(coveredGenes,bestInClass)
+        }
+
+        uncoveredGenes<-setdiff(uncoveredGenes,coveredGenes)
+        toCheck<-matrix(c(patterns[bestInClass,uncoveredSamples]),nrow = 1,ncol=ncol(patterns),dimnames = list(bestInClass,uncoveredSamples))
+
+        if (length(coveredGenes)==1){
+          coveredSamples<-names(which(colSums(toCheck)>0))
+        }else{
+          coveredSamples<-c(coveredSamples,names(which(colSums(toCheck)>0)))
+        }
+
+        uncoveredSamples<-setdiff(uncoveredSamples,coveredSamples)
+
+      }
+
+      BS<-c(BS,uncoveredGenes)
+
+      CID<-rearrangeMatrix(mutPatterns,BS)
+
+      FINALMAT<-mutPatterns[BS,CID]
+
+      nullCol<-matrix(0,nrow(FINALMAT),length(ColNull),
+                      dimnames = list(rownames(FINALMAT),ColNull))
+
+      FINALMAT<-cbind(FINALMAT,nullCol)
+
+      nullRow<-matrix(0,length(RowNull),ncol(FINALMAT),
+                      dimnames = list(RowNull,colnames(FINALMAT)))
+
+      FINALMAT<-rbind(FINALMAT,nullRow)
+
+      return(FINALMAT)
+
+    } else {
+      stop('Matrix must have at least 2 non-null rows and 2 non-null columns')
+    }
+  } else {
+    stop('Matrix must have at least 2 rows and 2 columns')
+  }
+}
+
+## This function finds the gene (i.e. row) with the highest exclusive coverage. The exclusive coverage for a gene g
+## is defined as the number of uncovered samples in which this gene is mutated minus the number of samples in which
+## at least another uncovered gene is mutated.
+findBestInClass<-function(patterns){
+
+  if(nrow(patterns)==1){
+    return(rownames(patterns))
+  }
+
+  if(ncol(patterns)==1){
+    return(rownames(patterns)[1])
+  }
+
+  exclCov<-colSums(t(2*patterns)-colSums(patterns))
+  names(exclCov)<-rownames(patterns)
+
+  return(names(sort(exclCov,decreasing=TRUE))[1])
+}
+
+## Rearrange Binary Matrix columns in order to minimise row-wise entry overlap based on exclusive coverage.
+rearrangeMatrix<-function(patterns,
+                          GENES){
 
   remainingSamples<-colnames(patterns)
 
   toAdd<-NULL
 
+  DD<-t(t(2*patterns)-colSums(patterns))
+  colnames(DD) <- remainingSamples
+
   for (g in GENES){
-    remainingGenes<-setdiff(GENES,g)
-
-    P1<-matrix(c(patterns[g,remainingSamples]),length(g),length(remainingSamples),dimnames = list(g,remainingSamples))
-    P2<-matrix(c(patterns[remainingGenes,remainingSamples]),length(remainingGenes),length(remainingSamples),
-               dimnames=list(remainingGenes,remainingSamples))
-
-    if(length(remainingGenes)>1){
-      DD<-colnames(P1)[order(P1-colSums(P2),decreasing=TRUE)]
-    }else{
-      DD<-colnames(P1)[order(P1-P2,decreasing=TRUE)]
-    }
-
-    toAdd<-c(toAdd,names(which(patterns[g,DD]>0)))
+    cols <- remainingSamples[order(DD[g,remainingSamples],decreasing = TRUE)]
+    toAdd<-c(toAdd,names(which(patterns[g,cols]>0)))
     remainingSamples<-setdiff(remainingSamples,toAdd)
+
     if(length(remainingSamples)==0){
       break
     }
@@ -44,7 +162,6 @@ rearrangeMatrix<-function(patterns,GENES){
 
   return(toAdd)
 }
-
 
 ## Exported
 ## Documentation Revised
@@ -111,8 +228,6 @@ CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'
 
 }
 
-
-## Documented
 CoRe.panessprofile<-function(depMat,display=TRUE,
                              main_suffix='fitness genes in at least 1 cell line',
                              xlab='n. dependent cell lines'){
@@ -140,6 +255,7 @@ CoRe.panessprofile<-function(depMat,display=TRUE,
     }
     return(list(panessprof=panessprof,CUMsums=CUMsums))
 }
+
 CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE,verbose=TRUE){
 
     set.seed(100812)
@@ -181,9 +297,11 @@ CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE,verbose=TRUE){
 
     return(list(nullProf=nullProf,nullCumSUM=nullCumSUM))
 }
+
 CoRe.randomisedepMat<-function(depMat){
     rmat<-apply(depMat,2,sample)
 }
+
 CoRe.empiricalOdds<-function(observedCumSum,simulatedCumSum){
   nsamples<-length(observedCumSum)
   ntrials<-nrow(simulatedCumSum)
@@ -195,6 +313,7 @@ CoRe.empiricalOdds<-function(observedCumSum,simulatedCumSum){
   }
   return(odds)
 }
+
 CoRe.truePositiveRate<-function(depMat,essentialGeneSet){
   nsamples<-ncol(depMat)
 
@@ -221,6 +340,7 @@ CoRe.truePositiveRate<-function(depMat,essentialGeneSet){
 
   return(list(P=P,TP=TP,TPR=TPR))
 }
+
 CoRe.tradeoffEO_TPR<-function(EO,TPR,test_set_name,display=TRUE){
   x<-EO
   x[x==Inf]<-max(x[x<Inf])
@@ -263,6 +383,7 @@ CoRe.tradeoffEO_TPR<-function(EO,TPR,test_set_name,display=TRUE){
 
   return(point)
 }
+
 CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
   coreFitnessGenes<-rownames(depMat)[rowSums(depMat)>=crossoverpoint]
   return (coreFitnessGenes)
@@ -347,13 +468,13 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   return(X)
 }
 
-#--- Extracting Binary Dependency SubMatrix for a given tissue or cancer type, among those included
+#--- Extracting Dependency SubMatrix for a given tissue or cancer type, among those included
 #--- in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
-CoRe.extract_tissueType_BinDepMatrix<-function(fullBinDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
+CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
   cmp<-read_csv('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
   cls<-cmp$model_name[which(cmp$tissue==tissue_type | cmp$cancer_type==tissue_type)]
-  cls<-intersect(cls,colnames(fullBinDepMat))
-  return(fullBinDepMat[,cls])
+  cls<-intersect(cls,colnames(fullDepMat))
+  return(fullDepMat[,cls])
 }
 
 #--- Execute AdAM on tissue or cancer type specifc dependency submatrix
@@ -411,13 +532,12 @@ CoRe.PanCancer_AdAM<-function(pancan_depMat,
 
 #--- Computes recall and other ROC indicators for identified core fitness genes
 #--- with respect to pre-defined signatures of essential genes
-CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePositives,displayBar=FALSE){
-
+CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePositives,displayBar=TRUE){
   priorKnownSignatures<-lapply(priorKnownSignatures,function(x){intersect(x,background)})
   falsePositives<-intersect(falsePositives,background)
 
   memb<-do.call(rbind,lapply(priorKnownSignatures,function(x){
-    is.element(testedGenes,x)
+    is.element(testedGenes,x)+0
   }))
 
   colnames(memb)<-testedGenes
@@ -426,12 +546,7 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
       length(intersect(x,background))
   }))
 
-  memb<-MExMaS.HeuristicMutExSorting(memb)
-
-  pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,col=c('white','blue'),show_colnames = FALSE,
-           main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
-           width = 5,height = 3)
-
+  memb<-HeuristicMutExSorting(memb)
 
   TPRs<-rowSums(memb)/totals[rownames(memb)]
 
@@ -443,13 +558,17 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
   ps<-phyper(x-1,n,N-n,k,lower.tail=FALSE)[rownames(memb)]
 
   if(displayBar){
+    pheatmap(memb,cluster_rows = FALSE,cluster_cols = FALSE,col=c('white','blue'),show_colnames = FALSE,
+             main=paste(length(testedGenes),'core fitness genes'),legend = FALSE,
+             width = 5,height = 3)
+
     par(mfrow=c(1,2))
     par(mar=c(5,1,0,1))
     barplot(100*rev(TPRs),horiz = TRUE,names.arg = NA,xlab='% covered genes',border=FALSE)
     abline(v=0)
     abline(v=c(20,40,60,80,100),lty=2,col='gray',lwd=2)
     ps[ps==0]<-min(ps[ps>0]/10)
-    barplot(rev(-log10(ps+10)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
+    barplot(rev(-log10(ps)),horiz = TRUE,names.arg = NA,xlab='-log10 pval',border=FALSE,xlim=c(1,200),log = 'x')
     abline(v=1)
     abline(v=seq(10,200,20),lty=2,col='gray',lwd=2)
   }
@@ -516,7 +635,7 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
     Label = "AUC of gene ranks across ranked dep cell lines"
   }
 
-  names(LeastDependentdf)<-rownames(rankG)
+  rownames(LeastDependentdf)<-rownames(rankG)
   doR <- density(LeastDependentdf, bw = "nrd0")
 
   if (display){
@@ -538,48 +657,41 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed',th
   }
 
   if(thresholding=='localMin'){
-    cfgenes <- names(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
+    cfgenes <- rownames(LeastDependentdf)[which(LeastDependentdf < rankthreshold[1])]
   }else{
-    cfgenes <- names(which(cfBFs>=10))
+    medianBFs <- median(cfBFs[which(cfBFs > 0)])
+    cfgenes <- rownames(LeastDependentdf)[which(cfBFs>=medianBFs)]
   }
 
   return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1],cfBFs=cfBFs))
 }
 
-CoRe.CalculateBayesianfactor<-function(RankDistribution,display=TRUE,prefix='BayesianFactor'){
+## Compute Bayesian Factors based on gene score rank distribution
+CoRe.CalculateBayesianfactor<-function(RankDistribution,
+                                       display=TRUE){
   his<-hist(RankDistribution,breaks=100,plot = display)
-  df<-data.frame(mid=his$mids, cou=his$counts)
 
-  doR <- density(RankDistribution, bw = "nrd0")
-  localmax <- which(diff(sign(diff(doR$y)))==-2)+1
-  myranks<- doR$x
-  rankthreshold <- as.integer(myranks[localmax])+1
+  fitpro <- normalmixEM(RankDistribution, k=2)
 
-  if(display){
-    abline(v=rankthreshold)
-  }
+  m1 <- fitpro$mu[1]
+  m2 <- fitpro$mu[2]
 
-  estimate_m1 <- rankthreshold[1]
-  estimate_m2 <- tail(rankthreshold,n=1)
+  s1 <- fitpro$sigma[1]
+  s2 <- fitpro$sigma[2]
 
-  estimate_sd = (estimate_m2-estimate_m1)/5;
-
-  fitpro <- mix(as.mixdata(df),
-                mixparam(mu=c(estimate_m1,estimate_m2),
-                         sigma=c(estimate_sd,3*estimate_sd)), dist="norm")
   if (display){
-    plot(fitpro)
+    est_distr <- density(c(rnorm(1e7,m1,s1),rnorm(1e7,m2,s2)))
+
+    densCut <- min(est_distr$y[which(est_distr$x > m1 & est_distr$x < m2)])
+    rankthreshold <- est_distr$x[which(est_distr$y == densCut)]
+
+    plot(est_distr, main = 'Mixture model output')
+    abline(v=rankthreshold, col="red")
   }
-
-  m1 <- fitpro$parameters$mu[1]
-  m2 <- fitpro$parameters$mu[2]
-
-  s1 <- fitpro$parameters$sigma[1]
-  s2 <- fitpro$parameters$sigma[2]
 
   m<-RankDistribution
-  bak<-apply(m,1, function(x) log(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
-  names(bak)<-names(m)
+  bak<-apply(m,1, function(x) log2(dnorm(x,mean=m1,sd=s1)/dnorm(x,mean=m2,sd=s2)))
+  names(bak)<-rownames(m)
   return(bak)
 }
 
@@ -603,14 +715,6 @@ CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MA
 
   nG<-nrow(rankG)
   nCL<-ncol(rankG)
-
-  plot(depMat[posControl,names(sort(rankCL[posControl,]))],
-       col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
-       pch=16,ylim=c(-3,1),
-       xlab='cell line dependency ranks',ylab='gene dependency rank in x dependant cell line')
-  points(depMat[negControl,names(sort(rankCL[negControl,]))],
-       col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
-       pch=16)
 
   plot(rankG[negControl,names(sort(rankCL[negControl,]))],
        col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
