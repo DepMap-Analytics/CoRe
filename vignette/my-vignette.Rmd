@@ -87,7 +87,7 @@ The package comes with built-in data objects containing predefined sets of BAGEL
 
 ### Execute ADaM pipeline in CoRe package step by step
 
-In this simple case scenario, we are going to execute the ADaM method step by step. First, we have to download the Binary Event Matrix (BEM) from the Project Score website (https://score.depmap.sanger.ac.uk/). The matrix illustrates binarized CRISPR-Cas9 screen data performed on over 300 cell lines where 1 points out the essentiality of that gene for cell viability.
+In this case scenario, we are going to execute the ADaM method step by step. First, we have to download the Binary Event Matrix (BEM) from the Project Score website (https://score.depmap.sanger.ac.uk/). The matrix illustrates binarized CRISPR-Cas9 screen data performed on over 300 cell lines where 1 points out the essentiality of that gene for cell viability.
 In our case, we want to focus on cell lines belonging to Non-Small Cell Lung Carcinoma.
 
 ```{r, fig.show='hold', eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
