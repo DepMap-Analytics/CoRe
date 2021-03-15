@@ -18,7 +18,7 @@ A named vector:
 This function calculates log10 odd ratios of observed vs expected profiles of cumulative number of fitness genes in fixed number of cell lines.
 }
 \details{
-This function is used by the AdAM method [1] to calculate odd ratios of observed vs expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the initial binary matrix. This function is used in cascade after calls to \code{CoRe.generateNullModel} and \code{CoRe.panessprofile}.
+This function is used by the ADaM method [1] to calculate odd ratios of observed vs expected profiles of cumulative number of fitness genes in fixed number of cell lines. Expected values are the mean of those observed across randomised version of the initial binary matrix. This function is used in cascade after calls to \code{CoRe.generateNullModel} and \code{CoRe.panessprofile}.
 }
 \examples{
 ## Downloading dependency matrix

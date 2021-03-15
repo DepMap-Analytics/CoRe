@@ -45,9 +45,9 @@ signatures<-list(DNA_REPLICATION=EssGenes.DNA_REPLICATION_cons,
 # downloading binary dependency matrix from project Score [3]
 BinDepMat<-CoRe.download_BinaryDepMatrix()
 
-## Running AdAM [3] to identify Pan-Cancer core fitness genes
+## Running ADaM [3] to identify Pan-Cancer core fitness genes
 
-## defining the cell line tissues to be used in the first step of AdAM
+## defining the cell line tissues to be used in the first step of ADaM
 tissues_ctypes<-c("Haematopoietic and Lymphoid",
                   "Ovary",
                   "Peripheral Nervous System",
@@ -67,9 +67,9 @@ clannotation<-
   CoRe.download_AnnotationModel(
   'https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
 
-## Running AdAM [2]
+## Running ADaM [2]
 PanCancer_CF_genes<-
-  CoRe.PanCancer_AdAM(pancan_depMat = BinDepMat,
+  CoRe.PanCancer_ADaM(pancan_depMat = BinDepMat,
                       tissues_ctypes = tissues_ctypes,
                       clannotation = clannotation,
                       TruePositives = curated_BAGEL_essential,
@@ -78,15 +78,15 @@ PanCancer_CF_genes<-
 ## Assemling lowly expressed genes from the CCLE [2]
 FPs<-CoRe.AssembleFPs()
 
-## benchmarking the core fitness genes predicted by AdAM
+## benchmarking the core fitness genes predicted by ADaM
 ## plotting a heatmap highlighting the recalled prior known essential genes
 ## with barplots and enrichhment pvalues
-AdAMperf<-CoRe.CF_Benchmark(PanCancer_CF_genes,
+ADaMperf<-CoRe.CF_Benchmark(PanCancer_CF_genes,
   background = rownames(BinDepMat),priorKnownSignatures =
   signatures,falsePositives=FPs)
 
 ## Inspecting TPRs, PPV and FPR
-AdAMper$
+ADaMper$
 
 }
 \references{
