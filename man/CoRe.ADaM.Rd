@@ -1,8 +1,8 @@
-\name{CoRe.AdAM}
-\alias{CoRe.AdAM}
+\name{CoRe.ADaM}
+\alias{CoRe.ADaM}
 \title{Adaptive Daisy Model to compute core fitness genes}
 \usage{
-CoRe.AdAM(depMat,
+CoRe.ADaM(depMat,
           display=TRUE,
           main_suffix='fitness genes in at least 1 cell line',
           xlab='n. dependent cell lines',
@@ -46,8 +46,8 @@ LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
 ## from the CRISPRcleanR package, derived from [1] and [2]
 data(curated_BAGEL_essential)
 
-## Computing lung cancer core-fitness genes with AdAM
-cfgenes <- CoRe.AdAM(LungDepMap, TruePositives = curated_BAGEL_essential)
+## Computing lung cancer core-fitness genes with ADaM
+cfgenes <- CoRe.ADaM(LungDepMap, TruePositives = curated_BAGEL_essential)
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.

@@ -14,7 +14,7 @@ CoRe.coreFitnessGenes(depMat,
 A vector of string containing the predicted core fitness genes.
 }
 \description{
-This function identifies as Core Fitness those genes that are fitness genes in at least \emph{n} cell lines (defined in input), according to the binary dependency matrix defined in input. This minimal \emph{n} is estimated through the AdAM method [1] by the \code{CoRe.tradeoffEO_TPR} function.
+This function identifies as Core Fitness those genes that are fitness genes in at least \emph{n} cell lines (defined in input), according to the binary dependency matrix defined in input. This minimal \emph{n} is estimated through the ADaM method [1] by the \code{CoRe.tradeoffEO_TPR} function.
 }
 \examples{
 ## Downloading a binary dependency matrix

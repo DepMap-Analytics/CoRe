@@ -1,7 +1,7 @@
-\name{CoRe.PanCancer_AdAM}
-\alias{CoRe.PanCancer_AdAM}
-\title{Execute AdAM at the Pan-cancer level}
-\usage{CoRe.PanCancer_AdAM(pancan_depMat,
+\name{CoRe.PanCancer_ADaM}
+\alias{CoRe.PanCancer_ADaM}
+\title{Execute ADaM at the Pan-cancer level}
+\usage{CoRe.PanCancer_ADaM(pancan_depMat,
                           tissues_ctypes,
                           clannotation = NULL,
                           display=TRUE,
@@ -20,12 +20,12 @@
 \value{
 \item{PanCancer_CF_genes}{A vector of string with Core Fitness Genes' symbols for the tissue/cancer type of interest.}
 }
-\description{Execute AdAM on tissue or cancer type specific dependency submatrix.}
+\description{Execute ADaM on tissue or cancer type specific dependency submatrix.}
 \details{
-Execute sequentially the whole AdAM pipeline on every tissue and identify Pan-cancer core fitness genes.
+Execute sequentially the whole ADaM pipeline on every tissue and identify Pan-cancer core fitness genes.
 }
 \examples{
-# Identifying pan-cancer core-fitness genes with the AdAM model, as
+# Identifying pan-cancer core-fitness genes with the ADaM model, as
 # described in Behan et al 2019, i.e. performing analyses at individual
 # tissues/cancer-type level then collapsing results at pan-cancer level
 
@@ -52,7 +52,7 @@ clannotation<-
 
 data(curated_BAGEL_essential)
 PanCancer_CF_genes<-
-  CoRe.PanCancer_AdAM(pancan_depMat = BinDepMat,
+  CoRe.PanCancer_ADaM(pancan_depMat = BinDepMat,
                       tissues_ctypes = tissues_ctypes,
                       clannotation = clannotation,
                       TruePositives = curated_BAGEL_essential,
@@ -65,8 +65,8 @@ PanCancer_CF_genes<-
 [2] Van der Meer D, Barthorpe S, Yang W, et al. Cell Model Passports-a hub for clinical, genetic and functional datasets of preclinical cancer models. Nucleic Acids Res. 2019;47(D1):D923–D929.
 }
 \seealso{
-\code{\link{CoRe.CS_AdAM}}
-\code{\link{CoRe.AdAM}}
+\code{\link{CoRe.CS_ADaM}}
+\code{\link{CoRe.ADaM}}
 }
 \author{
 C. Pacini, E. Karakoc, A. Vinceti & F. Iorio

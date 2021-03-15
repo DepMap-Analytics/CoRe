@@ -1,6 +1,6 @@
 \name{CoRe.tradeoffEO_TPR}
 \alias{CoRe.tradeoffEO_TPR}
-\title{Calculate AdAM threshold}
+\title{Calculate ADaM threshold}
 \usage{
 CoRe.tradeoffEO_TPR(EO,
                     TPR,
@@ -13,7 +13,7 @@ CoRe.tradeoffEO_TPR(EO,
 \item{TPR}{Profile of True positive rates for across number of cell line. Computed with the \code{CoRe.truePositiveRate} function.}
 
 \item{test_set_name}{Name to give to the analysis, used for plotting titles.}
-\item{display}{Boolean, default is TRUE. Should AdAM tradeoff strategy be plotted.}
+\item{display}{Boolean, default is TRUE. Should ADaM tradeoff strategy be plotted.}
 }
 \value{
 ADAM model threshold:

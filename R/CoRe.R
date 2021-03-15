@@ -165,7 +165,7 @@ rearrangeMatrix<-function(patterns,
 
 ## Exported
 ## Documentation Revised
-CoRe.AdAM<-function(depMat,display=TRUE,
+CoRe.ADaM<-function(depMat,display=TRUE,
                     main_suffix='fitness genes in at least 1 cell line',
                     xlab='n. dependent cell lines',
                     ntrials=1000,verbose=TRUE,TruePositives){
@@ -183,9 +183,9 @@ CoRe.AdAM<-function(depMat,display=TRUE,
     print('- Profiling true positive rates')}
   TPR<-CoRe.truePositiveRate(depMat,TruePositives)
   if(verbose){print('- Done!')
-    print('+ Calculating AdAM threshold (min. n. of dependent cell lines for core fitness genes)')}
+    print('+ Calculating ADaM threshold (min. n. of dependent cell lines for core fitness genes)')}
   crossoverpoint<-CoRe.tradeoffEO_TPR(EO,TPR$TPR,test_set_name = 'curated BAGEL essential',display = display)
-  if(verbose){print(paste('AdAM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
+  if(verbose){print(paste('ADaM threshold =',crossoverpoint,'(out of',ncol(depMat),'cell lines)'))
     print('- Done!')
     print('+ Estimating set of core fitness genes')}
   coreFitnessGenes<-CoRe.coreFitnessGenes(depMat,crossoverpoint)
@@ -477,8 +477,8 @@ CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Ce
   return(fullDepMat[,cls])
 }
 
-#--- Execute AdAM on tissue or cancer type specifc dependency submatrix
-CoRe.CS_AdAM<-function(pancan_depMat,
+#--- Execute ADaM on tissue or cancer type specifc dependency submatrix
+CoRe.CS_ADaM<-function(pancan_depMat,
                        tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                        clannotation = NULL,
                        display=TRUE,
@@ -490,40 +490,40 @@ CoRe.CS_AdAM<-function(pancan_depMat,
   cls<-intersect(colnames(pancan_depMat),cls)
   cs_depmat<-pancan_depMat[,cls]
 
-  return(CoRe.AdAM(cs_depmat,display=display,
+  return(CoRe.ADaM(cs_depmat,display=display,
                    main_suffix = main_suffix,
                    xlab=xlab,
                    ntrials=ntrials,
                    verbose=verbose,TruePositives = TruePositives))
 }
 
-#--- Execute AdAM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
-CoRe.PanCancer_AdAM<-function(pancan_depMat,
+#--- Execute ADaM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
+CoRe.PanCancer_ADaM<-function(pancan_depMat,
                               tissues_ctypes,
                               clannotation = NULL,
                               display=TRUE,
                               ntrials=1000,verbose=TRUE,TruePositives){
 
 
-  systematic_CS_AdAM_res<-lapply(tissues_ctypes,function(x){
+  systematic_CS_ADaM_res<-lapply(tissues_ctypes,function(x){
       if(verbose){
-        print(paste('Running AdAM for',x))
+        print(paste('Running ADaM for',x))
       }
-      CoRe.CS_AdAM(pancan_depMat,tissue_ctype = x,
+      CoRe.CS_ADaM(pancan_depMat,tissue_ctype = x,
                    clannotation,display = display,
                    ntrials = ntrials,
                    verbose=verbose,TruePositives = TruePositives)
     })
 
-  all_TS_CF_genes<-sort(unique(unlist(systematic_CS_AdAM_res)))
+  all_TS_CF_genes<-sort(unique(unlist(systematic_CS_ADaM_res)))
 
   TS_CF_matrix<-
-    do.call(cbind,lapply(systematic_CS_AdAM_res,function(x){is.element(all_TS_CF_genes,x)+0}))
+    do.call(cbind,lapply(systematic_CS_ADaM_res,function(x){is.element(all_TS_CF_genes,x)+0}))
 
   rownames(TS_CF_matrix)<-all_TS_CF_genes
   colnames(TS_CF_matrix)<-tissues_ctypes
 
-  CoRe.AdAM(depMat = TS_CF_matrix,
+  CoRe.ADaM(depMat = TS_CF_matrix,
             main_suffix = 'genes predicted to be core fitness for at least 1 tissue/cancer-type',
             xlab = 'n. tissue/cancer-type',verbose = FALSE,TruePositives = TruePositives)
 

@@ -1,7 +1,7 @@
-\name{CoRe.CS_AdAM}
-\alias{CoRe.CS_AdAM}
-\title{Execute AdAM on a specific tissue/cancer type}
-\usage{CoRe.CS_AdAM(pancan_depMat,
+\name{CoRe.CS_ADaM}
+\alias{CoRe.CS_ADaM}
+\title{Execute ADaM on a specific tissue/cancer type}
+\usage{CoRe.CS_ADaM(pancan_depMat,
                      tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                      clannotation = NULL,
                      display=TRUE,
@@ -24,9 +24,9 @@
 \value{
 \item{coreFitnessGenes}{A vector of strings with estimated Core Fitness Genes' symbols for the tissue/cancer type of interest.}
 }
-\description{Execute AdAM on a tissue- or cancer-type-specific binary dependency submatrix.}
+\description{Execute ADaM on a tissue- or cancer-type-specific binary dependency submatrix.}
 \details{
-Execute sequentially the whole AdAM pipeline on a tissue or cancer type specific dependency submatrix.
+Execute sequentially the whole ADaM pipeline on a tissue or cancer type specific dependency submatrix.
 }
 \examples{
 ## downloading a reference set of prior known essential genes from [3]
@@ -42,7 +42,7 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 clannotation<-
   CoRe.download_AnnotationModel('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz') ## dataset from [2]
 
-SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',
+SNCLC_cf_genes<-CoRe.CS_ADaM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                              clannotation = clannotation,
                              TruePositives = curated_BAGEL_essential)
 }
@@ -54,7 +54,7 @@ SNCLC_cf_genes<-CoRe.CS_AdAM(BinDepMat,tissue_ctype = 'Non-Small Cell Lung Carci
 [3] Hart T, Chandrashekhar M, Aregger M, et al. High-Resolution CRISPR Screens Reveal Fitness Genes and Genotype-Specific Cancer Liabilities. Cell. 2015 Dec 3;163(6):1515-26.
 }
 \seealso{
-\code{\link{CoRe.AdAM}}
+\code{\link{CoRe.ADaM}}
 }
 \author{
 C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
