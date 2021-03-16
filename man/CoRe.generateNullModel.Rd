@@ -8,7 +8,7 @@ CoRe.generateNullModel(depMat,
                        verbose=TRUE)
 }
 \arguments{
-\item{depMat}{A binary dependency matri where rows are genes and columns are cell-lines/samples with a 1 in position \emph{[i,j]} indicating that the inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th cell-line/sample.}
+\item{depMat}{A binary dependency matrix where rows are genes and columns are cell-lines/samples with a 1 in position \emph{[i,j]} indicating that the inactivation of the \emph{i}-th gene exerts a significant loss of fitness in the \emph{j}-th cell-line/sample.}
 
 \item{ntrials}{Integer, default = 1000. How many randomly permuted versions of the inputted dependency matrix should be generated
 to simulate null distributions of number of fitenss genes across number of cell lines and their cumulative sums.}
