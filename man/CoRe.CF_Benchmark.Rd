@@ -18,7 +18,7 @@
 \item{PPV}{Positive predicted value obtained pooling all inputed signatures together and using them as positive cases.}
 \item{FPR}{False positive rate of the inputed false positive genes.}
 }
-\description{This function assess the set of predicted core fitness genes by computing the recall (and other ROC indicators) of prior known essential genes and false positives.}
+\description{This function assesses the set of predicted core fitness genes by computing the recall (and other ROC indicators) of prior known essential genes and false positives.}
 \details{
 Computes recall and other ROC indicators for identified core fitness genes with respect to pre-defined signatures of essential and false positive genes defined in input.
 }

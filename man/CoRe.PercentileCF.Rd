@@ -1,47 +1,60 @@
 \name{CoRe.PercentileCF}
 \alias{CoRe.PercentileCF}
-\title{Execute 90-th percentile method}
+\title{Fitness Percentile method to estimate common essential genes}
 \usage{CoRe.PercentileCF(depMat,
                   display=TRUE,
                   percentile=0.9,
                   method='fixed')}
 \arguments{
-\item{depMat}{Quantitative Dependency Matrix containing Pan-cancer or tissue/cancer types specific models.}
-\item{display}{Boolean, default is TRUE. Should gene score rank distribution of the dependency be plotted.}
-\item{percentile}{Numerical value in range [0,1], default is 0.9. Percentile to be used as threshold.}
-\item{method}{Character, default is 'fixed'. Specify which version of the 90-th percentile use, options are:\cr
-  - fixed: calculates the rank distribution of genes at their least dependent 90-th percentile cell line.\cr
-  - average: calculates the average rank distribution of the least dependent 90-th percentile cell lines.\cr
-  - slope: employs all the cell lines to fit a linear model to generate a gene score rank distribution for each gene. The slope distribution of the genes score ranks form a bimodal distribution similar to the percentile gene score rank methods of the first two versions. Using this distribution it is possible to determine the point of minimum density between two peaks and predict the essential genes.\cr\cr
-  For each version, the resulting bimodal distribution is used for the identification of essential genes under the considered cell lines.}
+\item{depMat}{Quantitative Dependency Matrix containing Pan-cancer or tissue/cancer-types specific gene fitness/dependency scores across cell-lines/samples. The value in position \eqn{[i,j]} of such matrix quantifies the fitness/dependency score of the \eqn{i}-th gene in the \eqn{j}-th cell line.}
+\item{display}{Boolean, default is TRUE. Should gene score rank distributions of dependency scores be plotted.}
+\item{percentile}{Numerical value in range [0,1], default is 0.9. Percentile to be used as a threshold.}
+\item{method}{Character, default is 'fixed'. This parameter specifies which variant of the Fitness Percentile method should be used, admissimble values are:\cr
+  - fixed: a distribution of gene fitness-rank-position in their least dependent \code{n}-th (determined by the \code{percentile} parameter) percentile cell line is used in the subsequent step of the Fitness Percentile method.\cr
+  - average: a distribution of gene average fitness-rank-position across all cell lines at or over the \code{n}-th percentile of least dependent cell lines (where \eqn{n} is determined by the \code{percentile} parameter) is used in the subsequent step Fitness Percentile method.\cr
+  - slope: for each gene, a linear model is fit on the sequence of gene fitness-rank-positions across cell line sorted according to the dependency on that gene, then a distrubution of models' slopes is used in the subsequent step Fitness Percentile method.\cr\cr}
 }
 \value{
 List of the following items:
-\item{cfgenes}{A vector of string with Core Fitness Genes' symbols for the tissue/cancer type of interest.}
+\item{cfgenes}{A vector of string with common essential genes' symbols for the tissue/cancer type of interest.}
 \item{geneRanks}{Dataframe containing rank scores for each gene.}
-\item{LocalMinRank}{Discriminative threshold estimated using the 'localMin' thresholding option.}
+\item{LocalMinRank}{Discriminative rank threshold.}
 }
-\description{Execute 90-th percentile method [1] on Quantitative Dependency Matrix.}
+\description{Execute the Fitness percentile method introduced in [1] using multiple quantitative gene dependency profiles.}
 \details{
-Calculate the Core Fitness genes using the 90th-percentile [1] least dependent cell line from Quantative knockout screen dependency matrix containing Pan-cancer or tissue/cancer types specific models.
+This function implements the Fitness Percentile method to estimate common essential genes from multiple gene dependency screens introduced in [1]. For each gene in the quantitative dependency matrix provided in input a score is computed using three possible variants of the method. This can ben its fitness/essentiality rank when considering among all gene scores in its \code{n}-th percentile least dependent cell line, or the average rank when considering all cell lines falling within or over the
+\code{n}-th percentile of least dependent cell lines, or the slope of the curve obtained for each gene when fitting a linear model on the sequence of gene fitness-rank-positions across cell lines sorted according to the dependency on that gene (where both variant and \code{n} are user defined.)
+
+
+The density of these gene scores (generally bimodal) is then estimated using a Gaussian kernel
+the central point of minimum density identified. Genes whose score falls
+below the point of minimum density are classified as common
+essential.
+This method is fully detailed in [1].
 }
 \examples{
-## Execute all possible combination of 90-th percentile method on Quantitative
-## knockout screen dependency
+## Downloading a set of priori known essential genes to be used as true positives from [2] and manually
+## curated as detailed in [3]
 data(curated_BAGEL_essential)
 data(curated_BAGEL_nonEssential)
 
+## Downloading and scaling quantitative dependency matrix from project score [3,4]
 depMat<-CoRe.download_DepMatrix(scaled = TRUE, ess = curated_BAGEL_essential, noness = curated_BAGEL_nonEssential)
 
+## Executing the three variants of the Fitness percentile method
 CFgenes<-CoRe.PercentileCF(depMat,method = 'fixed')
 CFgenesAVG<-CoRe.PercentileCF(depMat,method = 'average')
 CFgenesSLOPE<-CoRe.PercentileCF(depMat,method = 'slope')
 }
 \references{
 [1] Dempster, J.M., Pacini, C., Pantel, S. et al. Agreement between two large pan-cancer CRISPR-Cas9 gene dependency data sets. Nat Commun 10, 5817 (2019).
-}
-\seealso{
-\code{\link{CoRe.CalculateBayesianfactor}}
+
+[2] Hart T, Chandrashekhar M, Aregger M, Steinhart Z, Brown KR, MacLeod G, Mis M, Zimmermann M, Fradet-Turcotte A, Sun S, Mero P, Dirks P, Sidhu S, Roth FP, Rissland OS, Durocher D, Angers S, Moffat J. High-Resolution CRISPR Screens Reveal Fitness Genes and Genotype-Specific Cancer Liabilities. Cell. 2015 Dec 3;163(6):1515-26. doi: 10.1016/j.cell.2015.11.015. Epub 2015 Nov 25. PMID: 26627737.
+
+[3] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
+
+[4] Dwane L, Behan FM, Gonçalves E, Lightfoot H, Yang W, van der Meer D, Shepherd R, Pignatelli M, Iorio F, Garnett MJ. Project Score database: a resource for investigating cancer cell dependencies and prioritizing therapeutic targets. Nucleic Acids Res. 2021 Jan 8;49(D1):D1365-D1372.
+
 }
 \author{
 C. Pacini, E. Karakoc, A. Vinceti & F. Iorio
