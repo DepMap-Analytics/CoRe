@@ -423,7 +423,7 @@ CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
   return(X)
 }
 
-#--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
+#--- Downloading and scaling Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
                                   scaled=FALSE,
                                   ess=NULL,
