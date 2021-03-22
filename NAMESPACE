@@ -1,15 +1,9 @@
-#export(CoRe.CalculateBayesianfactor)
-#export(CoRe.PercentileAverageCF)
-#export(CoRe.PercentileCF)
-#export(CoRe.SlopeCF)
-
-
 export(CoRe.ADaM)
 export(CoRe.AssembleFPs)
 export(CoRe.CF_Benchmark)
 export(CoRe.CS_ADaM)
 export(CoRe.PanCancer_ADaM)
-export(CoRe.PercentileCF)
+export(CoRe.FiPer)
 export(CoRe.coreFitnessGenes)
 export(CoRe.download_AnnotationModel)
 export(CoRe.download_BinaryDepMatrix)

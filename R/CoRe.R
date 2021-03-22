@@ -423,7 +423,7 @@ CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
   return(X)
 }
 
-#--- Downloading Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
+#--- Downloading and scaling Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
                                   scaled=FALSE,
                                   ess=NULL,
@@ -585,7 +585,7 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
 
 #--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
 #--- Quantative knockout screen dependency matrix.
-CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
+CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
 
   depMat<-as.matrix(depMat)
 
@@ -659,7 +659,8 @@ CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
   return(list(cfgenes=cfgenes,geneRanks=LeastDependentdf,LocalMinRank=rankthreshold[1]))
 }
 
-CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MAP2K1',gg){
+CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl='MAP2K1',method='fixed'){
+  gg<-gene
   depMat<-as.matrix(depMat)
 
   rankCL<-t(apply(depMat,1,function(x){
@@ -680,6 +681,8 @@ CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MA
   nG<-nrow(rankG)
   nCL<-ncol(rankG)
 
+  par(mfrow=c(1,2))
+
   plot(rankG[negControl,names(sort(rankCL[negControl,]))],
        col=rgb(150,0,0,alpha = 180,maxColorValue = 255),
        pch=16,ylim=c(0,nrow(depMat)),
@@ -692,10 +695,39 @@ CoRe.VisCFness<-function(depMat,percentile=0.9,posControl='RPL12',negControl='MA
 
   threshold = as.integer(nCL*percentile)
 
-  abline(v=threshold,lty=2)
+  if(method=='fixed'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
+    Label = "Gene rank in 90th perc. least dep cell line"
+  }
 
-  LeastDependentdf<-unlist(lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
-  Label = "Gene rank in 90th perc. least dep cell line"
+  if(method=='average'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){mean(rankG[x,names(which(rankCL[x,]>=threshold))])}))
+    Label = "Gene average rank in ≥ 90th perc. of least dep cell lines"
+  }
+
+  if(method=='slope'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){
+      a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
+      b<-as.data.frame(a)
+      p<-lm(a ~ seq(1:nCL) , data=b)
+      coef(p)[2]
+    }))
+    Label = "Slope of gene ranks across ranked dep cell lines"
+  }
+
+  if(method=='AUC'){
+    LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){
+      a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
+      sum(a)
+    }))
+    Label = "AUC of gene ranks across ranked dep cell lines"
+  }
+
+  cc<-c(rgb(0,200,100,alpha = 180,maxColorValue = 255),
+        rgb(150,0,0,alpha = 180,maxColorValue = 255),
+        rgb(0,0,100,alpha = 180,maxColorValue = 255))
+  legend('topleft',legend=c(posControl,negControl,gg),col=cc,pch=16)
+
   names(LeastDependentdf)<-rownames(rankG)
 
   hist(LeastDependentdf,main=Label)

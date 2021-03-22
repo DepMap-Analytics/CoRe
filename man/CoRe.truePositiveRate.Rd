@@ -17,31 +17,35 @@ A list of the following vectors:
 \item{TPR}{\code{TP} divided by number of genes in set reference set of essential genes provided in input.}
 }
 \description{
-This function calculates a profile of True Positive Rates for fitness genes in at least \emph{n} cell lines, with positive cases from a reference set of essential genes.
+This function is used by the ADaM method [1] calculates a profile of True Positive Rates for fitness genes in at least \emph{n} cell lines, with positive cases from a reference set of essential genes.
 }
 \details{
 This function calculates true positive rates for fitness genes in at least {n} cell lines (for each {n}). First, this function calculates the number of cell lines for which each gene is a fitness gene. Second, for a given number of cell lines, the set of genes that are fitness genes in at least that number of cell lines is determined. Finally, this set of genes is then compared to the reference set of essential genes to calculate a true positive rate.
 }
 \examples{
-## Downloading dependency matrix
-## for > 300 cancer cell lines from [1]
+## Downloading binary dependency matrix
+## for > 300 cancer cell lines from Project Score [1,2]
 BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMat<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat,tissue_type="Non-Small Cell Lung Carcinoma")
+LungDepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
 
 ## Loading a reference set of essential genes from
-## from the CRISPRcleanR package, derived from [2]
+## from the CRISPRcleanR package, derived from [3]
 data(BAGEL_essential)
 
 TPR<-CoRe.truePositiveRate(LungDepMat,BAGEL_essential)
-head(TPR)
+
+## inspect results
+TPR
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
 
-[2] Hart T, Chandrashekhar M, Aregger M, Steinhart Z, Brown KR, MacLeod G, Mis M, Zimmermann M, Fradet-Turcotte A, Sun S, Mero P, Dirks P, Sidhu S, Roth FP, Rissland OS, Durocher D, Angers S, Moffat J. High-Resolution CRISPR Screens Reveal Fitness Genes and Genotype-Specific Cancer Liabilities. Cell. 2015 Dec 3;163(6):1515-26. doi: 10.1016/j.cell.2015.11.015. Epub 2015 Nov 25. PMID: 26627737.
+[2] Dwane L, Behan FM, Gonçalves E, Lightfoot H, Yang W, van der Meer D, Shepherd R, Pignatelli M, Iorio F, Garnett MJ. Project Score database: a resource for investigating cancer cell dependencies and prioritizing therapeutic targets. Nucleic Acids Res. 2021 Jan 8;49(D1):D1365-D1372.
+
+[3] Hart T, Chandrashekhar M, Aregger M, Steinhart Z, Brown KR, MacLeod G, Mis M, Zimmermann M, Fradet-Turcotte A, Sun S, Mero P, Dirks P, Sidhu S, Roth FP, Rissland OS, Durocher D, Angers S, Moffat J. High-Resolution CRISPR Screens Reveal Fitness Genes and Genotype-Specific Cancer Liabilities. Cell. 2015 Dec 3;163(6):1515-26. doi: 10.1016/j.cell.2015.11.015. Epub 2015 Nov 25. PMID: 26627737.
 }
 \author{
 C. Pacini, E. Karakoc, A. Vinceti & F. Iorio

@@ -30,7 +30,7 @@ This function executes ADaM on every tissue in cascade to identify Cancer Type s
 # tissues/cancer-type level then iterating the proceudre at pan-cancer level
 
 ## Downloading binary dependency matrix
-## for > 300 cancer cell lines from Project Score [1]
+## for > 300 cancer cell lines from Project Score [1,4]
 BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Defining tissues/cancer-types that should be considered in the
@@ -75,6 +75,9 @@ PanCancer_CF_genes
 [2] Van der Meer D, Barthorpe S, Yang W, et al. Cell Model Passports-a hub for clinical, genetic and functional datasets of preclinical cancer models. Nucleic Acids Res. 2019;47(D1):D923–D929.
 
 [3] Hart T, Chandrashekhar M, Aregger M, Steinhart Z, Brown KR, MacLeod G, Mis M, Zimmermann M, Fradet-Turcotte A, Sun S, Mero P, Dirks P, Sidhu S, Roth FP, Rissland OS, Durocher D, Angers S, Moffat J. High-Resolution CRISPR Screens Reveal Fitness Genes and Genotype-Specific Cancer Liabilities. Cell. 2015 Dec 3;163(6):1515-26. doi: 10.1016/j.cell.2015.11.015. Epub 2015 Nov 25. PMID: 26627737.
+
+[4] Dwane L, Behan FM, Gonçalves E, Lightfoot H, Yang W, van der Meer D, Shepherd R, Pignatelli M, Iorio F, Garnett MJ. Project Score database: a resource for investigating cancer cell dependencies and prioritizing therapeutic targets. Nucleic Acids Res. 2021 Jan 8;49(D1):D1365-D1372.
+
 }
 \seealso{
 \code{\link{CoRe.CS_ADaM}}
