@@ -40,14 +40,14 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMat<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
+LungDepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
 
 ## Loading a reference set of essential genes from
 ## from the CRISPRcleanR package, derived from [1] and [2]
 data(curated_BAGEL_essential)
 
 ## Computing lung cancer core-fitness genes with ADaM
-cfgenes <- CoRe.ADaM(LungDepMap, TruePositives = curated_BAGEL_essential)
+cfgenes <- CoRe.ADaM(LungDepMat, TruePositives = curated_BAGEL_essential)
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
