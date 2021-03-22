@@ -1,7 +1,7 @@
-\name{CoRe.PercentileCF}
-\alias{CoRe.PercentileCF}
+\name{CoRe.FiPer}
+\alias{CoRe.FiPer}
 \title{Fitness Percentile method to estimate common essential genes}
-\usage{CoRe.PercentileCF(depMat,
+\usage{CoRe.FiPer(depMat,
                   display=TRUE,
                   percentile=0.9,
                   method='fixed')}
@@ -42,10 +42,10 @@ data(curated_BAGEL_nonEssential)
 depMat<-CoRe.download_DepMatrix(scaled = TRUE, ess = curated_BAGEL_essential, noness = curated_BAGEL_nonEssential)
 
 ## Executing the three variants of the Fitness percentile method
-CFgenes<-CoRe.PercentileCF(depMat,method = 'fixed')
-CFgenesAVG<-CoRe.PercentileCF(depMat,method = 'average')
-CFgenesSLOPE<-CoRe.PercentileCF(depMat,method = 'slope')
-CFgenesAUC<-CoRe.PercentileCF(depMat,method = 'AUC')
+CFgenes<-CoRe.FiPer(depMat,method = 'fixed')
+CFgenesAVG<-CoRe.FiPer(depMat,method = 'average')
+CFgenesSLOPE<-CoRe.FiPer(depMat,method = 'slope')
+CFgenesAUC<-CoRe.FiPer(depMat,method = 'AUC')
 
 ## Inspect the identified common essential genes
 CFgenes$cfgenes

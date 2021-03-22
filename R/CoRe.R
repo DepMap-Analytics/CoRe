@@ -585,7 +585,7 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
 
 #--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
 #--- Quantative knockout screen dependency matrix.
-CoRe.PercentileCF<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
+CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='fixed'){
 
   depMat<-as.matrix(depMat)
 
