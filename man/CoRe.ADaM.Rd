@@ -40,7 +40,7 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
+LungDepMat<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
 
 ## Loading a reference set of essential genes from
 ## from the CRISPRcleanR package, derived from [1] and [2]
