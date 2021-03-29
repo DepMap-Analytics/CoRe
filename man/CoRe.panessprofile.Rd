@@ -35,7 +35,7 @@ LungDepMap<-CoRe.extract_tissueType_BinDepMatrix(BinDepMat)
 
 ## Computing number of fitness genes across fixed numbers
 ## of cell lines and its cumulative sums
-pprofile <- CoRe.panessprofile(depMat = LungDepMap)
+pprofile <- CoRe.panessprofile(depMat = LungDepMat)
 head(pprofile)
 }
 \author{

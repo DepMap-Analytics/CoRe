@@ -428,6 +428,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
                                   scaled=FALSE,
                                   ess=NULL,
                                   noness=NULL){
+
   if(url.exists(URL)){
     dir.create(tmp <- tempfile())
     dir.create(file.path(tmp, "mydir"))
