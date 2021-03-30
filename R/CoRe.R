@@ -524,7 +524,7 @@ CoRe.PanCancer_ADaM<-function(pancan_depMat,
   rownames(TS_CF_matrix)<-all_TS_CF_genes
   colnames(TS_CF_matrix)<-tissues_ctypes
 
-  CoRe.ADaM(depMat = TS_CF_matrix,
+  CoRe.ADaM(depMat = TS_CF_matrix, display = display,
             main_suffix = 'genes predicted to be core fitness for at least 1 tissue/cancer-type',
             xlab = 'n. tissue/cancer-type',verbose = FALSE,TruePositives = TruePositives)
 
