@@ -1,0 +1,519 @@
+ELP3	SANGER and BROAD	Novel Core
+RPN1	SANGER and BROAD	Core gene in known essential processes
+RBM25	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+EIF2B2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+HIST1H2BJ	SANGER and BROAD	Novel Core
+SKIV2L2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CSNK2B	SANGER and BROAD	Therapeutically Tractable
+CHD4	SANGER and BROAD	Core gene in known essential processes
+SON	SANGER and BROAD	Novel Core
+STX5	SANGER and BROAD	Novel Core
+EIF4G1	SANGER and BROAD	Therapeutically Tractable
+PSMC4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CDCA5	SANGER and BROAD	Novel Core
+HIST1H2BE	SANGER and BROAD	Novel Core
+LSM5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SOD1	SANGER and BROAD	Therapeutically Tractable
+USP5	SANGER and BROAD	Core gene in known essential processes
+EIF4E	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MED20	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SRP54	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RBBP8	SANGER and BROAD	Novel Core
+TAF10	SANGER and BROAD	Novel Core
+ZC3H8	SANGER and BROAD	Novel Core
+NAA20	SANGER and BROAD	Novel Core
+BANP	SANGER and BROAD	Novel Core
+ZMAT2	SANGER and BROAD	Novel Core
+NCAPD2	SANGER and BROAD	Novel Core
+NCL	SANGER and BROAD	Core gene in known essential processes
+SIN3A	SANGER and BROAD	Core gene in known essential processes
+EIF1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NUP107	SANGER and BROAD	Novel Core
+RBM19	SANGER and BROAD	Core gene in known essential processes
+RPS28	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SMC3	SANGER and BROAD	Novel Core
+DNAJC9	SANGER and BROAD	Core gene in known essential processes
+DHFR	SANGER and BROAD	Core gene in known essential processes
+PSMD2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPL34	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TP53RK	SANGER and BROAD	Novel Core
+ATR	SANGER and BROAD	Core gene in known essential processes
+NACA	SANGER and BROAD	Therapeutically Tractable
+NUBP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PPP1R12A	SANGER and BROAD	Core gene in pluripotent stem cell development
+BUB1	SANGER and BROAD	Core gene in pluripotent stem cell development
+SF3A1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+POLR3B	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+UBAP1	SANGER and BROAD	Therapeutically Tractable
+HIST1H2BL	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SKP1	SANGER and BROAD	Core gene in known essential processes
+PTPN11	SANGER and BROAD	Therapeutically Tractable
+DNAJC8	SANGER and BROAD	Therapeutically Tractable
+SEC61A1	SANGER and BROAD	Novel Core
+ALYREF	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SHFM1	SANGER and BROAD	Novel Core
+CCDC59	SANGER and BROAD	Novel Core
+COX17	SANGER and BROAD	Core gene in pluripotent stem cell development
+PPP2R3C	SANGER and BROAD	Core gene in pluripotent stem cell development
+VPS18	SANGER and BROAD	Novel Core
+PPP1R7	SANGER and BROAD	Therapeutically Tractable
+DUT	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CDCA8	SANGER and BROAD	Core gene in known essential processes
+BMS1	SANGER and BROAD	Novel Core
+RPL7A	SANGER and BROAD	Core gene in pluripotent stem cell development
+CENPE	SANGER and BROAD	Therapeutically Tractable
+SRP68	SANGER and BROAD	Novel Core
+MTBP	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ARMC7	SANGER and BROAD	Novel Core
+ATP6V1H	SANGER and BROAD	Therapeutically Tractable
+UBE2I	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NELFCD	SANGER and BROAD	Novel Core
+ACO2	SANGER and BROAD	Novel Core
+SNUPN	SANGER and BROAD	Therapeutically Tractable
+AFG3L2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+XRN1	SANGER and BROAD	Therapeutically Tractable
+SSB	SANGER and BROAD	Therapeutically Tractable
+SGOL1	SANGER and BROAD	Novel Core
+RPAP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RRP7A	SANGER and BROAD	Core gene in pluripotent stem cell development
+CHCHD4	SANGER and BROAD	Novel Core
+PDAP1	SANGER and BROAD	Therapeutically Tractable
+TOP3A	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PAM16	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TCOF1	SANGER and BROAD	Novel Core
+MRPL34	SANGER and BROAD	Core gene in known essential processes
+KIF18A	SANGER and BROAD	Core gene in known essential processes
+PPP1CB	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+XRN2	SANGER and BROAD	Core gene in known essential processes
+TUBGCP4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+AP2S1	SANGER and BROAD	Novel Core
+SMNDC1	SANGER and BROAD	Novel Core
+PRC1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TRAPPC5	SANGER and BROAD	Core gene in known essential processes
+PPP2R1A	SANGER and BROAD	Core gene in known essential processes
+SUGP1	SANGER and BROAD	Novel Core
+PRPF40A	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPS25	SANGER and BROAD	Core gene in pluripotent stem cell development
+RBBP5	SANGER and BROAD	Novel Core
+DSN1	SANGER and BROAD	Therapeutically Tractable
+BCLAF1	SANGER and BROAD	Novel Core
+CHMP4B	SANGER and BROAD	Therapeutically Tractable
+WDR82	SANGER and BROAD	Novel Core
+HAUS4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+YBX1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SCAP	SANGER and BROAD	Core gene in pluripotent stem cell development
+TIMELESS	SANGER and BROAD	Core gene in known essential processes
+RPS24	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+BRD4	SANGER and BROAD	Therapeutically Tractable
+PYROXD1	SANGER and BROAD	Core gene in pluripotent stem cell development
+U2SURP	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+COPS4	SANGER and BROAD	Novel Core
+RPAP3	SANGER and BROAD	Novel Core
+RSL1D1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NPAT	SANGER and BROAD	Novel Core
+THG1L	SANGER and BROAD	Therapeutically Tractable
+POP4	SANGER and BROAD	Core gene in known essential processes
+RAD17	SANGER and BROAD	Novel Core
+NFYC	SANGER and BROAD	Novel Core
+PCBP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TTK	SANGER and BROAD	Therapeutically Tractable
+IPO7	SANGER and BROAD	Novel Core
+SMC6	SANGER and BROAD	Novel Core
+GPN2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SFPQ	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RABGGTA	SANGER and BROAD	Therapeutically Tractable
+MCL1	SANGER and BROAD	Therapeutically Tractable
+DAP3	SANGER and BROAD	Core gene in known essential processes
+NDUFAB1	SANGER and BROAD	Therapeutically Tractable
+RBBP4	SANGER and BROAD	Therapeutically Tractable
+SASS6	SANGER and BROAD	Novel Core
+SF3B4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TAF2	SANGER and BROAD	Novel Core
+HYPK	SANGER and BROAD	Core gene in known essential processes
+LSM3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+BOP1	SANGER and BROAD	Novel Core
+NOTCH2NL	SANGER and BROAD	Therapeutically Tractable
+RARS	SANGER and BROAD	Therapeutically Tractable
+DDX6	SANGER and BROAD	Core gene in known essential processes
+MRPS5	SANGER and BROAD	Core gene in known essential processes
+CPSF6	SANGER and BROAD	Novel Core
+MED22	SANGER and BROAD	Novel Core
+SLC25A3	SANGER and BROAD	Therapeutically Tractable
+TOPBP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPP14	SANGER and BROAD	Novel Core
+DYNLRB1	SANGER and BROAD	Therapeutically Tractable
+CLSPN	SANGER and BROAD	Novel Core
+ZNF207	SANGER and BROAD	Core gene in known essential processes
+SNRPE	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+GTF2E2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ECT2	SANGER and BROAD	Novel Core
+COPS8	SANGER and BROAD	Novel Core
+TFIP11	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+DDX59	SANGER and BROAD	Novel Core
+HAUS3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+OIP5	SANGER and BROAD	Novel Core
+SMG6	SANGER and BROAD	Therapeutically Tractable
+FBL	SANGER and BROAD	Therapeutically Tractable
+CDC7	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PDCD11	SANGER and BROAD	Novel Core
+NUP93	SANGER and BROAD	Core gene in known essential processes
+KIN	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+LETM1	SANGER and BROAD	Novel Core
+HAUS8	SANGER and BROAD	Novel Core
+DNAJC17	SANGER and BROAD	Novel Core
+TUBA1C	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ORC1	SANGER and BROAD	Therapeutically Tractable
+RPP40	SANGER and BROAD	Core gene in known essential processes
+POLE2	SANGER and BROAD	Novel Core
+GTF2F2	SANGER and BROAD	Therapeutically Tractable
+PNN	SANGER and BROAD	Core gene in known essential processes
+URI1	SANGER and BROAD	Novel Core
+CSNK1A1	SANGER and BROAD	Therapeutically Tractable
+SFSWAP	SANGER and BROAD	Novel Core
+PCBP2	SANGER and BROAD	Novel Core
+ACTR6	SANGER and BROAD	Novel Core
+LSM6	SANGER and BROAD	Novel Core
+CRCP	SANGER and BROAD	Therapeutically Tractable
+ALG11	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CLTC	SANGER and BROAD	Core gene in known essential processes
+SLC39A7	SANGER and BROAD	Novel Core
+RPA3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+BRF1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NEDD1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ATP1A1	SANGER and BROAD	Core gene in known essential processes
+SRP72	SANGER and BROAD	Novel Core
+SRCAP	SANGER and BROAD	Novel Core
+TRIAP1	SANGER and BROAD	Core gene in known essential processes
+GRWD1	SANGER and BROAD	Core gene in known essential processes
+MRTO4	SANGER and BROAD	Novel Core
+KANSL2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+EXOSC9	SANGER and BROAD	Therapeutically Tractable
+BCL2L1	SANGER and BROAD	Therapeutically Tractable
+CASC5	SANGER and BROAD	Novel Core
+PPP1R11	SANGER and BROAD	Novel Core
+ATP6V1C1	SANGER and BROAD	Therapeutically Tractable
+NDNL2	SANGER and BROAD	Novel Core
+SYF2	SANGER and BROAD	Novel Core
+ATP6V1B2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TXNL4B	SANGER and BROAD	Therapeutically Tractable
+MRPS21	SANGER and BROAD	Novel Core
+UTP18	SANGER and BROAD	Novel Core
+PSMD7	SANGER and BROAD	Core gene in known essential processes
+RNMT	SANGER and BROAD	Therapeutically Tractable
+NRBP1	SANGER and BROAD	Novel Core
+SAP30BP	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SPCS3	SANGER and BROAD	Novel Core
+CCNB1	SANGER and BROAD	Therapeutically Tractable
+CDC23	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MRPS10	SANGER and BROAD	Novel Core
+ARFRP1	SANGER and BROAD	Core gene in known essential processes
+CDC6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+COPS2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NCAPG2	SANGER and BROAD	Novel Core
+PES1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ZCCHC9	SANGER and BROAD	Novel Core
+GBF1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RUVBL1	SANGER and BROAD	Core gene in known essential processes
+ZNF492	SANGER and BROAD	Novel Core
+RPL38	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MED17	SANGER and BROAD	Novel Core
+EIF3M	SANGER and BROAD	Novel Core
+CDC45	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PSMG4	SANGER and BROAD	Novel Core
+EIF3CL	SANGER and BROAD	Core gene in pluripotent stem cell development
+USP36	SANGER and BROAD	Novel Core
+THOC1	SANGER and BROAD	Therapeutically Tractable
+SCFD1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+POLR3F	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+DBF4	SANGER and BROAD	Therapeutically Tractable
+WDR46	SANGER and BROAD	Core gene in known essential processes
+ZNRD1	SANGER and BROAD	Novel Core
+TAF1C	SANGER and BROAD	Novel Core
+RBMXL1	SANGER and BROAD	Novel Core
+PSMB5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NOP58	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+AKIRIN2	SANGER and BROAD	Core gene in known essential processes
+NOL12	SANGER and BROAD	Core gene in known essential processes
+POLR2F	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CPSF1	SANGER and BROAD	Core gene in known essential processes
+IPO11	SANGER and BROAD	Novel Core
+USP17L5	SANGER and BROAD	Novel Core
+HMGCS1	SANGER and BROAD	Core gene in known essential processes
+YEATS4	SANGER and BROAD	Novel Core
+UTP11L	SANGER and BROAD	Novel Core
+GRB2	SANGER and BROAD	Therapeutically Tractable
+STX18	SANGER and BROAD	Novel Core
+COPG1	SANGER and BROAD	Novel Core
+PPP1R10	SANGER and BROAD	Novel Core
+POLD3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+AAMP	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ESPL1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NAPG	SANGER and BROAD	Novel Core
+NIFK	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TAF1B	SANGER and BROAD	Core gene in known essential processes
+SNAPC3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+DCTN6	SANGER and BROAD	Novel Core
+SNAPC5	SANGER and BROAD	Core gene in pluripotent stem cell development
+GTF2E1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NCAPH2	SANGER and BROAD	Therapeutically Tractable
+RNPC3	SANGER and BROAD	Novel Core
+PTPN23	SANGER and BROAD	Core gene in known essential processes
+LSM4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPS27A	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+COPS5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPS29	SANGER and BROAD	Core gene in known essential processes
+MED28	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPS10	SANGER and BROAD	Novel Core
+LAMTOR3	SANGER and BROAD	Therapeutically Tractable
+SUPT4H1	SANGER and BROAD	Therapeutically Tractable
+SEC61G	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+VMP1	SANGER and BROAD	Therapeutically Tractable
+FIP1L1	SANGER and BROAD	Novel Core
+ARPC3	SANGER and BROAD	Therapeutically Tractable
+CENPW	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+URB2	SANGER and BROAD	Core gene in known essential processes
+AURKA	SANGER and BROAD	Therapeutically Tractable
+NAA15	SANGER and BROAD	Novel Core
+THAP1	SANGER and BROAD	Novel Core
+RTFDC1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+EIF5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RTF1	SANGER and BROAD	Novel Core
+SDE2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+XRCC5	SANGER and BROAD	Therapeutically Tractable
+ATP6V1F	SANGER and BROAD	Core gene in pluripotent stem cell development
+DDX24	SANGER and BROAD	Novel Core
+CENPN	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+GUK1	SANGER and BROAD	Core gene in known essential processes
+ANKLE2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+WDHD1	SANGER and BROAD	Novel Core
+GEMIN4	SANGER and BROAD	Therapeutically Tractable
+SART1	SANGER and BROAD	Core gene in known essential processes
+PFDN6	SANGER and BROAD	Core gene in known essential processes
+DARS	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+UTP6	SANGER and BROAD	Novel Core
+WDR1	SANGER and BROAD	Core gene in pluripotent stem cell development
+RRP15	SANGER and BROAD	Novel Core
+ISY1	SANGER and BROAD	Novel Core
+NSL1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MRPL35	SANGER and BROAD	Therapeutically Tractable
+POLE	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PSMB6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+BCAS2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+POLR3E	SANGER and BROAD	Core gene in pluripotent stem cell development
+HIST2H2BE	SANGER and BROAD	Core gene in pluripotent stem cell development
+DNM2	SANGER and BROAD	Core gene in known essential processes
+BDP1	SANGER and BROAD	Novel Core
+RPL17	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NOP10	SANGER and BROAD	Novel Core
+EIF3E	SANGER and BROAD	Therapeutically Tractable
+TMA16	SANGER and BROAD	Novel Core
+GGTLC2	SANGER and BROAD	Therapeutically Tractable
+EIF4A1	SANGER and BROAD	Therapeutically Tractable
+CCND1	SANGER and BROAD	Novel Core
+RPTOR	SANGER and BROAD	Novel Core
+DYNC1H1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PPP1R8	SANGER and BROAD	Therapeutically Tractable
+PHAX	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RIOK1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NFS1	SANGER and BROAD	Novel Core
+NRF1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+BRF2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MAT2A	SANGER and BROAD	Therapeutically Tractable
+DR1	SANGER and BROAD	Novel Core
+PCF11	SANGER and BROAD	Novel Core
+GEMIN6	SANGER and BROAD	Novel Core
+GARS	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+UBA2	SANGER and BROAD	Therapeutically Tractable
+PDRG1	SANGER and BROAD	Novel Core
+CHMP3	SANGER and BROAD	Core gene in known essential processes
+PPIL4	SANGER and BROAD	Novel Core
+WDR18	SANGER and BROAD	Novel Core
+DHX36	SANGER and BROAD	Therapeutically Tractable
+PDCD2	SANGER and BROAD	Core gene in pluripotent stem cell development
+RPL36AL	SANGER and BROAD	Therapeutically Tractable
+ETF1	SANGER and BROAD	Core gene in known essential processes
+ILF2	SANGER and BROAD	Core gene in known essential processes
+SBDS	SANGER and BROAD	Novel Core
+SNAP23	SANGER and BROAD	Core gene in pluripotent stem cell development
+WTAP	SANGER and BROAD	Novel Core
+FBXO5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CCNA2	SANGER and BROAD	Core gene in known essential processes
+PABPN1	SANGER and BROAD	Novel Core
+ATP5J2	SANGER and BROAD	Therapeutically Tractable
+AP2M1	SANGER and BROAD	Therapeutically Tractable
+ATP6V1G1	SANGER and BROAD	Therapeutically Tractable
+NOB1	SANGER and BROAD	Core gene in known essential processes
+SPRTN	SANGER and BROAD	Novel Core
+GPN1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+USP37	SANGER and BROAD	Novel Core
+DPH3	SANGER and BROAD	Novel Core
+IARS2	SANGER and BROAD	Novel Core
+SSRP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+GNL2	SANGER and BROAD	Core gene in known essential processes
+EIF2B4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+GOLGA6A	SANGER and BROAD	Novel Core
+POP7	SANGER and BROAD	Novel Core
+YKT6	SANGER and BROAD	Therapeutically Tractable
+ALDOA	SANGER and BROAD	Core gene in known essential processes
+ALG1	SANGER and BROAD	Core gene in known essential processes
+TWISTNB	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CSTF1	SANGER and BROAD	Novel Core
+ANAPC11	SANGER and BROAD	Novel Core
+DHX16	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+YAE1D1	SANGER and BROAD	Novel Core
+WDR55	SANGER and BROAD	Novel Core
+THOC7	SANGER and BROAD	Novel Core
+SRSF11	SANGER and BROAD	Novel Core
+UBR4	SANGER and BROAD	Therapeutically Tractable
+SUPT16H	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+LTV1	SANGER and BROAD	Novel Core
+SNRPG	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PGD	SANGER and BROAD	Therapeutically Tractable
+PSMD8	SANGER and BROAD	Novel Core
+SMG1	SANGER and BROAD	Novel Core
+TRAPPC8	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MLST8	SANGER and BROAD	Therapeutically Tractable
+CDK11A	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+UFD1L	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+POLR2K	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+HYOU1	SANGER and BROAD	Therapeutically Tractable
+TINF2	SANGER and BROAD	Core gene in known essential processes
+DCTN2	SANGER and BROAD	Therapeutically Tractable
+ATRIP	SANGER and BROAD	Core gene in known essential processes
+C12orf45	SANGER and BROAD	Novel Core
+AK6	SANGER and BROAD	Therapeutically Tractable
+RPS15	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MTOR	SANGER and BROAD	Therapeutically Tractable
+GTF2H3	SANGER and BROAD	Novel Core
+TIMM9	SANGER and BROAD	Novel Core
+CDC26	SANGER and BROAD	Novel Core
+METAP1	SANGER and BROAD	Therapeutically Tractable
+NUBP2	SANGER and BROAD	Novel Core
+INTS2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPP30	SANGER and BROAD	Novel Core
+MED7	SANGER and BROAD	Novel Core
+RINT1	SANGER and BROAD	Novel Core
+GOSR2	SANGER and BROAD	Novel Core
+RPS9	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ATP5D	SANGER and BROAD	Core gene in known essential processes
+SPDL1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NCAPH	SANGER and BROAD	Core gene in known essential processes
+CSTF3	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+ZNHIT2	SANGER and BROAD	Novel Core
+CNOT3	SANGER and BROAD	Core gene in known essential processes
+GTF2A2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RBM39	SANGER and BROAD	Core gene in pluripotent stem cell development
+RPAP2	SANGER and BROAD	Novel Core
+NRDE2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CENPK	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SMG5	SANGER and BROAD	Novel Core
+TSG101	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MFAP1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MRPL41	SANGER and BROAD	Therapeutically Tractable
+DDX42	SANGER and BROAD	Novel Core
+WDR5	SANGER and BROAD	Core gene in known essential processes
+RPL31	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+POLD1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+AATF	SANGER and BROAD	Novel Core
+PWP1	SANGER and BROAD	Core gene in pluripotent stem cell development
+SPATA5	SANGER and BROAD	Novel Core
+INTS6	SANGER and BROAD	Novel Core
+DENR	SANGER and BROAD	Novel Core
+CPSF3L	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+DCTN3	SANGER and BROAD	Novel Core
+PRPF3	SANGER and BROAD	Core gene in known essential processes
+CTNNBL1	SANGER and BROAD	Novel Core
+ARPC4	SANGER and BROAD	Core gene in known essential processes
+GINS1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+FAM32A	SANGER and BROAD	Novel Core
+RPF1	SANGER and BROAD	Novel Core
+PSMC1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CWC22	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CACTIN	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+HNRNPH1	SANGER and BROAD	Novel Core
+RBM22	SANGER and BROAD	Novel Core
+EXOSC5	SANGER and BROAD	Core gene in known essential processes
+SMC5	SANGER and BROAD	Novel Core
+GTF2A1	SANGER and BROAD	Novel Core
+DDX54	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RRP9	SANGER and BROAD	Novel Core
+PDE4DIP	SANGER and BROAD	Novel Core
+SENP6	SANGER and BROAD	Novel Core
+HIST1H2BC	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+HSCB	SANGER and BROAD	Novel Core
+KANSL1	SANGER and BROAD	Novel Core
+RPL5	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+COPE	SANGER and BROAD	Novel Core
+CARS	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MMS19	SANGER and BROAD	Core gene in known essential processes
+HSPD1	SANGER and BROAD	Core gene in known essential processes
+MED4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RAD51	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PLK4	SANGER and BROAD	Therapeutically Tractable
+DDX51	SANGER and BROAD	Novel Core
+TBCA	SANGER and BROAD	Core gene in known essential processes
+TCEB2	SANGER and BROAD	Therapeutically Tractable
+TUBGCP5	SANGER and BROAD	Novel Core
+PNPT1	SANGER and BROAD	Therapeutically Tractable
+HMGCR	SANGER and BROAD	Core gene in known essential processes
+CTCF	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+PMF1	SANGER and BROAD	Novel Core
+DGCR14	SANGER and BROAD	Novel Core
+SPCS2	SANGER and BROAD	Core gene in pluripotent stem cell development
+KCMF1	SANGER and BROAD	Therapeutically Tractable
+INTS7	SANGER and BROAD	Novel Core
+MFN2	SANGER and BROAD	Core gene in known essential processes
+DHDDS	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+KIAA1429	SANGER and BROAD	Novel Core
+CRKL	SANGER and BROAD	Therapeutically Tractable
+RSL24D1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+DCTN4	SANGER and BROAD	Novel Core
+PRPF6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RPL7	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NUP205	SANGER and BROAD	Novel Core
+ZBTB11	SANGER and BROAD	Core gene in known essential processes
+PSMD6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+UBE2D3	SANGER and BROAD	Therapeutically Tractable
+TRAPPC11	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+CAPZB	SANGER and BROAD	Therapeutically Tractable
+INCENP	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+TIPIN	SANGER and BROAD	Novel Core
+CEBPZ	SANGER and BROAD	Core gene in known essential processes
+ATP5B	SANGER and BROAD	Core gene in known essential processes
+RRM2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+AGAP6	SANGER and BROAD	Novel Core
+MED21	SANGER and BROAD	Novel Core
+SNRPB	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NUP98	SANGER and BROAD	Core gene in known essential processes
+POLD2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MCM2	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+RFT1	SANGER and BROAD	Core gene in known essential processes
+SRP9	SANGER and BROAD	Therapeutically Tractable
+NOP14	SANGER and BROAD	Novel Core
+TPR	SANGER and BROAD	Novel Core
+TRNT1	SANGER and BROAD	Therapeutically Tractable
+MED6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+SETD1A	SANGER and BROAD	Novel Core
+RFC3	SANGER and BROAD	Core gene in known essential processes
+LYRM4	SANGER and BROAD	Novel Core
+CEP192	SANGER and BROAD	Core gene in known essential processes
+BRIX1	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NCAPG	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+MIS12	SANGER and BROAD	Novel Core
+TBCB	SANGER and BROAD	Novel Core
+DDX23	SANGER and BROAD	Core gene in known essential processes
+SNF8	SANGER and BROAD	Therapeutically Tractable
+PPP1CA	SANGER and BROAD	Core gene in known essential processes
+SMARCE1	SANGER and BROAD	Novel Core
+GEMIN7	SANGER and BROAD	Novel Core
+INTS4	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+NUP43	SANGER and BROAD	Core gene in known essential processes
+IK	SANGER and BROAD	Therapeutically Tractable
+NOL8	SANGER and BROAD	Novel Core
+MCM6	"ADaM, SANGER and BROAD"	CEN-Tools and ADaM
+METTL14	SANGER and BROAD	Novel Core
+EIF1AD	SANGER and BROAD	Core gene in known essential processes
+HIST2H2AC	SANGER and BROAD	Novel Core
+MAD2L2	SANGER and BROAD	Core gene in known essential processes
+NOL7	SANGER and BROAD	Novel Core
+RPAIN	SANGER and BROAD	Novel Core
