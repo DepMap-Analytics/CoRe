@@ -1,4 +1,17 @@
-## not exported
+## Non Documented
+CoRe.scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
+  essential_indices <- which(row.names(ge_fit) %in% ess_genes)
+  nonessential_indices <- which(row.names(ge_fit) %in% noness_genes)
+  scaled_ge_fit <- ge_fit %>%
+    apply(2, function(x){
+      (x - median(x[nonessential_indices], na.rm=T)) %>%
+        divide_by(median(x[nonessential_indices], na.rm=T) - median(x[essential_indices], na.rm=T))
+    })
+  return(scaled_ge_fit)
+}
+
+
+## Documented
 
 ## Apply CERES scaling on cell line fold change scores using two reference sets of essential and non-essential
 ## genes
@@ -748,3 +761,4 @@ CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl
          lty=2)
 
 }
+
