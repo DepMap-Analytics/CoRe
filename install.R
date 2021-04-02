@@ -1,0 +1,8 @@
+library(devtools)
+install_github("DepMap-Analytics/CoRe")
+install_github("kassambara/factoextra")
+install.packages("cluster")
+install.packages("tidyverse")
+install.packages("pheatmap")
+install.packages("magrittr")
+install.packages("nVennR")
