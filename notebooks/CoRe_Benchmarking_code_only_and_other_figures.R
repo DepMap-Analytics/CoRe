@@ -215,23 +215,21 @@ Recall_Sharma2020<-unlist(lapply(CFs_sets,function(x){
 }))
 
 
-par(mar=c(4,8,2,2))
-barplot(Recall_Hart2014[6:11],las=2,border = FALSE,horiz = TRUE,xlim=c(0,100),
-        col=col[names(CFs_sets)[6:11]],xlab='%',main='Recall of Hart2014 CFGs')
-abline(v=median(Recall_Hart2014[6:11]),col='gray')
+Recalls<-rbind(Recall_Hart2014[6:11],Recall_Hart2017[6:11],Recall_Behan2019[6:11],Recall_Sharma2020[6:11])
+rownames(Recalls)<-c('Hart2014','Hart2017','Behan2019','Sharma2020')
+## creating some space for displaying the legend
+Recalls<-rbind(Recalls,rep(NA,6))
+Recalls<-rbind(Recalls,rep(NA,6))
 
-barplot(Recall_Hart2017[6:11],las=2,border = FALSE,horiz = TRUE,xlim=c(0,100),
-        col=col[names(CFs_sets)[6:11]],xlab='%',main='Recall of Hart2017 CFGs')
-abline(v=median(Recall_Hart2017[6:11]),col='gray')
 
-barplot(Recall_Behan2019[6:11],las=2,border = FALSE,horiz = TRUE,xlim=c(0,100),
-        col=col[names(CFs_sets)[6:11]],xlab='%',main='Recall of Behan2019 CFGs')
-abline(v=median(Recall_Behan2019[6:11]),col='gray')
+par(mar=c(6,4,2,1))
+barplot(t(Recalls),beside = TRUE,col=col[names(CFs_sets)[6:11]],ylim=c(0,100),ylab='%',
+        border=FALSE,main='Recall of prior sets of CFGs',las=2)
+legend('right',names(CFs_sets)[6:11],cex=0.9,fill=col[names(CFs_sets)[6:11]],border=NA,bty = 'n')
 
-barplot(Recall_Sharma2020[6:11],las=2,border = FALSE,horiz = TRUE,xlim=c(0,100),
-        col=col[names(CFs_sets)[6:11]],xlab='%',main='Recall of Sharma2020 CFGs')
-abline(v=median(Recall_Sharma2020[6:11]),col='gray')
-
+print(paste('ADaM median Recall across prior known sets:',median(Recalls[,'ADaM'],na.rm = TRUE)))
+print(paste('FiPer median Recall across prior known sets avg across variants:',
+            mean(apply(Recalls[,2:6],MARGIN = 2,median,na.rm = TRUE))))
 
 ## Adding training sets to CENtools predictions to explore overall sets similarities
 CFs_sets_plus_training<-CFs_sets
