@@ -231,13 +231,14 @@ print(paste('ADaM median Recall across prior known sets:',median(Recalls[,'ADaM'
 print(paste('FiPer median Recall across prior known sets avg across variants:',
             mean(apply(Recalls[,2:6],MARGIN = 2,median,na.rm = TRUE))))
 
-## Adding training sets to CENtools predictions to explore overall sets similarities
+## Adding training sets to Sharma2020 and CENtools predictions to explore overall sets similarities
 CFs_sets_plus_training<-CFs_sets
 CFs_sets_plus_training$`CEN-tools (Sharma 2020)`<-
   union(CFs_sets_plus_training$`CEN-tools (Sharma 2020)`,BAGEL_essential)
 
 CFs_sets_plus_training$`CEN-tools`<-
   union(CFs_sets_plus_training$`CEN-tools`,curated_BAGEL_essential)
+
 
 
 
