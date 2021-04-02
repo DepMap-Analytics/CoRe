@@ -1,3 +1,4 @@
+install.packages("devtools")
 library(devtools)
 install_github("DepMap-Analytics/CoRe")
 install_github("kassambara/factoextra")
