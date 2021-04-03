@@ -8,17 +8,17 @@
 "
 
 # Install Packages
-library(ggplot2)
-library(gridExtra)
-library(reshape2)
-library(ggrepel)
+# library(ggplot2)
+# library(gridExtra)
+# library(reshape2)
+# library(ggrepel)
 library(factoextra)
-library(GGally)
-library(plotly)
+# library(GGally)
+# library(plotly)
 library(cluster)
-library(dplyr)
-library(enrichR)
-library(CRISPRcleanR)
+# library(dplyr)
+# library(enrichR)
+# library(CRISPRcleanR)
 
 # User defined info
 
@@ -54,25 +54,25 @@ ClusterEssentiality<- function(Chosen_project, binPath, resultPath){
     Data_to_plot$cluster<- Cluster_information$`clustering_project$cluster`[match(Data_to_plot$Gene, rownames(Cluster_information))]
     Data_to_plot$cluster<- as.factor(as.character(Data_to_plot$cluster))
 
-    pdf(paste0(resultPath, Chosen_project, "_PCA_clusters.pdf"), width= 6, height =4)
-    p <- ggplot(Data_to_plot, aes(PC1,PC2, color= cluster))
-    p1 <- p + geom_point()+
-      xlab("PC1")+
-      ylab ('PC2')+
-      theme_bw() +
-      theme(axis.text.y = element_text(angle = 0, hjust = 1,size=14 ),
-            axis.text.x = element_text(angle = 0, size=14, hjust=0.5,vjust=0.5),
-            axis.title.x = element_text(size=14),
-            axis.title.y = element_text(size=14),
-            plot.background = element_blank() ,
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank())+
-      scale_color_manual(values=c('#003f5c', '#58508d', '#bc5090', '#ff6361', "#ffa600"))+
-    theme(legend.title=element_blank())+
-      theme(plot.title = element_text(size = 14))+
-      theme(legend.position= 'right')
-    print(p1)
-    dev.off()
+    # pdf(paste0(resultPath, Chosen_project, "_PCA_clusters.pdf"), width= 6, height =4)
+    # p <- ggplot(Data_to_plot, aes(PC1,PC2, color= cluster))
+    # p1 <- p + geom_point()+
+    #   xlab("PC1")+
+    #   ylab ('PC2')+
+    #   theme_bw() +
+    #   theme(axis.text.y = element_text(angle = 0, hjust = 1,size=14 ),
+    #         axis.text.x = element_text(angle = 0, size=14, hjust=0.5,vjust=0.5),
+    #         axis.title.x = element_text(size=14),
+    #         axis.title.y = element_text(size=14),
+    #         plot.background = element_blank() ,
+    #         panel.grid.major = element_blank(),
+    #         panel.grid.minor = element_blank())+
+    #   scale_color_manual(values=c('#003f5c', '#58508d', '#bc5090', '#ff6361', "#ffa600"))+
+    # theme(legend.title=element_blank())+
+    #   theme(plot.title = element_text(size = 14))+
+    #   theme(legend.position= 'right')
+    # print(p1)
+    # dev.off()
 
     sil <- silhouette(clustering_project$cluster, dist(Clusters_Project_matrix))
     sil_df_project<-as.data.frame(cbind(cluster=sil[,1],neighbor=sil[,2],sil_width=sil[,3]))
