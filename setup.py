@@ -12,7 +12,7 @@ setuptools.setup(
     author="Emre Karakoc, Clare Pacini, Alessandro Vinceti and Francesco Iorio",
     author_email="francesco.iorio@sanger.ac.uk",
     description="CoRe",
-    long_description=,
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/DepMap-Analytics/CoRe",
     packages=setuptools.find_packages(),
