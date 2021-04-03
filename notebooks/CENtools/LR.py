@@ -130,7 +130,7 @@ def construct_lr_model(df, project, gene_object, result_path):
     melt_df.columns = ["Gene", "Binarised", "Essentiality_Score"]
 
     # GENE ESSENTIALITY DISTRIBUTION
-
+    '''
     fig, ax = plt.subplots()
     ax.boxplot(x=[numpy.array(melt_df[melt_df.Binarised == 0].Essentiality_Score),
                   numpy.array(melt_df[melt_df.Binarised == 1].Essentiality_Score)],
@@ -140,10 +140,10 @@ def construct_lr_model(df, project, gene_object, result_path):
     plt.xticks([1, 2], ["BAGEL Non Essential", "BAGEL Essential"])
     plt.xlabel("BAGEL GENES")
     plt.ylabel("ESSENTIALITY SCORES")
-    ##plt.show()
+    plt.show()
     plt.savefig(result_path + project + "_BAGEL_ESS_DIST.pdf")
     plt.close()
-
+    '''
     # PERTURB THE DATA FRAME TO AVOID ANY BIAS
 
     melt_df = melt_df.reindex(numpy.random.permutation(melt_df.index))
@@ -247,21 +247,23 @@ def construct_lr_model(df, project, gene_object, result_path):
     # TAKE THE MEDIAN OF THE AUCS
 
     ROC_medians = [value["AUC"] for key, value in info.items()]
+    '''
     ROC_fig.suptitle("SANGER - ROC Curve - Median AUC = %.3f" % (numpy.median(list(ROC_medians))))
     ROC_fig.legend(eg_lines, classes, loc="lower right")
-    #plt.show()
+    plt.show()
     ROC_fig.savefig(result_path + project + "_ROC_AUC_LR.pdf")
     plt.close()
-
+    '''
     # PR CURVE
 
     PR_medians = [value["AP_E"] for key, value in info.items()]
+    '''
     PR_fig.suptitle("SANGER - PR Curve - Median AP = %.3f" % (numpy.median(list(PR_medians))))
     PR_fig.legend(eg_lines, list(classes), loc="lower right")
-    #plt.show()
+    plt.show()
     PR_fig.savefig(result_path + project + "_PR_LR.pdf")
     plt.close()
-
+    '''
     # BEST MODEL -- Median
 
     ROC_med = [key for key, value in info.items() if value["AUC"] == numpy.median(ROC_medians)]
@@ -272,6 +274,7 @@ def construct_lr_model(df, project, gene_object, result_path):
 
     med = PR_med[0]
     best = info[med]
+    '''
     f = open(result_path + project + "_LR_Model_Scores.txt", "w")
     f.write(best["REPORT"] + "\n\n")
     f.write("Average Precision of the Median Model\n")
@@ -279,7 +282,7 @@ def construct_lr_model(df, project, gene_object, result_path):
     f.write("NEG:\t%.3f\n" % (info[med]["AP_NE"]))
 
     f.close()
-
+    '''
     prob_df = info[med]["Probability_DF"]
 
     return best["MODEL"], prob_df
