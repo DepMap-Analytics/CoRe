@@ -1,8 +1,6 @@
 # CoRe
 ![alt text](https://github.com/DepMap-Analytics/CoRe/blob/master/web/coRe_logo.jpg)
 
-**Jupyter Interactive Benchmarking:** [![Binder](https://notebooks.gesis.org/binder/badge_logo.svg)](https://notebooks.gesis.org/binder/v2/gh/AleVin1995/CoRe/HEAD)
-
 The CoRe package implements two methods for identification of core fitness genes (at two level of stringency) from joint analyses of multiple genome-wide CRISPR-Cas9 screens: 
 
 1) The percentile ranking method builds on the starting basic intuition that if a gene is involved in essential processes in every cell, it should be among the top essential genes in all the analysed screens, even those performed on the cell lines whose viability is lowly impacted by the knock-out of that gene, i.e. the least dependent cell lines. The CoRe package implements four versions of this method, which verify if the starting assumption is satisfied for (considering each gene in turn) in different ways. The first variant, named 'fixed', accounts for the distribution of the rank position of the genes in their least 90-th percentile dependent cell lines, obtained by sorting all genes based on their essentiality in that cell line. The second, named 'average', considers the distribution of the average gene rank positions in all the cell lines falling at least in 90-th percentile cell lines of least dependent ones.
