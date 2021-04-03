@@ -1,11 +1,11 @@
 config:
   BinderHub:
-    auth_enabled: false
+    auth_enabled: true
 
 jupyterhub:
   cull:
     # don't cull authenticated users
-    users: False
+    users: true
   custom:
     binderauth_enabled: true
   hub:

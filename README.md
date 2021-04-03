@@ -1,7 +1,7 @@
 # CoRe
 ![alt text](https://github.com/DepMap-Analytics/CoRe/blob/master/web/coRe_logo.jpg)
 
-**Jupyter Interactive Benchmarking:** [![Binder](https://notebooks.gesis.org/binder/badge_logo.svg)](https://notebooks.gesis.org/user/alessandro.vinceti@fht.org/notebooks/notebooks/CoRe_Benchmarking.ipynb)
+**Jupyter Interactive Benchmarking:** [![Binder](https://notebooks.gesis.org/binder/badge_logo.svg)](https://notebooks.gesis.org/binder/v2/gh/AleVin1995/CoRe/HEAD?filepath=notebooks%2FCoRe_Benchmarking.ipynb)
 
 The CoRe package implements two methods for identification of core fitness genes (at two level of stringency) from joint analyses of multiple genome-wide CRISPR-Cas9 screens: 
 
