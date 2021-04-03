@@ -7,7 +7,7 @@ jupyterhub:
     # don't cull authenticated users
     users: False
   custom:
-    binderauth_enabled: true
+    binderauth_enabled: false
   hub:
     redirectToServer: true
     allowNamedServers: true
@@ -16,7 +16,7 @@ jupyterhub:
     namedServerLimitPerUser: 5
     services:
       binder:
-        oauth_no_confirm: true
+        oauth_no_confirm: false
         oauth_redirect_uri: "http://<binderhub_url>/oauth_callback"
         oauth_client_id: "binder-oauth-client-test"
 
