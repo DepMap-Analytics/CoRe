@@ -32,7 +32,7 @@ Benchmark
 CoRe has been robustly benchmarked against state-of-the-art sets of core-fitness essential genes and other computational
 methods to predict these from multiple CRISPR-cas9 screens.
 
-The benchmarking analysis is implemented in a Jupyter notebook avaiable on this repository and also executable via browser [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AleVin1995/CoRe/blob/master/notebooks/CoRe_Benchmarking.ipynb)
+The benchmarking analysis is implemented in a Jupyter notebook avaiable on this repository and also executable via browser [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github.com/DepMap-Analytics/CoRe/blob/master/notebooks/CoRe_Benchmarking.ipynb)
 
 
 References
