@@ -20,6 +20,8 @@ library(cluster)
 # library(enrichR)
 # library(CRISPRcleanR)
 
+set.seed(1234)
+
 # User defined info
 
 # core_marker <- ""
@@ -39,8 +41,6 @@ normalize <- function(x) {
 
 # To do the same with just CRISPR score
 ClusterEssentiality<- function(Chosen_project, binPath, resultPath){
-    set.seed(1234)
-
     Clusters_Project<- read.table(binPath, header=T, stringsAsFactors = F)
     Clusters_Project_matrix<- normalize(as.matrix(Clusters_Project))
 

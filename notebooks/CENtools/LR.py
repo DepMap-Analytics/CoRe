@@ -27,6 +27,8 @@ import jsonpickle.ext.numpy as jsonpickle_numpy
 jsonpickle_numpy.register_handlers()
 
 
+numpy.random.seed(1234)
+
 ########################################################################################################################
 ########################################################################################################################
 # FIGURE PROPERTIES #
@@ -97,7 +99,6 @@ def construct_lr_model(df, project, gene_object, result_path):
     :param gene_obj: The dictionary of gene annotation objects.
     :return: The best model (median AUC) and Probability table for each gene being essential or non-essential.
     """
-    numpy.random.seed(1234)
     # TAKE ESSENTIALITY OF THE GOLD STANDARD GENES
 
     gold_genes = [gene for gene, obj in gene_object.items() if (obj.BEG) or (obj.BNEG)]
@@ -433,9 +434,9 @@ GenesDict = {}
 for gene in essentiality_df.index:
     obj = Gene(gene)
     obj.add_bagel_info(essential_genes = BEG, non_essential_genes = BNEG)
-    
+
     GenesDict[gene] = obj
-    
+
 pickle.dump(GenesDict, open(object_path + "INITIAL_CUSTOM_GENE_OBJ.pkl", "wb"))
 
 run(project = "INTEGRATED", gene_project = "CUSTOM", bin_number = 20, model_application = True)

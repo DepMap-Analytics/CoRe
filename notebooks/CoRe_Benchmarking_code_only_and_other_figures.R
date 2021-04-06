@@ -113,6 +113,31 @@ print(paste('Loaded',length(Hart_2017),'CFGs from Hart2017'))
 print(paste('Loaded',length(Behan_2019),'CFGs from Behan2019'))
 print(paste('Loaded',length(Sharma_2020),'CFGs from Sharma2020'))
 
+
+## Executing a logistic regression model part of the CEN-tools suite  using curated BAGEL essential
+## and curated BAGEL never-essential genes
+## This is followed by a k-means clustering and a prediction phase based on the clusters' silhouettes
+## identifying core essential genes.
+
+write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
+
+
+system('pip3 install -r CENtools/requirements.txt')
+
+system('mkdir -p CENtools/data/objects')
+system('python3 CENtools/LR.py', wait = TRUE)
+
+source('CENtools/clustering.R')
+
+project_path = 'CENtools/prediction_output/INTEGRATED/'
+CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
+                                binPath= paste0(project_path, 'INTEGRATED_Histogram_DF_20_BIN.txt'),
+                                resultPath = project_path)
+
+system('rm -r CENtools/prediction_output/')
+system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
+
+
 ## Essentials genes obtained with CENtools using BAGEL curated genes as reference sets (default nº bin = 20)
 load('data/CENtools_Essentials.RData')
 

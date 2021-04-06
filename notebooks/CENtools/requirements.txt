@@ -1,3 +1,4 @@
+scipy==1.6.2
 jsonpickle==2.0.0
 matplotlib==3.3.4
 networkx==2.5
