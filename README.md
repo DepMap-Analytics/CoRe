@@ -1,7 +1,7 @@
 # CoRe
 ![alt text](https://github.com/DepMap-Analytics/CoRe/blob/master/web/coRe_logo.jpg)
 
-**News: CoRe is robustly benchmarked. Interactive Notebook: ** [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AleVin1995/CoRe/blob/master/notebooks/CoRe_Benchmarking.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AleVin1995/CoRe/blob/master/notebooks/CoRe_Benchmarking.ipynb)
 
 The CoRe package implements two methods for identification of core fitness genes (at two level of stringency) from joint analyses of multiple genome-wide CRISPR-Cas9 screens: 
 
