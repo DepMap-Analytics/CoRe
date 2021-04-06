@@ -34,7 +34,9 @@ methods to predict these from multiple CRISPR-cas9 screens.
 
 The benchmarking analysis is implemented in a Jupyter notebook avaiable on this repository and also executable via browser [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AleVin1995/CoRe/blob/master/notebooks/CoRe_Benchmarking.ipynb)
 
-**References**
+
+References
+--
 
 [1] J. M. Dempster et al., Agreement between two large pan-cancer CRISPR-Cas9 gene dependency data sets., Nat. Commun., vol. 10, no. 1, p. 5817, 2019, doi: 10.1038/s41467-019-13805-y.
 
