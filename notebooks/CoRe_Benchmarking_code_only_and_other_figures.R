@@ -57,48 +57,54 @@ tissues_ctypes<-
 print('ADaM will be executed at the tissue type level on the following tissue lineages:')
 print(tissues_ctypes)
 
-ADaM <- CoRe.PanCancer_ADaM(bdep,
-                            tissues_ctypes,
-                            clannotation = clannotation,
-                            display=FALSE,
-                            ntrials=1000,
-                            verbose=TRUE,
-                            TruePositives = curated_BAGEL_essential)
+## The procomputed ADaM CFGs are also available and can be loaded uncommenting
+## and executing this line instead of the the following one:
+
+load('data/preComputed/ADaM.RData')
+
+#ADaM <- CoRe.PanCancer_ADaM(bdep,
+#                            tissues_ctypes,
+#                            clannotation = clannotation,
+#                            display=FALSE,
+#                            ntrials=1000,
+#                            verbose=TRUE,
+#                            TruePositives = curated_BAGEL_essential)
 
 print('Done')
 
+load('data/preComputed/FiPer_outputs.RData')
 
 ## FiPer with fixed strategy
-Perc_fixed <- CoRe.FiPer(scaled_depFC,
-                         display=FALSE,
-                         method = 'fixed')$cfgenes
+#Perc_fixed <- CoRe.FiPer(scaled_depFC,
+#                         display=FALSE,
+#                         method = 'fixed')$cfgenes
 
 ## FiPer with average strategy
-Perc_avg <- CoRe.FiPer(scaled_depFC,
-                       display=FALSE,
-                       method = 'average')$cfgenes
+#Perc_avg <- CoRe.FiPer(scaled_depFC,
+#                       display=FALSE,
+#                       method = 'average')$cfgenes
 
 ## FiPer with slope strategy
-Perc_slope <- CoRe.FiPer(scaled_depFC,
-                         display=FALSE,
-                         method = 'slope')$cfgenes
+#Perc_slope <- CoRe.FiPer(scaled_depFC,
+#                         display=FALSE,
+#                         method = 'slope')$cfgenes
 
 ## Fiper with AUC strategy
-Perc_AUC <- CoRe.FiPer(scaled_depFC,
-                       display=FALSE,
-                       method = 'AUC')$cfgenes
+#Perc_AUC <- CoRe.FiPer(scaled_depFC,
+#                       display=FALSE,
+#                       method = 'AUC')$cfgenes
 
 ## consensual core-fitness genes across the three less stringent variants
-Perc_Consensus <- Reduce(intersect,list(Perc_fixed,Perc_slope,Perc_AUC))
+#Perc_Consensus <- Reduce(intersect,list(Perc_fixed,Perc_slope,Perc_AUC))
 
-print('Done')
+#print('Done')
 
 ## Hart2014 (built-in the CoRe package)
 data(BAGEL_essential)
 Hart_2014<-BAGEL_essential
 
 ## Hart2017
-load('data/BAGEL_v2_ESSENTIAL_GENES.RData')
+load('data/BAGEL_v2_Essentials.RData')
 Hart_2017<-BAGEL_essential
 
 ## Behan2019
@@ -113,11 +119,12 @@ print(paste('Loaded',length(Hart_2017),'CFGs from Hart2017'))
 print(paste('Loaded',length(Behan_2019),'CFGs from Behan2019'))
 print(paste('Loaded',length(Sharma_2020),'CFGs from Sharma2020'))
 
-
 ## Executing a logistic regression model part of the CEN-tools suite  using curated BAGEL essential
 ## and curated BAGEL never-essential genes
 ## This is followed by a k-means clustering and a prediction phase based on the clusters' silhouettes
 ## identifying core essential genes.
+
+load('data/preComputed/CENtools.RData')
 
 write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
 
@@ -137,12 +144,6 @@ CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
 system('rm -r CENtools/prediction_output/')
 system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
 
-
-## Essentials genes obtained with CENtools using BAGEL curated genes as reference sets (default nº bin = 20)
-load('data/CENtools_Essentials.RData')
-
-## CENtools
-CENtools <- CENtools_ess
 
 print(paste('Computed',length(CENtools),'CFGs via the logistic regression based method (part of CEN-tools)'))
 
@@ -246,7 +247,6 @@ rownames(Recalls)<-c('Hart2014','Hart2017','Behan2019','Sharma2020')
 Recalls<-rbind(Recalls,rep(NA,6))
 Recalls<-rbind(Recalls,rep(NA,6))
 
-
 par(mar=c(6,4,2,1))
 barplot(t(Recalls),beside = TRUE,col=col[names(CFs_sets)[6:11]],ylim=c(0,100),ylab='%',
         border=FALSE,main='Recall of prior sets of CFGs',las=2)
@@ -264,7 +264,20 @@ CFs_sets_plus_training$`CEN-tools (Sharma 2020)`<-
 CFs_sets_plus_training$`CEN-tools`<-
   union(CFs_sets_plus_training$`CEN-tools`,curated_BAGEL_essential)
 
+##### CF gene set similarity
+allEss<-unique(unlist(CFs_sets_plus_training))
+membMat<-do.call(rbind,lapply(CFs_sets_plus_training,function(x){is.element(allEss,x)}))
+rownames(membMat)<-names(CFs_sets)
+colnames(membMat)<-allEss
+membMat<-membMat+0
 
+pheatmap(membMat,show_colnames = FALSE,clustering_distance_rows = 'binary',cluster_cols = FALSE,border_color = NA,
+         main = 'Similarity across sets',col=c('white','blue'))
+
+dmat<-dist(membMat,method = 'binary')
+
+pheatmap(1-as.matrix(dmat), main = 'JS for Pan-cancer core fitness genes across methods',
+         legend = FALSE,display_numbers = round(dmat,digits = 2))
 
 
 
