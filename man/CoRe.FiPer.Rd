@@ -10,9 +10,9 @@
 \item{display}{Boolean, default is TRUE. Should gene score rank distributions of dependency scores be plotted.}
 \item{percentile}{Numerical value in range [0,1], default is 0.9. Percentile to be used as a threshold.}
 \item{method}{Character, default is 'fixed'. This parameter specifies which variant of the Fitness Percentile method should be used. Admissimble values are:\cr
-  - fixed: a distribution of gene fitness-rank-positions in their least dependent \code{n}-th (determined by the \code{percentile} parameter) percentile cell line is used in the subsequent step of the Fitness Percentile method.\cr
-  - average: a distribution of gene average fitness-rank-position across all cell lines at or over the \code{n}-th percentile of least dependent cell lines (where \eqn{n} is determined by the \code{percentile} parameter) is used in the subsequent step of the Fitness Percentile method.\cr
-  - slope: for each gene, a linear model is fit on the sequence of gene fitness-rank-positions across all cell lines sorted according to their dependency on that gene, then a distrubution of models' slopes is used in the subsequent step of the  Fitness Percentile method.\cr
+  - fixed: a distribution of gene fitness-rank-positions in their most dependent \code{n}-th (determined by the \code{percentile} parameter) percentile cell line is used in the subsequent step of the Fitness Percentile method.\cr
+  - average: a distribution of gene average fitness-rank-position across all cell lines at or over the \code{n}-th percentile of most dependent cell lines (where \eqn{n} is determined by the \code{percentile} parameter) is used in the subsequent step of the Fitness Percentile method.\cr
+  - slope: for each gene, a linear model is fit on the sequence of gene fitness-rank-positions across all cell lines sorted according to their dependency on that gene, then a distrubution of models' slopes is used in the subsequent step of the Fitness Percentile method.\cr
   - AUC: for each gene, the area under the curve resulting from considering the sequence of gene fitness-rank-positions across all cell lines sorted according to their dependency on that gene is used in the subsequent step of the Fitness Percentile method.\cr
   \cr}
 }
