@@ -143,7 +143,6 @@ CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
 system('rm -r CENtools/prediction_output/')
 system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
 
-
 print(paste('Computed',length(CENtools),'CFGs via the logistic regression based method (part of CEN-tools)'))
 
 ## Assembling all CFGs in a unique list and creating a vector of colors to be used in the plots
