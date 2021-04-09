@@ -1,3 +1,5 @@
+## Working directory needs to be /CoRe/notebooks
+
 options(warn=-1)
 
 library(tidyverse)
@@ -126,22 +128,22 @@ print(paste('Loaded',length(Sharma_2020),'CFGs from Sharma2020'))
 
 load('data/preComputed/CENtools.RData')
 
-write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
-
-system('pip3 install -r CENtools/requirements.txt')
-
-system('mkdir -p CENtools/data/objects')
-system('python3 CENtools/LR.py', wait = TRUE)
-
-source('CENtools/clustering.R')
-
-project_path = 'CENtools/prediction_output/INTEGRATED/'
-CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
-                                binPath= paste0(project_path, 'INTEGRATED_Histogram_DF_20_BIN.txt'),
-                                resultPath = project_path)
-
-system('rm -r CENtools/prediction_output/')
-system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
+# write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
+#
+# system('pip3 install -r CENtools/requirements.txt')
+#
+# system('mkdir -p CENtools/data/objects')
+# system('python3 CENtools/LR.py', wait = TRUE)
+#
+# source('CENtools/clustering.R')
+#
+# project_path = 'CENtools/prediction_output/INTEGRATED/'
+# CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
+#                                 binPath= paste0(project_path, 'INTEGRATED_Histogram_DF_20_BIN.txt'),
+#                                 resultPath = project_path)
+#
+# system('rm -r CENtools/prediction_output/')
+# system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
 
 print(paste('Computed',length(CENtools),'CFGs via the logistic regression based method (part of CEN-tools)'))
 
@@ -269,8 +271,11 @@ rownames(membMat)<-names(CFs_sets)
 colnames(membMat)<-allEss
 membMat<-membMat+0
 
+rownames(membMat)[which(rownames(membMat)=="CEN-tools (Sharma 2020)")]<-"CEN-tools (Sharma 2020) + Hart 2017"
+rownames(membMat)[which(rownames(membMat)=="CEN-tools")]<-"CEN-tools (Sharma 2020) + curated Hart 2014"
+
 pheatmap(membMat,show_colnames = FALSE,clustering_distance_rows = 'binary',cluster_cols = FALSE,border_color = NA,
-         main = 'Similarity across sets',col=c('white','blue'))
+         main = 'Similarity across sets',col=c('white','blue'),legend_labels = c('out','in'),legend_breaks = c(0,1))
 
 dmat<-dist(membMat,method = 'binary')
 
@@ -278,5 +283,48 @@ pheatmap(1-as.matrix(dmat), main = 'JS for Pan-cancer core fitness genes across 
          legend = FALSE,display_numbers = round(dmat,digits = 2))
 
 
+
+## Assembling a set of prior known essential genes that are not included in the
+## training sets used by CENtools and/or ADaM
+
+## Loading built sets of essential genes from Iorio et al, 2018
+data(EssGenes.DNA_REPLICATION_cons)
+data(EssGenes.KEGG_rna_polymerase)
+data(EssGenes.PROTEASOME_cons)
+data(EssGenes.SPLICEOSOME_cons)
+data(EssGenes.ribosomalProteins)
+data(EssGenes.HISTONES)
+
+## Adding additional signatures of known CFGs from Pacini et al, 2020
+load("data/Kegg.DNArep.Rdata")
+load("data/Kegg.Ribosome.Rdata")
+load("data/Kegg.Proteasome.Rdata")
+load("data/Kegg.Spliceosome.Rdata")
+load("data/Kegg.RNApoly.Rdata")
+load("data/Histones.Rdata")
+
+postiveControls<-c(EssGenes.DNA_REPLICATION_cons,
+  EssGenes.KEGG_rna_polymerase,
+  EssGenes.PROTEASOME_cons,
+  EssGenes.SPLICEOSOME_cons,
+  EssGenes.ribosomalProteins,
+  EssGenes.HISTONES,
+  Kegg.DNArep,
+  Kegg.Ribosome,
+  Kegg.Proteasome,
+  Kegg.Spliceosome,
+  Kegg.RNApoly,
+  Histones)
+
+## removing training sets
+positiveControls<-setdiff(postiveControls,TrainingSets)
+
+print(paste(length(positiveControls),'genes not included in any of the training sets will be used as independent positive controls'))
+
+
+## Assembling a set of genes not expressed in human cancer cell lines (FPKM < 0.1 in more than 1,000 cell lines from
+## the Cell Model Passports [10], https://cellmodelpassports.sanger.ac.uk/downloads, version: rnaseq_20191101) or
+## whose essentiality is statistically associated with a molecular feature
+## (thus very likely to be context specific essential genes) as negative controls
 
 
