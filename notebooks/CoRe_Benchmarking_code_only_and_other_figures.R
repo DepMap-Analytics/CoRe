@@ -7,6 +7,9 @@ library(pheatmap)
 library(CoRe)
 library(magrittr)
 library(nVennR)
+library(limma)
+
+
 
 data('curated_BAGEL_essential')
 data('curated_BAGEL_nonEssential')
@@ -321,10 +324,192 @@ positiveControls<-setdiff(postiveControls,TrainingSets)
 
 print(paste(length(positiveControls),'genes not included in any of the training sets will be used as independent positive controls'))
 
-
 ## Assembling a set of genes not expressed in human cancer cell lines (FPKM < 0.1 in more than 1,000 cell lines from
 ## the Cell Model Passports [10], https://cellmodelpassports.sanger.ac.uk/downloads, version: rnaseq_20191101) or
 ## whose essentiality is statistically associated with a molecular feature
 ## (thus very likely to be context specific essential genes) as negative controls
+
+load('data/CMP_RNAseq.Rdata')
+
+## genes not expressed
+lowlyExp<-names(which(rowSums(CMP_RNAseq<0.01,na.rm=TRUE)>=ncol(CMP_RNAseq)))
+
+## genes that are differentially essential in the presence of a molecular feature,
+## i.e. associated with a biomarker, thus unlikely to be CFGs
+wBm <- sort(unique(unlist(read.table('data/dependency_with_biomarkers.txt',stringsAsFactors = FALSE))))
+
+negativeControls<-union(lowlyExp,wBm)
+
+## removing training sets
+negativeControls<-setdiff(negativeControls,TrainingSets)
+
+print(paste(length(negativeControls),
+            'genes not included in any of the training sets will be used as independent negative controls'))
+
+
+## Assembling CFGs outputted by a baseline DM predictor
+baselineCFGs <- lapply(1:ncol(bdep),function(n){
+  names(which(rowSums(bdep)>=n))
+})
+
+## Computing sizes (in terms of number of included genes)
+## of the baseline CFGs
+baselineSizes<-unlist(lapply(baselineCFGs,length))
+
+## Computing baseline TPRs
+baselineTPRs<-100*unlist(lapply(baselineCFGs,function(x){
+  length(intersect(x,positiveControls))/length(positiveControls)
+}))
+
+## Computing baseline FPRs
+baselineFPRs<-100*unlist(lapply(baselineCFGs,function(x){
+  length(intersect(x,negativeControls))/length(negativeControls)
+}))
+
+
+## Plotting sizes of baseline CFGs, curves of baseline TPRs/FPRs and of FPRs at given level of TPRs.
+
+par(mar=c(6,4,1,1))
+plot(baselineSizes,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
+     ylab='n. of predicted CF genes',pch=16,log='y')
+
+plot(baselineTPRs,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
+     ylab='% Recall of positive controls (TPRs)',pch=16)
+
+plot(baselineFPRs,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
+     ylab='% Recall of negative controls (FPRs)',pch=16)
+
+plot(baselineTPRs,baselineFPRs,xlab='% Recall of negative controls (TPRs)',
+     ylab='% Recall of negative controls (FPRs)',pch=16)
+
+
+# Computing observed TPRs and FPRs
+observedTPRs<-100*unlist(lapply(novelCFs_sets[3:length(novelCFs_sets)],
+                                function(x){length(intersect(x,positiveControls))/length(positiveControls)}))
+
+observedFPRs<-100*unlist(lapply(novelCFs_sets[3:length(novelCFs_sets)],
+                                function(x){length(intersect(x,negativeControls))/length(negativeControls)}))
+
+# Barplotting observed TPRs/FPRs
+par(mar=c(15,4,4,1))
+barplot(observedTPRs/max(baselineTPRs),col=col[names(observedTPRs)],
+        las=2,ylab='TPR / (max baseline TPR)',border=NA,main = 'Observed Relative TPRs')
+
+barplot(observedFPRs/max(baselineFPRs),col=col[names(observedFPRs)],
+        las=2,ylab='FPR / (max baseline FPR)', border=NA, main = 'Observed Relative FPRs')
+
+# Plotting observed FPRs at observed level of TPRs, with respect to baseline FPRs at fixed level of TPRs.
+plot(spline(baselineTPRs,baselineFPRs),pch=16,
+     xlab='% Recall of positive controls (TPRs)',
+     ylab='% Recall of negative controls (FPRs)',
+     type='l',lwd=5,
+     xlim=c(9,32),ylim=c(0.05,0.35))
+
+points(observedTPRs,observedFPRs,col=col[names(observedTPRs)],pch=16,cex=2)
+
+# Barplotting ratios between observed FPRs and baseline FPRs at observed TPRs
+s0fun<-splinefun(baselineTPRs,baselineFPRs)
+
+par(mar=c(12,4,4,4))
+barplot(observedFPRs/s0fun(observedTPRs),col=col[names(observedFPRs)],
+        las=2,border=NA,ylab='Observed FPRs / baseline FPRs at observed level of TPRs')
+abline(h=1,lty=2)
+
+
+
+
+
+
+## Comparing median numbers of dependant cell lines across sets of predicted CFGs.
+screenedGenes<-rownames(bdep)
+
+median_n_dep_cell_lines<-
+  unlist(lapply(novelCFs_sets[3:length(novelCFs_sets)],function(x){median(rowSums(bdep[intersect(x,screenedGenes),]))}))
+
+median_perc_dep_cell_lines<-100*median_n_dep_cell_lines/ncol(bdep)
+
+par(mar=c(12,4,2,1))
+barplot(median_perc_dep_cell_lines,
+        col=col[names(median_n_dep_cell_lines)],
+        las=2, border=NA,main = 'CFGs Median % dep cell lines', ylab = '%',ylim=c(0,100))
+
+# Comparing median dependent cell lines for the predicted CFGs and threshold n of the baseline
+# DM classifier required to attain the observed TPRs
+par(mar=c(6,4,1,1))
+plot(100*1:length(baselineTPRs)/length(baselineTPRs),
+     baselineTPRs,xlab='threshold n of baseline classifier (as % of screened cell lines)',
+     ylab='% Recall of positive controls (TPRs)',pch=16)
+
+s0fun<-splinefun(baselineTPRs,1:length(baselineTPRs))
+abline(v=100*s0fun(observedTPRs)/length(baselineTPRs),col=col[names(observedTPRs)],lwd=2)
+
+baseline_n_dep_cl_at_observed_TPR<-s0fun(observedTPRs)
+
+par(mar=c(12,4,2,1))
+barplot(median_n_dep_cell_lines/baseline_n_dep_cl_at_observed_TPR,
+        col=col[names(median_n_dep_cell_lines)],
+        las=2, border=NA,main = 'CFGs Median n.dep cell lines / baseline n at obs TPRs', ylab = 'ratio')
+abline(h=1,lty=2)
+
+
+##  Comparing median fitness effects across predicted CFGs and comparison with baseline median
+## fitness effect at observed TPRs
+
+median_dep <- unlist(lapply(novelCFs_sets[3:11],
+                            function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,median))}))
+
+par(mar=c(12,6,4,2))
+barplot(median_dep,col=col[names(median_dep)],
+        las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect')
+abline(h=1,lty=2)
+
+baseline_dep <- unlist(lapply(baselineCFGs[round(s0fun(observedTPRs))],
+                              function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,median))}))
+par(mar=c(12,6,4,2))
+barplot(median_dep/baseline_dep,col=col[names(median_dep)],
+        las=2,main = 'Median CFGs fitness effect / baseline median at observed TPRs', border=NA, ylab = 'ratio',ylim=c(0,1))
+abline(h=1,lty=2)
+
+## Comparing number of CFGs across predicted set and compared with baseline CFGs at observed TPRs
+baseline_size<-unlist(lapply(baselineCFGs[round(s0fun(observedTPRs))],function(x){length(setdiff(x,TrainingSets))}))
+
+observed_sizes<-novelGeneLengths[3:11]
+par(mar=c(12,6,4,2))
+barplot(observed_sizes/baseline_size,col=col[names(observed_sizes)],
+        las=2,main = 'n. CFGs / baseline at observed TPRs',border=NA, ylab = 'ratio')
+abline(h=1,lty=2)
+
+
+
+### Comparing basal expression of predicted CFGs in Normal tissues
+load('data/GTEx_Analysis_v6p_RNA-seq_RNA-SeQCv1.1.8_gene_median_rpkm.Rdata')
+
+bsexp<-lapply(novelCFs_sets[3:11],function(x){
+    tmp<-basalExprsNormalTissues[intersect(x,rownames(basalExprsNormalTissues)),]
+    unlist(lapply(1:nrow(tmp),function(x){median(tmp[x,])}))
+  })
+
+par(mar=c(12,4,4,2))
+boxplot(lapply(bsexp,function(x){log(x+1)}),las=2,col=col[names(bsexp)],ylab='grand median across tissues',
+main='basal expression in normal tissues')
+
+### Comparison of covered prior known CFGs not included in any of the trainin sets
+### across supervised methods
+recalledPK_CFGs<-lapply(novelCFs_sets,
+                   function(x){intersect(x,positiveControls)})
+
+allNewHits<-unique(unlist(recalledPK_CFGs))
+
+newHitsMemb<-do.call(rbind,lapply(recalledPK_CFGs,function(x){is.element(allNewHits,x)}))+0
+colnames(newHitsMemb)<-allNewHits
+
+par(mfrow=c(3,1))
+vennDiagram(t(newHitsMemb[c(3,6),]),main='prior known CFGs not included in any of the trainin sets')
+vennDiagram(t(newHitsMemb[c(4,6),]))
+vennDiagram(t(newHitsMemb[c(5,6),]))
+
+
+
+
 
 
