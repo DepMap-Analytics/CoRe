@@ -1,5 +1,3 @@
-## working directory needs to be CoRe/notebooks/
-
 options(warn=-1)
 
 library(tidyverse)
@@ -128,22 +126,22 @@ print(paste('Loaded',length(Sharma_2020),'CFGs from Sharma2020'))
 
 load('data/preComputed/CENtools.RData')
 
-#write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
+write.csv(scaled_depFC, 'CENtools/data/curated_data/CERES_scaled_depFC.csv', quote = FALSE)
 
-#system('pip3 install -r CENtools/requirements.txt')
+system('pip3 install -r CENtools/requirements.txt')
 
-#system('mkdir -p CENtools/data/objects')
-#system('python3 CENtools/LR.py', wait = TRUE)
+system('mkdir -p CENtools/data/objects')
+system('python3 CENtools/LR.py', wait = TRUE)
 
-#source('CENtools/clustering.R')
+source('CENtools/clustering.R')
 
-#project_path = 'CENtools/prediction_output/INTEGRATED/'
-#CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
-#                                binPath= paste0(project_path, 'INTEGRATED_Histogram_DF_20_BIN.txt'),
-#                                resultPath = project_path)
+project_path = 'CENtools/prediction_output/INTEGRATED/'
+CENtools <- ClusterEssentiality(Chosen_project= 'INTEGRATED',
+                                binPath= paste0(project_path, 'INTEGRATED_Histogram_DF_20_BIN.txt'),
+                                resultPath = project_path)
 
-#system('rm -r CENtools/prediction_output/')
-#system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
+system('rm -r CENtools/prediction_output/')
+system('rm CENtools/data/curated_data/CERES_scaled_depFC.csv')
 
 print(paste('Computed',length(CENtools),'CFGs via the logistic regression based method (part of CEN-tools)'))
 
@@ -218,6 +216,9 @@ legend('bottomright',legend = c('Training sets','(Hart2017 + curated Hart2014)')
 myNV <- plotVenn(CFs_sets[c(7,9:11)],outFile='SuppFig1A.svg')
 myNV <- plotVenn(novelCFs_sets[c(7,9:11)],outFile='SuppFig1B.svg')
 
+par(mar=c(4,12,2,2))
+barplot(rbind(novelGeneLengths,GeneLengths-novelGeneLengths),las=2,border = FALSE,horiz = TRUE,xlim=c(0,2300))
+
 
 ## Computing Recall rates of state-of-the-art sets of CFGs.
 
@@ -275,6 +276,7 @@ dmat<-dist(membMat,method = 'binary')
 
 pheatmap(1-as.matrix(dmat), main = 'JS for Pan-cancer core fitness genes across methods',
          legend = FALSE,display_numbers = round(dmat,digits = 2))
+
 
 
 
