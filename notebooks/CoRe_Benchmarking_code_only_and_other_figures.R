@@ -10,7 +10,6 @@ library(nVennR)
 library(limma)
 
 
-
 data('curated_BAGEL_essential')
 data('curated_BAGEL_nonEssential')
 
@@ -655,7 +654,7 @@ print(median_n_dep_cell_lines_includingTraining/baseline_n_dep_cl_at_observed_TP
 print(paste('median ratio for unsupervised methods:',
             median((median_n_dep_cell_lines_includingTraining/baseline_n_dep_cl_at_observed_TPR_includingTraining)[5:9])))
 
-###  Comparing median fitness effects across predicted CFGs and comparison with baseline median
+##  Comparing median fitness effects across predicted CFGs and comparison with baseline median
 ## fitness effect at observed TPRs (excluding training sets)
 median_dep_includingTraining <- unlist(lapply(CFs_sets_plus_training,
                                               function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
@@ -702,7 +701,7 @@ boxplot(lapply(bsexp_includingTraining,
         ylab='grand median across tissues',
         main='basal expression in normal tissues')
 
-################################################################################
+#################################################################################
 
 
 
