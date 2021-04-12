@@ -154,12 +154,17 @@ CFGs_infos<-lapply(CFs_sets_plus_training,retrievegeneInfo)
 GFs<-lapply(CFs_sets_plus_training,function(x){enrichedGeneFamilies(x,screenedGenes)})
 names(GFs)<-names(CFs_sets_plus_training)
 
-x<-GFs$`Hart 2017`
+
+pdf('../../Other Paper Results/GF_enrich.pdf',11,15)
+par(mar=c(4,20,0,6))
+
+x<-GFs$`Hart 2014`
 x<-x[which(x$fdr<0.05),]
 tt<-barplot(rev(-log10(x$pval)),horiz = TRUE,xlim=c(1,10),log='x',
             names.arg = rev(x$`Gene Family`),las=2,border = FALSE,
             xlab='-log10 pval')
 text(rep(1,length(tt)),tt-0.06,rev(x$GENES),pos = 4,cex=0.7)
+dev.off()
 
 
 
