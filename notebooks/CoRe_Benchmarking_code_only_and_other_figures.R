@@ -306,7 +306,7 @@ load("data/Kegg.Spliceosome.Rdata")
 load("data/Kegg.RNApoly.Rdata")
 load("data/Histones.Rdata")
 
-postiveControls<-c(EssGenes.DNA_REPLICATION_cons,
+positiveControls<-c(EssGenes.DNA_REPLICATION_cons,
   EssGenes.KEGG_rna_polymerase,
   EssGenes.PROTEASOME_cons,
   EssGenes.SPLICEOSOME_cons,
@@ -319,9 +319,12 @@ postiveControls<-c(EssGenes.DNA_REPLICATION_cons,
   Kegg.RNApoly,
   Histones)
 
-## removing training sets
-positiveControls<-setdiff(postiveControls,TrainingSets)
+positiveControls_includingTraining<-positiveControls
 
+## removing training sets
+positiveControls<-setdiff(positiveControls,TrainingSets)
+
+print(paste(length(positiveControls_includingTraining),'genes in the independent reference sets'))
 print(paste(length(positiveControls),'genes not included in any of the training sets will be used as independent positive controls'))
 
 ## Assembling a set of genes not expressed in human cancer cell lines (FPKM < 0.1 in more than 1,000 cell lines from
@@ -340,12 +343,14 @@ wBm <- sort(unique(unlist(read.table('data/dependency_with_biomarkers.txt',strin
 
 negativeControls<-union(lowlyExp,wBm)
 
+negativeControls_includingTraining<-negativeControls
+
 ## removing training sets
 negativeControls<-setdiff(negativeControls,TrainingSets)
 
+print(paste(length(negativeControls_includingTraining),'genes lowly expressed or associated with a marker'))
 print(paste(length(negativeControls),
             'genes not included in any of the training sets will be used as independent negative controls'))
-
 
 ## Assembling CFGs outputted by a baseline DM predictor
 baselineCFGs <- lapply(1:ncol(bdep),function(n){
@@ -369,18 +374,19 @@ baselineFPRs<-100*unlist(lapply(baselineCFGs,function(x){
 
 ## Plotting sizes of baseline CFGs, curves of baseline TPRs/FPRs and of FPRs at given level of TPRs.
 
+par(mfrow=c(2,2))
 par(mar=c(6,4,1,1))
-plot(baselineSizes,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
-     ylab='n. of predicted CF genes',pch=16,log='y')
+plot(baselineSizes,xlab='minimal n. cell lines dependent on the CFGs',
+     ylab='n. of predicted CFGs',pch=16,log='y')
 
-plot(baselineTPRs,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
-     ylab='% Recall of positive controls (TPRs)',pch=16)
+plot(baselineTPRs,ylab='Recall of positive controls (TPRs)',
+     xlab='minimal n. cell lines dependent on the CFGs',pch=16)
 
-plot(baselineFPRs,xlab='Baseline predictor of CF genes (essentials in >= n cell lines)',
-     ylab='% Recall of negative controls (FPRs)',pch=16)
+plot(baselineFPRs,ylab='Recall of negative controls (FPRs)',
+     xlab='minimal n. cell lines dependent on the CFGs',pch=16)
 
-plot(baselineTPRs,baselineFPRs,xlab='% Recall of negative controls (TPRs)',
-     ylab='% Recall of negative controls (FPRs)',pch=16)
+plot(baselineTPRs,baselineFPRs,xlab='Recall of positive controls (TPRs)',
+     ylab='Recall of negative controls (FPRs)',pch=16)
 
 
 # Computing observed TPRs and FPRs
@@ -398,27 +404,37 @@ barplot(observedTPRs/max(baselineTPRs),col=col[names(observedTPRs)],
 barplot(observedFPRs/max(baselineFPRs),col=col[names(observedFPRs)],
         las=2,ylab='FPR / (max baseline FPR)', border=NA, main = 'Observed Relative FPRs')
 
+
 # Plotting observed FPRs at observed level of TPRs, with respect to baseline FPRs at fixed level of TPRs.
+par(mfrow=c(1,2))
+par(mar=c(4,4,2,1))
 plot(spline(baselineTPRs,baselineFPRs),pch=16,
      xlab='% Recall of positive controls (TPRs)',
      ylab='% Recall of negative controls (FPRs)',
      type='l',lwd=5,
      xlim=c(9,32),ylim=c(0.05,0.35))
+legend('topleft',legend='baseline predictor',lwd = 5)
 
 points(observedTPRs,observedFPRs,col=col[names(observedTPRs)],pch=16,cex=2)
+
 
 # Barplotting ratios between observed FPRs and baseline FPRs at observed TPRs
 s0fun<-splinefun(baselineTPRs,baselineFPRs)
 
-par(mar=c(12,4,4,4))
+par(mar=c(4,10,2,1))
+
 barplot(observedFPRs/s0fun(observedTPRs),col=col[names(observedFPRs)],
-        las=2,border=NA,ylab='Observed FPRs / baseline FPRs at observed level of TPRs')
-abline(h=1,lty=2)
+        las=2,border=NA,xlab=paste('FPRs /\n(baseline FPRs at observed TPRs)'),
+        horiz = TRUE,xlim=c(0,2))
+abline(v=1,lty=2)
 
 
+print(sort(observedFPRs/s0fun(observedTPRs)))
 
+print(sort(observedFPRs/s0fun(observedTPRs)))
 
-
+print(paste('median FPRs vs expectation ratio for unsupervised methods:',
+            median((observedFPRs/s0fun(observedTPRs))[5:9])))
 
 ## Comparing median numbers of dependant cell lines across sets of predicted CFGs.
 screenedGenes<-rownames(bdep)
@@ -432,6 +448,10 @@ par(mar=c(12,4,2,1))
 barplot(median_perc_dep_cell_lines,
         col=col[names(median_n_dep_cell_lines)],
         las=2, border=NA,main = 'CFGs Median % dep cell lines', ylab = '%',ylim=c(0,100))
+
+print(sort(median_perc_dep_cell_lines),decreasing=TRUE)
+print(paste('grand median percentaged of dependent cell lines for unsupervised methods:',
+            median(median_perc_dep_cell_lines[5:9])))
 
 # Comparing median dependent cell lines for the predicted CFGs and threshold n of the baseline
 # DM classifier required to attain the observed TPRs
@@ -451,24 +471,36 @@ barplot(median_n_dep_cell_lines/baseline_n_dep_cl_at_observed_TPR,
         las=2, border=NA,main = 'CFGs Median n.dep cell lines / baseline n at obs TPRs', ylab = 'ratio')
 abline(h=1,lty=2)
 
+print(median_n_dep_cell_lines/baseline_n_dep_cl_at_observed_TPR)
+
+print(paste('median ratio for unsupervised methods:',
+            median((median_n_dep_cell_lines/baseline_n_dep_cl_at_observed_TPR)[5:9])))
 
 ##  Comparing median fitness effects across predicted CFGs and comparison with baseline median
-## fitness effect at observed TPRs
-
+## fitness effect at observed TPRs (excluding training sets)
 median_dep <- unlist(lapply(novelCFs_sets[3:11],
-                            function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,median))}))
+                            function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
+
+print(sort(median_dep))
 
 par(mar=c(12,6,4,2))
 barplot(median_dep,col=col[names(median_dep)],
-        las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect')
-abline(h=1,lty=2)
+        las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect',ylim=c(-1,0))
+abline(h=-1,lty=1)
+abline(h=-0.5,lty=2)
+
 
 baseline_dep <- unlist(lapply(baselineCFGs[round(s0fun(observedTPRs))],
-                              function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,median))}))
+                              function(x){median(apply(scaled_depFC[intersect(setdiff(x,TrainingSets),screenedGenes),],1,mean))}))
+
 par(mar=c(12,6,4,2))
 barplot(median_dep/baseline_dep,col=col[names(median_dep)],
-        las=2,main = 'Median CFGs fitness effect / baseline median at observed TPRs', border=NA, ylab = 'ratio',ylim=c(0,1))
+        las=2,main = 'Median CFGs fitness effect / baseline', border=NA, ylab = 'ratio',ylim=c(0,1))
 abline(h=1,lty=2)
+
+print(sort(median_dep/baseline_dep))
+
+print(median((median_dep/baseline_dep)[5:9]))
 
 ## Comparing number of CFGs across predicted set and compared with baseline CFGs at observed TPRs
 baseline_size<-unlist(lapply(baselineCFGs[round(s0fun(observedTPRs))],function(x){length(setdiff(x,TrainingSets))}))
@@ -491,7 +523,189 @@ bsexp<-lapply(novelCFs_sets[3:11],function(x){
 
 par(mar=c(12,4,4,2))
 boxplot(lapply(bsexp,function(x){log(x+1)}),las=2,col=col[names(bsexp)],ylab='grand median across tissues',
-main='basal expression in normal tissues')
+main='basal expression in normal tissues')#
+
+##################################################################################################################
+## Benchmarking including training sets
+## The following code re-executes the benchmark including also the Hart2014 and Hart2017 sets
+## and adding to the Sharma2020 and CENtools predicted CFGs the prior known CFGs used in the training phase, respectively Hart2017 and curated Hart2014
+## all plots including training
+
+names(CFs_sets_plus_training)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
+names(CFs_sets_plus_training)[5]<-'CEN-tools + curated Hart2017'
+col_includingTraining<-col
+names(col_includingTraining)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
+names(col_includingTraining)[5]<-'CEN-tools + curated Hart2017'
+col<-c(col,col_includingTraining)
+
+## Computing baseline TPRs Including Training sets
+baselineTPRs_includingTraining<-100*unlist(lapply(baselineCFGs,function(x){
+  length(intersect(x,positiveControls_includingTraining))/length(positiveControls_includingTraining)
+}))
+
+## Computing baseline FPRs Including Training sets
+baselineFPRs_includingTraining<-100*unlist(lapply(baselineCFGs,function(x){
+  length(intersect(x,negativeControls_includingTraining))/length(negativeControls_includingTraining)
+}))
+
+## Plotting baseline DM features Including Training sets
+par(mfrow=c(2,2))
+par(mar=c(6,4,1,1))
+plot(baselineTPRs_includingTraining,ylab='Recall of positive controls (TPRs)',
+     xlab='minimal n. cell lines dependent on the CFGs',pch=16)
+
+plot(baselineFPRs_includingTraining,ylab='Recall of negative controls (FPRs)',
+     xlab='minimal n. cell lines dependent on the CFGs',pch=16)
+
+plot(baselineTPRs_includingTraining,baselineFPRs_includingTraining,xlab='Recall of positive controls (TPRs)',
+     ylab='Recall of negative controls (FPRs)',pch=16)
+
+
+## computing observed TPRs/FPRs including Training sets
+observedTPRs_includingTraining<-100*unlist(lapply(CFs_sets_plus_training,
+                                                  function(x){length(intersect(x,positiveControls_includingTraining))/length(positiveControls_includingTraining)}))
+
+observedFPRs_includingTraining<-100*unlist(lapply(CFs_sets_plus_training,
+                                                  function(x){length(intersect(x,negativeControls_includingTraining))/length(negativeControls_includingTraining)}))
+
+## Barplotting observed TPRs/FPRs including Training sets
+par(mfrow=c(1,1))
+par(mar=c(15,4,4,1))
+barplot(observedTPRs_includingTraining/max(baselineTPRs_includingTraining),col=col[names(observedTPRs_includingTraining)],
+        las=2,ylab='TPR / (max baseline TPR)',border=NA,main = 'Observed Relative TPRs')
+
+print(sort(observedTPRs_includingTraining/max(baselineTPRs_includingTraining),decreasing=TRUE))
+
+print(paste('median relative TPRs for unsupervised methods:',
+            median((observedTPRs_includingTraining/max(baselineTPRs_includingTraining)))))
+
+barplot(observedFPRs_includingTraining/max(baselineFPRs_includingTraining),
+        col=col[names(observedFPRs_includingTraining)],
+        las=2,ylab='FPR / (max baseline FPR)', border=NA, main = 'Observed Relative FPRs')
+
+print(sort(observedFPRs_includingTraining/max(baselineFPRs_includingTraining)))
+
+print(paste('median relative FPRs for unsupervised methods:',
+            median((observedFPRs_includingTraining/max(baselineFPRs_includingTraining)))))
+
+
+## Plotting observed FPRs at observed level of TPRs, with respect to baseline FPRs at fixed level of TPRs.
+
+par(mar=c(4,4,2,1))
+
+plot(spline(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining)),pch=16,
+     xlab='% Recall of positive controls (TPRs)',
+     ylab='% Recall of negative controls (FPRs)',
+     type='l',lwd=5,ylim=c(0.05,0.55),xlim=c(15,37))
+
+points(observedTPRs_includingTraining,observedFPRs_includingTraining,
+       col=col[names(observedTPRs_includingTraining)],pch=16,cex=2)
+
+
+#Barplotting ratios between observed FPRs and baseline FPRs at observed TPRs
+s0fun<-splinefun(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining))
+
+par(mar=c(15,4,4,4))
+barplot(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining),
+        col=col[names(observedFPRs_includingTraining)],
+        las=2,border=NA,ylab='Observed FPRs / baseline FPRs at observed level of TPRs')
+abline(h=1,lty=2)
+
+print(sort(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining)))
+
+print(paste('median FPRs vs expectation ratio for unsupervised methods:',
+            median((observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining))[5:9])))
+
+## Comparing numbers of dependant cell lines across sets of predicted CFGs.
+screenedGenes<-rownames(bdep)
+
+median_n_dep_cell_lines_includingTraining<-
+  unlist(lapply(CFs_sets_plus_training,function(x){median(rowSums(bdep[intersect(x,screenedGenes),]))}))
+
+median_perc_dep_cell_lines_includingTraining<-100*median_n_dep_cell_lines_includingTraining/ncol(bdep)
+
+par(mar=c(15,4,2,1))
+barplot(median_perc_dep_cell_lines_includingTraining,
+        col=col[names(median_n_dep_cell_lines_includingTraining)],
+        las=2, border=NA,main = 'CFGs Median % dep cell lines', ylab = '%',ylim=c(0,100))
+
+print(sort(median_perc_dep_cell_lines_includingTraining),decreasing=TRUE)
+print(paste('grand median percentaged of dependent cell lines for unsupervised methods:',
+            median(median_perc_dep_cell_lines_includingTraining[5:9])))
+
+## Comparing number of dependent cell lines for the predicted CFGs and threshold  𝑛  of minimal number of dependent cell lines required by the baseline DM classifier required to attain the observed TPRs.par(mar=c(6,4,1,1))
+plot(100*1:length(baselineTPRs_includingTraining)/length(baselineTPRs_includingTraining),
+     baselineTPRs_includingTraining,xlab='threshold n of baseline classifier (as % of screened cell lines)',
+     ylab='% Recall of positive controls (TPRs)',pch=16)
+
+s0fun<-splinefun(c(0,baselineTPRs_includingTraining),0:length(baselineTPRs))
+abline(v=100*s0fun(observedTPRs_includingTraining)/length(baselineTPRs_includingTraining),
+       col=col[names(observedTPRs_includingTraining)],lwd=2)
+
+baseline_n_dep_cl_at_observed_TPR_includingTraining<-s0fun(observedTPRs_includingTraining)
+
+par(mar=c(15,4,2,1))
+barplot(median_n_dep_cell_lines_includingTraining/baseline_n_dep_cl_at_observed_TPR_includingTraining,
+        col=col[names(median_n_dep_cell_lines_includingTraining)],
+        las=2, border=NA,main = 'CFGs Median n.dep cell lines / baseline n at obs TPRs', ylab = 'ratio')
+abline(h=1,lty=2)
+
+print(median_n_dep_cell_lines_includingTraining/baseline_n_dep_cl_at_observed_TPR_includingTraining)
+
+print(paste('median ratio for unsupervised methods:',
+            median((median_n_dep_cell_lines_includingTraining/baseline_n_dep_cl_at_observed_TPR_includingTraining)[5:9])))
+
+###  Comparing median fitness effects across predicted CFGs and comparison with baseline median
+## fitness effect at observed TPRs (excluding training sets)
+median_dep_includingTraining <- unlist(lapply(CFs_sets_plus_training,
+                                              function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
+
+par(mar=c(15,6,4,2))
+barplot(median_dep_includingTraining,col=col[names(median_dep_includingTraining)],
+        las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect')
+abline(h=1,lty=2)
+
+baseline_dep_includingTraining <- unlist(lapply(baselineCFGs[round(s0fun(observedTPRs_includingTraining))],
+                                                function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
+
+par(mar=c(15,6,4,2))
+barplot(median_dep_includingTraining/baseline_dep_includingTraining,col=col[names(median_dep_includingTraining)],
+        las=2,main = 'Median CFGs fitness effect / baseline median at observed TPRs', border=NA, ylab = 'ratio',ylim=c(0,1))
+abline(h=1,lty=2)
+
+##Comparing number of CFGs across predicted set and compared with baseline CFGs at observed TPRs
+
+baseline_size_includingTraining<-
+  unlist(lapply(baselineCFGs[round(s0fun(observedTPRs_includingTraining))],length))
+
+observed_sizes_includingTraining<-
+  unlist(lapply(CFs_sets_plus_training,length))
+
+par(mar=c(15,6,4,2))
+barplot(observed_sizes_includingTraining/baseline_size_includingTraining,
+        col=col[names(observed_sizes_includingTraining)],
+        las=2,main = 'n. CFGs / baseline at observed TPRs',border=NA, ylab = 'ratio')
+
+
+##Comparing basal expression of predicted CFGs in Normal tissues
+
+load('data/GTEx_Analysis_v6p_RNA-seq_RNA-SeQCv1.1.8_gene_median_rpkm.Rdata')
+
+bsexp_includingTraining<-lapply(CFs_sets_plus_training,function(x){
+  tmp<-basalExprsNormalTissues[intersect(x,rownames(basalExprsNormalTissues)),]
+  unlist(lapply(1:nrow(tmp),function(x){median(tmp[x,])}))
+})
+
+par(mar=c(15,4,4,2))
+boxplot(lapply(bsexp_includingTraining,
+               function(x){log(x+1)}),las=2,col=col[names(bsexp_includingTraining)],
+        ylab='grand median across tissues',
+        main='basal expression in normal tissues')
+
+################################################################################
+
+
+
 
 ### Comparison of covered prior known CFGs not included in any of the trainin sets
 ### across supervised methods
