@@ -39,8 +39,8 @@ retrievegeneInfo<-function(GENES, fc){
   family<-rep('',length(GENES))
   names(family)<-GENES
 
-  pubmed_id<-rep('',length(GENES))
-  names(pubmed_id)<-GENES
+  #pubmed_id<-rep('',length(GENES))
+  #names(pubmed_id)<-GENES
 
   description[commong]<-fc[,'name']
   family[commong]<-fc[,'gene_family']
@@ -48,9 +48,9 @@ retrievegeneInfo<-function(GENES, fc){
   entrez_id[commong]<-fc[,'entrez_id']
   ensemble_id[commong]<-fc[,'ensembl_gene_id']
   location[commong]<-fc[,'location_sortable']
-  pubmed_id[commong]<-fc[,'pubmed_id']
+  #pubmed_id[commong]<-fc[,'pubmed_id']
 
-  res<-cbind(description,family,hgnc_id,entrez_id,ensemble_id,location,pubmed_id)
+  res<-cbind(description,family,hgnc_id,entrez_id,ensemble_id,location) #,pubmed_id)
 
   return(res)
 }
@@ -97,6 +97,36 @@ enrichedGeneFamilies<-function(geneset,BGgs){
 
   return(RES)
 }
+
+## Run this only if you want to build the protein-coding_genes_annot.txt files from scratch
+
+# library(biomaRt)
+# library(UniProt.ws)
+#
+# load('notebooks/data/screenedGenes.RData')
+# load('notebooks/data/UniProt_Homo_sapiens.RData')
+#
+# ## Used BioMart database (version Ensembl Genes 103) and Homo sapiens as dataset (version GRCh38.p13)
+# mart = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+#
+# BM = getBM(attributes = c("hgnc_id", "entrezgene_id", "ensembl_gene_id", "band", "hgnc_symbol"),
+#            mart = mart)
+#
+# BM = BM[which(BM$hgnc_symbol != ""),]
+# BM = BM[which(BM$hgnc_symbol %in% screenedGenes),]
+#
+# ## Get protein and family name from Uniprot
+# res <- UniProt.ws::select(UniProt,
+#                           keys = BM$hgnc_symbol[1:100],
+#                           columns = c("PROTEIN-NAMES", "FAMILIES"),
+#                           keytype = "GENECARDS")
+# colnames(res) <- c("hgnc_symbol","name","gene_family")
+#
+# BM <- left_join(BM,res) %>% distinct()
+#
+# fc_annotation <- BM
+# colnames(fc_annotation) <- c("hgnc_id", "entrez_id", "ensembl_gene_id", "location_sortable",
+#                              "symbol", "name", "gene_family")
 
 load('data/preComputed/CFs_sets_plus_training.RData')
 load('data/preComputed/CFs_sets.RData')
