@@ -570,7 +570,7 @@ observedFPRs_includingTraining<-100*unlist(lapply(CFs_sets_plus_training,
 
 ## Barplotting observed TPRs/FPRs including Training sets
 par(mfrow=c(1,1))
-par(mar=c(15,4,4,1))
+par(mar=c(16,4,4,1))
 barplot(observedTPRs_includingTraining/max(baselineTPRs_includingTraining),col=col[names(observedTPRs_includingTraining)],
         las=2,ylab='TPR / (max baseline TPR)',border=NA,main = 'Observed Relative TPRs')
 
@@ -590,31 +590,53 @@ print(paste('median relative FPRs for unsupervised methods:',
 
 
 ## Plotting observed FPRs at observed level of TPRs, with respect to baseline FPRs at fixed level of TPRs.
-
+par(mfrow=c(1,2))
 par(mar=c(4,4,2,1))
 
 plot(spline(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining)),pch=16,
      xlab='% Recall of positive controls (TPRs)',
      ylab='% Recall of negative controls (FPRs)',
-     type='l',lwd=5,ylim=c(0.05,0.55),xlim=c(15,37))
+     type='l',lwd=5,ylim=c(0.05,0.55),xlim=c(21,53))
 
 points(observedTPRs_includingTraining,observedFPRs_includingTraining,
        col=col[names(observedTPRs_includingTraining)],pch=16,cex=2)
 
+abline(v=min(baselineTPRs_includingTraining),lty=2)
+abline(h=min(baselineFPRs_includingTraining),lty=2)
+legend('topleft','basal DM n* = 1 cell line',lty=2)
 
 #Barplotting ratios between observed FPRs and baseline FPRs at observed TPRs
 s0fun<-splinefun(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining))
 
-par(mar=c(15,4,4,4))
+par(mar=c(4,15,1,1))
 barplot(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining),
         col=col[names(observedFPRs_includingTraining)],
-        las=2,border=NA,ylab='Observed FPRs / baseline FPRs at observed level of TPRs')
-abline(h=1,lty=2)
+        las=2,border=NA,
+        xlab=paste('Observed FPRs /\nbaseline FPRs at observed level of TPRs'),
+        horiz=TRUE)
+abline(v=1,lty=2)
 
 print(sort(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining)))
 
 print(paste('median FPRs vs expectation ratio for unsupervised methods:',
             median((observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining))[5:9])))
+
+
+print(paste(length(nc_cfgs),
+                   'always depleted positive controls not covered by Hart2014:'))
+nc_cfgs<-setdiff(intersect(baselineCFGs[[ncol(bdep)]],
+                                       positiveControls_includingTraining),
+                             CFs_sets_plus_training$`Hart 2014`)
+
+print(nc_cfgs)
+
+par(mar=c(16,5,4,1))
+coverage<-100*unlist(lapply(CFs_sets_plus_training,
+                            function(x){length(intersect(x,nc_cfgs))/length(nc_cfgs)}))
+barplot(coverage,
+        col=col_includingTraining[names(CFs_sets_plus_training)],las=2,
+        ylab=paste('% of always essential positive\ncontrols not covered by Hart2014'))
+abline(h=100,lty=2)
 
 ## Comparing numbers of dependant cell lines across sets of predicted CFGs.
 screenedGenes<-rownames(bdep)
@@ -660,7 +682,7 @@ print(paste('median ratio for unsupervised methods:',
 median_dep_includingTraining <- unlist(lapply(CFs_sets_plus_training,
                                               function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
 
-par(mar=c(15,6,4,2))
+par(mar=c(16,6,4,2))
 barplot(median_dep_includingTraining,col=col[names(median_dep_includingTraining)],
         las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect')
 abline(h=1,lty=2)
@@ -668,7 +690,7 @@ abline(h=1,lty=2)
 baseline_dep_includingTraining <- unlist(lapply(baselineCFGs[round(s0fun(observedTPRs_includingTraining))],
                                                 function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
 
-par(mar=c(15,6,4,2))
+par(mar=c(16,6,4,2))
 barplot(median_dep_includingTraining/baseline_dep_includingTraining,col=col[names(median_dep_includingTraining)],
         las=2,main = 'Median CFGs fitness effect / baseline median at observed TPRs', border=NA, ylab = 'ratio',ylim=c(0,1))
 abline(h=1,lty=2)
