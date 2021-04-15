@@ -8,6 +8,7 @@ library(CoRe)
 library(magrittr)
 library(nVennR)
 library(limma)
+library(stringr)
 
 
 data('curated_BAGEL_essential')
@@ -318,7 +319,7 @@ positiveControls<-c(EssGenes.DNA_REPLICATION_cons,
   Kegg.RNApoly,
   Histones)
 
-positiveControls_includingTraining<-positiveControls
+positiveControls_includingTraining<-unique(positiveControls)
 
 ## removing training sets
 positiveControls<-setdiff(positiveControls,TrainingSets)
@@ -342,7 +343,7 @@ wBm <- sort(unique(unlist(read.table('data/dependency_with_biomarkers.txt',strin
 
 negativeControls<-union(lowlyExp,wBm)
 
-negativeControls_includingTraining<-negativeControls
+negativeControls_includingTraining<-unique(negativeControls)
 
 ## removing training sets
 negativeControls<-setdiff(negativeControls,TrainingSets)
@@ -703,6 +704,40 @@ boxplot(lapply(bsexp_includingTraining,
 
 #################################################################################
 
+
+## Downloading DEMETER RNAi Cancer Dependency dataset
+url <- 'https://ndownloader.figshare.com/files/11489669'
+temp <- tempfile()
+download.file(url, temp, mode="wb")
+
+## Loading and formatting DEMETER RNAi Cancer Dependency dataset
+DEMETER_dep<-as.matrix(read.csv(temp,stringsAsFactors = FALSE,row.names = 1))
+gnames<-rownames(DEMETER_dep)
+gnames<-unlist(lapply(str_split(gnames,' '),function(x){x[1]}))
+rownames(DEMETER_dep)<-gnames
+
+setToconsider<-CFs_sets_plus_training
+medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
+                                                                         MARGIN=1,'median',na.rm=TRUE)})
+
+boxplot(medianRNAi_dep,las=2,
+        col=col_includingTraining[names(medianRNAi_dep)],
+        ylab='Median DEMETER gene fitness score')
+
+grandMedian<-unlist(lapply(medianRNAi_dep,'median'))
+print(sort(grandMedian))
+
+setToconsider<-baselineCFGs[s0fun(observedTPRs_includingTraining)]
+baselineDM_medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
+                                                             MARGIN = 1,
+                                                             'median',na.rm=TRUE)})
+
+baselinegrandMedian<-unlist(lapply(baselineDM_medianRNAi_dep,'median'))
+
+par(mar=c(15,5,4,2))
+barplot(grandMedian/baselinegrandMedian,col=col_includingTraining[names(medianRNAi_dep)],
+        ylab='Median DEMETER gene fitness score\n/ baseline DM',las=2)
+abline(h=1)
 
 
 
