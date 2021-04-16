@@ -738,48 +738,35 @@ gnames<-rownames(DEMETER_dep)
 gnames<-unlist(lapply(str_split(gnames,' '),function(x){x[1]}))
 rownames(DEMETER_dep)<-gnames
 
-setToconsider<-CFs_sets_plus_training
-medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
-                                                                         MARGIN=1,'median',na.rm=TRUE)})
+scaled_DEMETER_de<-
+  CoRe.scale_to_essentials(DEMETER_dep,ess_genes = curated_BAGEL_essential,noness_genes = curated_BAGEL_nonEssential)
 
+setToconsider<-CFs_sets_plus_training[3:11]
+
+medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(scaled_DEMETER_de[intersect(x,rownames(scaled_DEMETER_de)),],
+                                                             MARGIN=1,'median',na.rm=TRUE)})
+## barplotting median DEMETER dependency scores
+par(mar=c(16,5,4,2))
 boxplot(medianRNAi_dep,las=2,
         col=col_includingTraining[names(medianRNAi_dep)],
         ylab='Median DEMETER gene fitness score')
 
 grandMedian<-unlist(lapply(medianRNAi_dep,'median'))
-print(sort(grandMedian))
 
-setToconsider<-baselineCFGs[s0fun(observedTPRs_includingTraining)]
-baselineDM_medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
-                                                             MARGIN = 1,
-                                                             'median',na.rm=TRUE)})
+## Computing baseline DM DEMETER depenendency scores at the observed TPRs
+setToconsider<-baselineCFGs[s0fun(observedTPRs_includingTraining[3:11])]
+
+baselineDM_medianRNAi_dep<-lapply(setToconsider,function(x){subM<-
+  apply(scaled_DEMETER_de[intersect(x,rownames(scaled_DEMETER_de)),],
+        MARGIN = 1,
+        'median',na.rm=TRUE)})
 
 baselinegrandMedian<-unlist(lapply(baselineDM_medianRNAi_dep,'median'))
 
-par(mar=c(15,5,4,2))
+## barplotting median DEMETER dependency scores / baseline
+par(mar=c(16,5,4,2))
 barplot(grandMedian/baselinegrandMedian,col=col_includingTraining[names(medianRNAi_dep)],
         ylab='Median DEMETER gene fitness score\n/ baseline DM',las=2)
 abline(h=1)
 
-
-
-### Comparison of covered prior known CFGs not included in any of the trainin sets
-### across supervised methods
-recalledPK_CFGs<-lapply(novelCFs_sets,
-                   function(x){intersect(x,positiveControls)})
-
-allNewHits<-unique(unlist(recalledPK_CFGs))
-
-newHitsMemb<-do.call(rbind,lapply(recalledPK_CFGs,function(x){is.element(allNewHits,x)}))+0
-colnames(newHitsMemb)<-allNewHits
-
-par(mfrow=c(3,1))
-vennDiagram(t(newHitsMemb[c(3,6),]),main='prior known CFGs not included in any of the trainin sets')
-vennDiagram(t(newHitsMemb[c(4,6),]))
-vennDiagram(t(newHitsMemb[c(5,6),]))
-
-
-
-
-
-
+###############
