@@ -117,7 +117,7 @@ enrichedGeneFamilies<-function(geneset,BGgs){
 #
 # ## Get protein and family name from Uniprot
 # res <- UniProt.ws::select(UniProt,
-#                           keys = BM$hgnc_symbol[1:100],
+#                           keys = BM$hgnc_symbol,
 #                           columns = c("PROTEIN-NAMES", "FAMILIES"),
 #                           keytype = "GENECARDS")
 # colnames(res) <- c("hgnc_symbol","name","gene_family")
