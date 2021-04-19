@@ -928,7 +928,6 @@ significantOnly<-lapply(NN,function(nn){
 ## Extracting families enriched in all supervised methods and state-of-the-art CFGs sets
 always_enriched_CFGs<-Reduce(intersect,significantOnly[1:6])
 
-
 ## Computing recall of the always enriched in CFG families across methods and sets
 RecallOfEnrichedFamilies<-do.call(rbind,lapply(always_enriched_CFGs,function(x){
   unlist(lapply(GFs,function(g){g[x,'Covered']}))
@@ -947,6 +946,8 @@ plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
 legend('center',rownames(RecallOfEnrichedFamilies),fill=col_13_distinct,title='gene families always enriched in CFGs (FDR < 5%)')
 #dev.off()
 
+print('Average Recall of always enriched in GFCs families:')
+print(100*sort(unlist(lapply(GFs,function(x){mean(x[always_enriched_CFGs,'Recall'])})),decreasing = TRUE))
 
 ## Extracting families enriched in all unsupervised methods
 always_enriched_CEGs<-Reduce(intersect,significantOnly[7:11])
