@@ -902,24 +902,24 @@ NN<-names(CFs_sets_plus_training)
 significantOnly<-lapply(NN,function(nn){
   print(nn)
   #pdf(paste('../../../Other Paper Results/plots/',nn,'_GF_enr.pdf',sep=''),11,15)
-  par(mar=c(5,25,4,6))
-  par(xpd=TRUE)
-
+  p# par(mar=c(5,25,4,6))
+  # par(xpd=TRUE)
+  #
   x<-GFs[[nn]]
   x<-x[which(x$fdr<5),]
-  tt<-barplot(rev(-log10(x$pval)),horiz = TRUE,xlim=c(1,10),log='x',
-              names.arg = rev(x$`Gene Family`),las=2,border = FALSE,
-              xlab='-log10 pval',main = paste(nn,'(FDR < 5%)'))
+  # tt<-barplot(rev(-log10(x$pval)),horiz = TRUE,xlim=c(1,10),log='x',
+  #             names.arg = rev(x$`Gene Family`),las=2,border = FALSE,
+  #             xlab='-log10 pval',main = paste(nn,'(FDR < 5%)'))
 
   #write.table(x,quote=FALSE,sep='\t',row.names = FALSE,
   #            file = paste('../../../Other Paper Results/SuppTable3/',nn,'_GF_enr.tsv',sep=''))
 
-  tex<-rev(x$GENES)
-  nchar<-90
-  toCut<-which(str_length(tex)>nchar)
-  tex[toCut]<-str_sub(tex[toCut],1,nchar)
-  tex[toCut]<-paste(tex[toCut],', ...',sep='')
-  text(rep(1,length(tt)),tt-0.06,tex,pos = 4,cex=0.7)
+  # tex<-rev(x$GENES)
+  # nchar<-90
+  # toCut<-which(str_length(tex)>nchar)
+  # tex[toCut]<-str_sub(tex[toCut],1,nchar)
+  # tex[toCut]<-paste(tex[toCut],', ...',sep='')
+  #text(rep(1,length(tt)),tt-0.06,tex,pos = 4,cex=0.7)
   #dev.off()
 
   return(x$`Gene Family`)
