@@ -2,10 +2,10 @@ library(tidyverse)
 library(rstudioapi)
 library(nVennR)
 
-setwd(gsub("/Characterising_CFsets.R","",getSourceEditorContext()$path))
+#setwd(gsub("/Characterising_CFsets.R","",getSourceEditorContext()$path))
 
-system('mkdir -p ../../Other_Paper_Results/SuppTable1')
-system('mkdir -p ../../Other_Paper_Results/Plots')
+#system('mkdir -p ../../Other_Paper_Results/SuppTable1')
+#system('mkdir -p ../../Other_Paper_Results/Plots')
 
 my.hypTest<-function(x,k,n,N){
 
@@ -39,24 +39,22 @@ retrievegeneInfo<-function(GENES, fc){
   family<-rep('',length(GENES))
   names(family)<-GENES
 
-  #pubmed_id<-rep('',length(GENES))
-  #names(pubmed_id)<-GENES
+  pubmed_id<-rep('',length(GENES))
+  names(pubmed_id)<-GENES
 
   description[commong]<-fc[,'name']
   family[commong]<-fc[,'gene_family']
   hgnc_id[commong]<-fc[,'hgnc_id']
   entrez_id[commong]<-fc[,'entrez_id']
-  ensemble_id[commong]<-fc[,'ensembl_gene_id']
-  location[commong]<-fc[,'location_sortable']
-  #pubmed_id[commong]<-fc[,'pubmed_id']
+  pubmed_id[commong]<-fc[,'pubmed_id']
 
-  res<-cbind(description,family,hgnc_id,entrez_id,ensemble_id,location) #,pubmed_id)
+  res<-cbind(description,family,hgnc_id,entrez_id,pubmed_id)
 
   return(res)
 }
 
-enrichedGeneFamilies<-function(geneset,BGgs){
-  geneInfos<-retrievegeneInfo(BGgs)[,2]
+enrichedGeneFamilies<-function(geneset,BGgs,fc){
+  geneInfos<-retrievegeneInfo(BGgs,fc)[,2]
   tokened<-str_split(geneInfos,'[|]')
   names(tokened)<-names(geneInfos)
 
@@ -98,39 +96,7 @@ enrichedGeneFamilies<-function(geneset,BGgs){
   return(RES)
 }
 
-## Run this only if you want to build the protein-coding_genes_annot.txt files from scratch
-
-# library(biomaRt)
-# library(UniProt.ws)
-#
-# load('notebooks/data/screenedGenes.RData')
-# load('notebooks/data/UniProt_Homo_sapiens.RData')
-#
-# ## Used BioMart database (version Ensembl Genes 103) and Homo sapiens as dataset (version GRCh38.p13)
-# mart = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-#
-# BM = getBM(attributes = c("hgnc_id", "entrezgene_id", "ensembl_gene_id", "band", "hgnc_symbol"),
-#            mart = mart)
-#
-# BM = BM[which(BM$hgnc_symbol != ""),]
-# BM = BM[which(BM$hgnc_symbol %in% screenedGenes),]
-#
-# ## Get protein and family name from Uniprot
-# res <- UniProt.ws::select(UniProt,
-#                           keys = BM$hgnc_symbol[1:100],
-#                           columns = c("PROTEIN-NAMES", "FAMILIES"),
-#                           keytype = "GENECARDS")
-# colnames(res) <- c("hgnc_symbol","name","gene_family")
-#
-# BM <- left_join(BM,res) %>% distinct()
-#
-# fc_annotation <- BM
-# colnames(fc_annotation) <- c("hgnc_id", "entrez_id", "ensembl_gene_id", "location_sortable",
-#                              "symbol", "name", "gene_family")
-
 load('data/preComputed/CFs_sets_plus_training.RData')
-load('data/preComputed/CFs_sets.RData')
-
 load('data/screenedGenes.RData')
 
 fc_annotation<-read.table('data/protein-coding_genes_annot.txt',sep = '\t',header=TRUE,stringsAsFactors = FALSE)
@@ -140,8 +106,8 @@ col_includingTraining=c("#03B2C8","#034DD9","#E6AB02","#1B9E77","#337100","#FC8D
       '#F4CAE4','#800080','#CAB2D6','#BEBADA','#777892')
 names(col_includingTraining)<-names(CFs_sets_plus_training)
 
-CFGs_infos<-lapply(CFs_sets_plus_training,retrievegeneInfo)
-GFs<-lapply(CFs_sets_plus_training,function(x){enrichedGeneFamilies(x,screenedGenes)})
+CFGs_infos<-lapply(CFs_sets_plus_training,retrievegeneInfo,fc_annotation)
+GFs<-lapply(CFs_sets_plus_training,function(x){enrichedGeneFamilies(x,screenedGenes,fc_annotation)})
 names(GFs)<-names(CFs_sets_plus_training)
 
 CFGs_infos_no_training<-lapply(CFs_sets,retrievegeneInfo)

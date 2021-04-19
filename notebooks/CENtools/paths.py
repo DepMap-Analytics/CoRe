@@ -1,8 +1,7 @@
-import os, pathlib
- 
+import os
+
 # Specify the paths to import them from the modules
-path = str(pathlib.Path(__file__).absolute())
-path = path.replace("paths.py","")
+path = os.getcwd() + "/CENtools/"
 raw_data_path = path + "data/raw_data/"
 curated_data_path = path + "data/curated_data/"
 object_path = path + "data/objects/"
