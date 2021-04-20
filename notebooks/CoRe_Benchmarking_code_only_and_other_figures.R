@@ -532,10 +532,10 @@ main='basal expression in normal tissues')#
 ## all plots including training
 
 names(CFs_sets_plus_training)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
-names(CFs_sets_plus_training)[5]<-'CEN-tools + curated Hart2017'
+names(CFs_sets_plus_training)[5]<-'CEN-tools + curated Hart2014'
 col_includingTraining<-col
 names(col_includingTraining)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
-names(col_includingTraining)[5]<-'CEN-tools + curated Hart2017'
+names(col_includingTraining)[5]<-'CEN-tools + curated Hart2014'
 col<-c(col,col_includingTraining)
 
 ## Computing baseline TPRs Including Training sets
@@ -570,7 +570,7 @@ observedFPRs_includingTraining<-100*unlist(lapply(CFs_sets_plus_training,
 
 ## Barplotting observed TPRs/FPRs including Training sets
 par(mfrow=c(1,1))
-par(mar=c(15,4,4,1))
+par(mar=c(16,4,4,1))
 barplot(observedTPRs_includingTraining/max(baselineTPRs_includingTraining),col=col[names(observedTPRs_includingTraining)],
         las=2,ylab='TPR / (max baseline TPR)',border=NA,main = 'Observed Relative TPRs')
 
@@ -590,31 +590,53 @@ print(paste('median relative FPRs for unsupervised methods:',
 
 
 ## Plotting observed FPRs at observed level of TPRs, with respect to baseline FPRs at fixed level of TPRs.
-
+par(mfrow=c(1,2))
 par(mar=c(4,4,2,1))
 
 plot(spline(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining)),pch=16,
      xlab='% Recall of positive controls (TPRs)',
      ylab='% Recall of negative controls (FPRs)',
-     type='l',lwd=5,ylim=c(0.05,0.55),xlim=c(15,37))
+     type='l',lwd=5,ylim=c(0.05,0.55),xlim=c(21,53))
 
 points(observedTPRs_includingTraining,observedFPRs_includingTraining,
        col=col[names(observedTPRs_includingTraining)],pch=16,cex=2)
 
+abline(v=min(baselineTPRs_includingTraining),lty=2)
+abline(h=min(baselineFPRs_includingTraining),lty=2)
+legend('topleft','basal DM n* = 1 cell line',lty=2)
 
 #Barplotting ratios between observed FPRs and baseline FPRs at observed TPRs
 s0fun<-splinefun(c(0,baselineTPRs_includingTraining),c(0,baselineFPRs_includingTraining))
 
-par(mar=c(15,4,4,4))
+par(mar=c(4,15,1,1))
 barplot(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining),
         col=col[names(observedFPRs_includingTraining)],
-        las=2,border=NA,ylab='Observed FPRs / baseline FPRs at observed level of TPRs')
-abline(h=1,lty=2)
+        las=2,border=NA,
+        xlab=paste('Observed FPRs /\nbaseline FPRs at observed level of TPRs'),
+        horiz=TRUE)
+abline(v=1,lty=2)
 
 print(sort(observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining)))
 
 print(paste('median FPRs vs expectation ratio for unsupervised methods:',
             median((observedFPRs_includingTraining/s0fun(observedTPRs_includingTraining))[5:9])))
+
+
+print(paste(length(nc_cfgs),
+                   'always depleted positive controls not covered by Hart2014:'))
+nc_cfgs<-setdiff(intersect(baselineCFGs[[ncol(bdep)]],
+                                       positiveControls_includingTraining),
+                             CFs_sets_plus_training$`Hart 2014`)
+
+print(nc_cfgs)
+
+par(mar=c(16,5,4,1))
+coverage<-100*unlist(lapply(CFs_sets_plus_training,
+                            function(x){length(intersect(x,nc_cfgs))/length(nc_cfgs)}))
+barplot(coverage,
+        col=col_includingTraining[names(CFs_sets_plus_training)],las=2,
+        ylab=paste('% of always essential positive\ncontrols not covered by Hart2014'))
+abline(h=100,lty=2)
 
 ## Comparing numbers of dependant cell lines across sets of predicted CFGs.
 screenedGenes<-rownames(bdep)
@@ -660,7 +682,7 @@ print(paste('median ratio for unsupervised methods:',
 median_dep_includingTraining <- unlist(lapply(CFs_sets_plus_training,
                                               function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
 
-par(mar=c(15,6,4,2))
+par(mar=c(16,6,4,2))
 barplot(median_dep_includingTraining,col=col[names(median_dep_includingTraining)],
         las=2,main = 'Median CFGs fitness effect', border=NA, ylab = 'median fitness effect')
 abline(h=1,lty=2)
@@ -668,7 +690,7 @@ abline(h=1,lty=2)
 baseline_dep_includingTraining <- unlist(lapply(baselineCFGs[round(s0fun(observedTPRs_includingTraining))],
                                                 function(x){median(apply(scaled_depFC[intersect(x,screenedGenes),],1,mean))}))
 
-par(mar=c(15,6,4,2))
+par(mar=c(16,6,4,2))
 barplot(median_dep_includingTraining/baseline_dep_includingTraining,col=col[names(median_dep_includingTraining)],
         las=2,main = 'Median CFGs fitness effect / baseline median at observed TPRs', border=NA, ylab = 'ratio',ylim=c(0,1))
 abline(h=1,lty=2)
@@ -716,48 +738,287 @@ gnames<-rownames(DEMETER_dep)
 gnames<-unlist(lapply(str_split(gnames,' '),function(x){x[1]}))
 rownames(DEMETER_dep)<-gnames
 
-setToconsider<-CFs_sets_plus_training
-medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
-                                                                         MARGIN=1,'median',na.rm=TRUE)})
+scaled_DEMETER_de<-
+  CoRe.scale_to_essentials(DEMETER_dep,ess_genes = curated_BAGEL_essential,noness_genes = curated_BAGEL_nonEssential)
 
+setToconsider<-CFs_sets_plus_training[3:11]
+
+medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(scaled_DEMETER_de[intersect(x,rownames(scaled_DEMETER_de)),],
+                                                             MARGIN=1,'median',na.rm=TRUE)})
+## barplotting median DEMETER dependency scores
+par(mar=c(16,5,4,2))
 boxplot(medianRNAi_dep,las=2,
         col=col_includingTraining[names(medianRNAi_dep)],
         ylab='Median DEMETER gene fitness score')
 
 grandMedian<-unlist(lapply(medianRNAi_dep,'median'))
-print(sort(grandMedian))
 
-setToconsider<-baselineCFGs[s0fun(observedTPRs_includingTraining)]
-baselineDM_medianRNAi_dep<-lapply(setToconsider,function(x){subM<-apply(DEMETER_dep[intersect(x,rownames(DEMETER_dep)),],
-                                                             MARGIN = 1,
-                                                             'median',na.rm=TRUE)})
+## Computing baseline DM DEMETER depenendency scores at the observed TPRs
+setToconsider<-baselineCFGs[s0fun(observedTPRs_includingTraining[3:11])]
+
+baselineDM_medianRNAi_dep<-lapply(setToconsider,function(x){subM<-
+  apply(scaled_DEMETER_de[intersect(x,rownames(scaled_DEMETER_de)),],
+        MARGIN = 1,
+        'median',na.rm=TRUE)})
 
 baselinegrandMedian<-unlist(lapply(baselineDM_medianRNAi_dep,'median'))
 
-par(mar=c(15,5,4,2))
+## barplotting median DEMETER dependency scores / baseline
+par(mar=c(16,5,4,2))
 barplot(grandMedian/baselinegrandMedian,col=col_includingTraining[names(medianRNAi_dep)],
         ylab='Median DEMETER gene fitness score\n/ baseline DM',las=2)
 abline(h=1)
 
+############### FUNCTIONAL CHARACTERISATION AND COMPARISON ############################
+
+my.hypTest<-function(x,k,n,N){
 
 
-### Comparison of covered prior known CFGs not included in any of the trainin sets
-### across supervised methods
-recalledPK_CFGs<-lapply(novelCFs_sets,
-                   function(x){intersect(x,positiveControls)})
+  PVALS<-phyper(x-1,n,N-n,k,lower.tail=FALSE)
 
-allNewHits<-unique(unlist(recalledPK_CFGs))
+  return(PVALS)
+}
+retrievegeneInfo<-function(GENES, fc){
 
-newHitsMemb<-do.call(rbind,lapply(recalledPK_CFGs,function(x){is.element(allNewHits,x)}))+0
-colnames(newHitsMemb)<-allNewHits
+  commong<-intersect(rownames(fc),GENES)
 
-par(mfrow=c(3,1))
-vennDiagram(t(newHitsMemb[c(3,6),]),main='prior known CFGs not included in any of the trainin sets')
-vennDiagram(t(newHitsMemb[c(4,6),]))
-vennDiagram(t(newHitsMemb[c(5,6),]))
+  fc<-fc[commong,]
+
+  description<-rep('',length(GENES))
+  names(description)<-GENES
+
+  hgnc_id<-rep('',length(GENES))
+  names(hgnc_id)<-GENES
+
+  entrez_id<-rep('',length(GENES))
+  names(entrez_id)<-GENES
+
+  ensemble_id<-rep('',length(GENES))
+  names(ensemble_id)<-GENES
+
+  location<-rep('',length(GENES))
+  names(location)<-GENES
+
+  family<-rep('',length(GENES))
+  names(family)<-GENES
+
+  pubmed_id<-rep('',length(GENES))
+  names(pubmed_id)<-GENES
+
+  description[commong]<-fc[,'name']
+  family[commong]<-fc[,'gene_family']
+  hgnc_id[commong]<-fc[,'hgnc_id']
+  entrez_id[commong]<-fc[,'entrez_id']
+  pubmed_id[commong]<-fc[,'pubmed_id']
+
+  res<-cbind(description,family,hgnc_id,entrez_id,pubmed_id)
+
+  return(res)
+}
+enrichedGeneFamilies<-function(geneset,BGgs,fc){
+  geneInfos<-retrievegeneInfo(BGgs,fc)[,2]
+  tokened<-str_split(geneInfos,'[|]')
+  names(tokened)<-names(geneInfos)
+
+  observed<-tokened[geneset]
+
+  observed<-observed[observed!='']
+
+  k<-length(observed)
+
+  tokened<-tokened[tokened!='']
+
+  N<-length(tokened)
+
+  toTest<-summary(as.factor(unlist(observed)))
+  toTest<-sort(toTest[which(toTest>1)],decreasing=TRUE)
+  toTest<-names(toTest)
+  toTest<-setdiff(toTest,'(Other)')
 
 
+  RES<-do.call(rbind,lapply(toTest,function(x){
+    n<-length(which((unlist(lapply(lapply(tokened,'intersect',x),'length')))>0))
+    currSet<-names(which((unlist(lapply(lapply(observed,'intersect',x),'length')))>0))
+    x<-length(currSet)
+    pvals<-my.hypTest(x,k,n,N)
+    GENES<-paste(sort(currSet),collapse=', ')
+    res<-data.frame(pval=pvals,Recall=x/n,Covered=x,n_in_category=n,n_picked=k,n_background=N,GENES=GENES,stringsAsFactors = FALSE)
+  }))
+
+  rownames(RES)<-toTest
+
+  fdr<-100*p.adjust(RES$pval,'fdr')
+
+  RES<-cbind(rownames(RES),fdr,RES)
+  colnames(RES)[1]<-'Gene Family'
+
+  RES[,1]<-as.character(RES[,1])
+  RES<-RES[order(RES$fdr),]
+
+  return(RES)
+}
 
 
+## loading pre-computed CFG sets, this line should be commented
+load('data/preComputed/CFs_sets_plus_training.RData')
+
+## Loading gene set to be used as background population
+load('data/screenedGenes.RData')
+
+## Deriving gene annotations
+fc_annotation<-read.table('data/protein-coding_genes_annot.txt',sep = '\t',header=TRUE,stringsAsFactors = FALSE)
+rownames(fc_annotation)<-fc_annotation$symbol
+
+## declaring a vector of colors
+col_includingTraining=c("#03B2C8","#034DD9","#E6AB02","#1B9E77","#337100","#FC8D62",
+                        '#F4CAE4','#800080','#CAB2D6','#BEBADA','#777892')
+names(col_includingTraining)<-names(CFs_sets_plus_training)
+
+## Deriving gene info tables for all the CFG/CEG sets
+CFGs_infos<-lapply(CFs_sets_plus_training,retrievegeneInfo,fc_annotation)
+
+## Performing enrichment analysis of gene families
+GFs<-lapply(CFs_sets_plus_training,function(x){enrichedGeneFamilies(x,screenedGenes,fc_annotation)})
+names(GFs)<-names(CFs_sets_plus_training)
+
+# CFGs_infos_no_training<-lapply(CFs_sets,retrievegeneInfo)
+# names(CFGs_infos_no_training)<-names(CFs_sets)
+#
+# NN<-names(CFGs_infos_no_training)
+#
+# lapply(NN,function(x){
+#   tmp<-CFGs_infos_no_training[[x]]
+#   tmp<-cbind(rownames(tmp),tmp)
+#   colnames(tmp)[1]<-'Gene'
+#
+#   write.table(tmp,row.names = FALSE,
+#               quote=FALSE,
+#               sep='\t',file=paste('../../Other_Paper_Results/SuppTable1/',x,'_set.tsv',sep=''))
+# })
+
+
+## Extracting significant hits only (FDR < 5%)
+NN<-names(CFs_sets_plus_training)
+significantOnly<-lapply(NN,function(nn){
+  print(nn)
+  #pdf(paste('../../../Other Paper Results/plots/',nn,'_GF_enr.pdf',sep=''),11,15)
+  p# par(mar=c(5,25,4,6))
+  # par(xpd=TRUE)
+  #
+  x<-GFs[[nn]]
+  x<-x[which(x$fdr<5),]
+  # tt<-barplot(rev(-log10(x$pval)),horiz = TRUE,xlim=c(1,10),log='x',
+  #             names.arg = rev(x$`Gene Family`),las=2,border = FALSE,
+  #             xlab='-log10 pval',main = paste(nn,'(FDR < 5%)'))
+
+  #write.table(x,quote=FALSE,sep='\t',row.names = FALSE,
+  #            file = paste('../../../Other Paper Results/SuppTable3/',nn,'_GF_enr.tsv',sep=''))
+
+  # tex<-rev(x$GENES)
+  # nchar<-90
+  # toCut<-which(str_length(tex)>nchar)
+  # tex[toCut]<-str_sub(tex[toCut],1,nchar)
+  # tex[toCut]<-paste(tex[toCut],', ...',sep='')
+  #text(rep(1,length(tt)),tt-0.06,tex,pos = 4,cex=0.7)
+  #dev.off()
+
+  return(x$`Gene Family`)
+})
+
+## Extracting families enriched in all supervised methods and state-of-the-art CFGs sets
+always_enriched_CFGs<-Reduce(intersect,significantOnly[1:6])
+
+## Computing recall of the always enriched in CFG families across methods and sets
+RecallOfEnrichedFamilies<-do.call(rbind,lapply(always_enriched_CFGs,function(x){
+  unlist(lapply(GFs,function(g){g[x,'Covered']}))
+}))
+
+rownames(RecallOfEnrichedFamilies)<-always_enriched_CFGs
+
+## plotting computed recalls
+#pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Supervised.pdf')
+load('data/col_13_distinct.RData')
+par(mar=c(17,4,4,2), pty = "s")
+par(xpd=TRUE)
+barplot(RecallOfEnrichedFamilies,las=2,col=col_13_distinct,ylim=c(0,400),ylab='n. genes',main='Coverage of gene families
+        always enriched in CFGs (FDR < 5%)')
+plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
+legend('center',rownames(RecallOfEnrichedFamilies),fill=col_13_distinct,title='gene families always enriched in CFGs (FDR < 5%)')
+#dev.off()
+
+print('Average Recall of always enriched in GFCs families:')
+print(100*sort(unlist(lapply(GFs,function(x){mean(x[always_enriched_CFGs,'Recall'])})),decreasing = TRUE))
+
+## Extracting families enriched in all unsupervised methods
+always_enriched_CEGs<-Reduce(intersect,significantOnly[7:11])
+
+allGinfos<-retrievegeneInfo(screenedGenes,fc_annotation)
+
+## computing recalls of always enriched families
+RecallOfEnrichedFamilies_CEGs<-do.call(rbind,lapply(always_enriched_CEGs,function(x){
+  genes_in_the_family<-rownames(allGinfos)[grep(x,allGinfos[,'family'])]
+  unlist(lapply(CFs_sets_plus_training,function(y){length(intersect(y,genes_in_the_family))}))
+}))
+
+rownames(RecallOfEnrichedFamilies_CEGs)<-always_enriched_CEGs
+colnames(RecallOfEnrichedFamilies_CEGs)<-names(CFs_sets_plus_training)
+
+## Plotting results
+pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Unsupervised.pdf')
+load(file='data/col_57_distinct.RData')
+par(mar=c(17,4,6,2), pty = "s")
+par(xpd=TRUE)
+barplot(RecallOfEnrichedFamilies_CEGs,las=2,col=col_57_distinct,
+        ylim=c(0,800),ylab='n. genes',main='Coverage of gene families always enriched in CEGs (FDR < 5%)',
+        border=NA)
+par(mar=c(4,2,3,2))
+plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
+legend('center',rownames(RecallOfEnrichedFamilies_CEGs),cex=0.55,
+       fill=col_57_distinct,title='gene families always enriched in CEGs (FDR < 5%)',border = NA)
+dev.off()
+
+
+##############
+
+load('data/early_ess.RData')
+load('data/mid_ess.RData')
+load('data/late_ess.RData')
+
+## Determining early/mid/late essential gene families
+early_ess_enrich_families<-enrichedGeneFamilies(early_ess,screenedGenes,fc_annotation)
+early_ess_enrich_families<-early_ess_enrich_families$`Gene Family`[which(early_ess_enrich_families$fdr<5)]
+
+mid_ess_enrich_families<-enrichedGeneFamilies(mid_ess,screenedGenes,fc_annotation)
+mid_ess_enrich_families<-mid_ess_enrich_families$`Gene Family`[which(mid_ess_enrich_families$fdr<5)]
+
+late_ess_enrich_families<-enrichedGeneFamilies(late_ess,screenedGenes,fc_annotation)
+late_ess_enrich_families<-late_ess_enrich_families$`Gene Family`[which(late_ess_enrich_families$fdr<5)]
+
+common_CFGs_CEGs_time_comp<-c(length(intersect(intersect(always_enriched_CEGs,always_enriched_CFGs),early_ess_enrich_families)),
+                              length(intersect(intersect(always_enriched_CEGs,always_enriched_CFGs),union(mid_ess_enrich_families,late_ess_enrich_families))))
+CEGs_exclusive_time_comp<-c(length(intersect(setdiff(always_enriched_CEGs,always_enriched_CFGs),early_ess_enrich_families)),
+                              length(intersect(setdiff(always_enriched_CEGs,always_enriched_CFGs),union(mid_ess_enrich_families,late_ess_enrich_families))))
+
+barplot(100*cbind(common_CFGs_CEGs_time_comp/sum(common_CFGs_CEGs_time_comp),
+              CEGs_exclusive_time_comp/sum(CEGs_exclusive_time_comp)),
+        names.arg = c('CFG and CEG','CEG only'),main='Enriched Gene Families',ylab='%',
+        col=c('darkgray','lightblue'),border=NA)
+plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
+legend('center',c('early essential gene families','mid/late essential gene families'),
+       fill=c('darkgray','lightblue'),border = NA)
+
+
+# recalledPK_CFGs<-lapply(novelCFs_sets,
+#                         function(x){intersect(x,positiveControls)})
+#
+# allNewHits<-unique(unlist(recalledPK_CFGs))
+#
+# newHitsMemb<-do.call(rbind,lapply(recalledPK_CFGs,function(x){is.element(allNewHits,x)}))+0
+# colnames(newHitsMemb)<-allNewHits
+#
+# par(mfrow=c(3,1))
+# vennDiagram(t(newHitsMemb[c(3,6),]),main='prior known CFGs not included in any of the trainin sets')
+# vennDiagram(t(newHitsMemb[c(4,6),]))
+# vennDiagram(t(newHitsMemb[c(5,6),]))
 
 
