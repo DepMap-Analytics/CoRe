@@ -1,7 +1,7 @@
 Package: CoRe
 Type: Package
 Title: CoRe R package
-Version: 0.1.0
+Version: 1.0.0
 Author: Emre Karakoc, Clare Pacini, Alessandro Vinceti and Francesco Iorio
 Maintainer: Francesco Iorio <francesco.iorio@sanger.ac.uk>
 Description: The CoRe package implements algorithms for the identification of core-fitness and common-essential genes from joint analyses of multiple CRISPR-cas9 (or RNAi) viability screens

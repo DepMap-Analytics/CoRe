@@ -14,11 +14,7 @@ library(stringr)
 data('curated_BAGEL_essential')
 data('curated_BAGEL_nonEssential')
 
-url <- 'https://www.depmap.org/broad-sanger/integrated_Sanger_Broad_essentiality_matrices_20201201.zip'
-temp <- tempfile()
-download.file(url, temp, mode="wb")
-unzip(temp, exdir = 'integrated_dataset')
-unlink(temp)
+
 
 depFC <- read.table('integrated_dataset/integrated_Sanger_Broad_essentiality_matrices_20201201/CERES_FC.txt',
                     row.names = 1, sep = '\t', header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
