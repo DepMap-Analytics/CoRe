@@ -11,6 +11,6 @@ do
 	do
 		a=$(echo $j | sed 's/\//\t/g' | rev | cut -f1 | rev | sed 's/\.gz//')
 
-		python3.9 data/BAGEL.py bf -i $j -o data/BAGEL_output/$b/$a -e $i -n data/curated_NEG.txt -c 1 -s 1234 -r
+		python3 data/BAGEL.py bf -i $j -o data/BAGEL_output/$b/$a -e $i -n data/curated_NEG.txt -c 1 -s 1234 -r
 	done
 done
