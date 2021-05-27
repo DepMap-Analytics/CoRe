@@ -5,7 +5,12 @@ install.packages("pheatmap")
 install.packages("mixtools")
 install.packages("RCurl")
 install.packages("devtools")
-install.packages("limma")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("limma")
+
 library(devtools)
 install_github("DepMap-Analytics/CoRe")
 install_github("kassambara/factoextra")
