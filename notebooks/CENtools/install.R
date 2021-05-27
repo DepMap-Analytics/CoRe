@@ -10,6 +10,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
 BiocManager::install("limma")
+BiocManager::install("DNAcopy")
 
 library(devtools)
 install_github("DepMap-Analytics/CoRe")
