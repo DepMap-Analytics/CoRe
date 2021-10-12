@@ -1,5 +1,5 @@
 # CoRe
-![alt text](https://github.com/DepMap-Analytics/CoRe/blob/master/notebooks/web/coRe_logo.jpg)
+![alt text](https://github.com/DepMap-Analytics/CoRe/blob/master/web/coRe_logo.jpg)
 
 The CoRe package implements two methods for identification of core fitness genes (at two level of stringency) from joint analyses of multiple genome-wide CRISPR-Cas9 screens: 
 
