@@ -902,7 +902,7 @@ NN<-names(CFs_sets_plus_training)
 significantOnly<-lapply(NN,function(nn){
   print(nn)
   #pdf(paste('../../../Other Paper Results/plots/',nn,'_GF_enr.pdf',sep=''),11,15)
-  p# par(mar=c(5,25,4,6))
+  # par(mar=c(5,25,4,6))
   # par(xpd=TRUE)
   #
   x<-GFs[[nn]]
@@ -964,7 +964,7 @@ rownames(RecallOfEnrichedFamilies_CEGs)<-always_enriched_CEGs
 colnames(RecallOfEnrichedFamilies_CEGs)<-names(CFs_sets_plus_training)
 
 ## Plotting results
-pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Unsupervised.pdf')
+#pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Unsupervised.pdf')
 load(file='data/col_57_distinct.RData')
 par(mar=c(17,4,6,2), pty = "s")
 par(xpd=TRUE)
@@ -975,11 +975,10 @@ par(mar=c(4,2,3,2))
 plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
 legend('center',rownames(RecallOfEnrichedFamilies_CEGs),cex=0.55,
        fill=col_57_distinct,title='gene families always enriched in CEGs (FDR < 5%)',border = NA)
-dev.off()
+#dev.off()
 
 
 ##############
-
 load('data/early_ess.RData')
 load('data/mid_ess.RData')
 load('data/late_ess.RData')
