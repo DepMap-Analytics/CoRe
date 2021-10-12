@@ -99,7 +99,7 @@ load('data/preComputed/FiPer_outputs.RData')
 #                       display=FALSE,
 #                       method = 'AUC')$cfgenes
 
-## consensual core-fitness genes across the three less stringent variants
+## consensus core-fitness genes across the three less stringent variants
 #Perc_Consensus <- Reduce(intersect,list(Perc_fixed,Perc_slope,Perc_AUC))
 
 #print('Done')
@@ -170,7 +170,7 @@ names(CFs_sets)<-c('Hart 2014',
                    'CEN-tools',
                    'ADaM',
                    'FiPer Average',
-                   'FiPer Consensual',
+                   'FiPer Consensus',
                    'FiPer Slope',
                    'FiPer AUC',
                    'FiPer Fixed')
@@ -207,8 +207,8 @@ print('Unsupervised method novel hits:')
 print(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')])
 print(median(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')]))
 
-print(paste('FiPer consensual n.genes (total): ',length(CFs_sets$`FiPer Consensual`)))
-print(paste('FiPer consensual n.genes (novel hits):',length(novelCFs_sets$`FiPer Consensual`)))
+print(paste('FiPer consensus n.genes (total): ',length(CFs_sets$`FiPer Consensus`)))
+print(paste('FiPer consensus n.genes (novel hits):',length(novelCFs_sets$`FiPer Consensus`)))
 
 par(mar=c(4,12,2,2))
 barplot(rbind(novelGeneLengths,GeneLengths-novelGeneLengths),
