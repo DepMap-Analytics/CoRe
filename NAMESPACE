@@ -16,7 +16,6 @@ export(CoRe.randomisedepMat)
 export(CoRe.tradeoffEO_TPR)
 export(CoRe.truePositiveRate)
 export(CoRe.VisCFness)
-export(CoRe.scale_to_essentials)
 
 
 import(magrittr)
