@@ -4,7 +4,7 @@
 \usage{CoRe.FiPer(depMat,
                   display=TRUE,
                   percentile=0.9,
-                  method='fixed')}
+                  method='AUC')}
 \arguments{
 \item{depMat}{Quantitative Dependency Matrix containing Pan-cancer or tissue/cancer-types specific gene fitness/dependency scores across cell-lines/samples. The value in position \eqn{[i,j]} of such matrix quantifies the fitness/dependency score of the \eqn{i}-th gene in the \eqn{j}-th cell line.}
 \item{display}{Boolean, default is TRUE. Should gene score rank distributions of dependency scores be plotted.}
