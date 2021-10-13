@@ -19,7 +19,6 @@ export(CoRe.VisCFness)
 export(CoRe.scale_to_essentials)
 
 
-import(mixtools)
 import(magrittr)
 import(pheatmap)
 importFrom("RCurl", "url.exists")
