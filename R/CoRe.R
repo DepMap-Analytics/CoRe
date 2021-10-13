@@ -208,6 +208,8 @@ CoRe.ADaM<-function(depMat,display=TRUE,
 
 #--- Assemble expression based false positives
 CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
+  options(timeout=200)
+
   dir.create(tmp <- tempfile())
   dir.create(file.path(tmp, "mydir"))
   print('Downloading zipped CCLE expression data from DepMap portal')
