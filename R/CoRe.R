@@ -196,9 +196,9 @@ CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'
   options(timeout=1000)
 
   dir.create(tmp <- tempfile())
-  dir.create(file.path(tmp, "mydir"))
+  dir.create(file.path(tmp, 'mydir'))
   print('Downloading zipped CCLE expression data from DepMap portal')
-  download.file(URL,file.path(tmp, "mydir","CCLE_expression.csv"))
+  download.file(URL,file.path(tmp, 'mydir','CCLE_expression.csv'))
   print('...done')
 
   print('Reading Expression data matrix...')
@@ -289,7 +289,7 @@ CoRe.generateNullModel<-function(depMat,ntrials=1000,display=TRUE,verbose=TRUE){
                      sep=''))
         boxplot(nullProf,las=2,xlab='n. cell lines',ylab='fitness genes in n cell lines',main=main)
 
-        colnames(nullCumSUM)<-paste(">=",1:ncol(nullCumSUM))
+        colnames(nullCumSUM)<-paste('>=',1:ncol(nullCumSUM))
         boxplot(log10(nullCumSUM+1),las=2,main='Cumulative sums',xlab='n. cell lines',
                 ylab='log10 [number of fitness genes + 1]',
                 cex.axis=0.8)
@@ -431,9 +431,9 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
 
   if(url.exists(URL)){
     dir.create(tmp <- tempfile())
-    dir.create(file.path(tmp, "mydir"))
+    dir.create(file.path(tmp, 'mydir'))
     print('Downloading zipped essentiality matrices from Project Score...')
-    download.file(URL,file.path(tmp, "mydir","essentiality_matrices.zip"))
+    download.file(URL,file.path(tmp, 'mydir','essentiality_matrices.zip'))
     print('...done')
 
     dir(file.path(tmp,'mydir'))
@@ -471,7 +471,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
 
 ## Extracting Dependency SubMatrix for a given tissue or cancer type, among those included
 ## in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
-CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
+CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type='Non-Small Cell Lung Carcinoma'){
   cmp<-read_csv('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
   cls<-cmp$model_name[which(cmp$tissue==tissue_type | cmp$cancer_type==tissue_type)]
   cls<-intersect(cls,colnames(fullDepMat))
@@ -610,12 +610,12 @@ CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='AUC'){
 
   if(method=='fixed'){
     LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
-    Label = "Gene rank in 90th perc. least dep cell line"
+    Label = 'Gene rank in 90th perc. least dep cell line'
   }
 
   if(method=='average'){
     LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){mean(rankG[x,names(which(rankCL[x,]>=threshold))])}))
-    Label = "Gene average rank in ≥ 90th perc. of least dep cell lines"
+    Label = 'Gene average rank in ≥ 90th perc. of least dep cell lines'
   }
 
   if(method=='slope'){
@@ -625,7 +625,7 @@ CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='AUC'){
       p<-lm(a ~ seq(1:nCL) , data=b)
       coef(p)[2]
     }))
-    Label = "Slope of gene ranks across ranked dep cell lines"
+    Label = 'Slope of gene ranks across ranked dep cell lines'
   }
 
   if(method=='AUC'){
@@ -633,16 +633,16 @@ CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='AUC'){
       a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
       sum(a)
     }))
-    Label = "AUC of gene ranks across ranked dep cell lines"
+    Label = 'AUC of gene ranks across ranked dep cell lines'
   }
 
   rownames(LeastDependentdf)<-rownames(rankG)
-  doR <- density(LeastDependentdf, bw = "nrd0")
+  doR <- density(LeastDependentdf, bw = 'nrd0')
 
   if (display){
     par(mfrow=c(2,1))
-    hist(LeastDependentdf,breaks = 100,xlab="Rank",main=Label)
-    plot(doR,main="Gaussian Kernel Density Estimation",xlab="Rank")
+    hist(LeastDependentdf,breaks = 100,xlab='Rank',main=Label)
+    plot(doR,main='Gaussian Kernel Density Estimation',xlab='Rank')
 
   }
 
@@ -698,12 +698,12 @@ CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl
 
   if(method=='fixed'){
     LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){rankG[x,match(threshold,rankCL[x,])]}))
-    Label = "Gene rank in 90th perc. least dep cell line"
+    Label = 'Gene rank in 90th perc. least dep cell line'
   }
 
   if(method=='average'){
     LeastDependentdf<-do.call(rbind,lapply(1:nG,function(x){mean(rankG[x,names(which(rankCL[x,]>=threshold))])}))
-    Label = "Gene average rank in ≥ 90th perc. of least dep cell lines"
+    Label = 'Gene average rank in ≥ 90th perc. of least dep cell lines'
   }
 
   if(method=='slope'){
@@ -713,7 +713,7 @@ CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl
       p<-lm(a ~ seq(1:nCL) , data=b)
       coef(p)[2]
     }))
-    Label = "Slope of gene ranks across ranked dep cell lines"
+    Label = 'Slope of gene ranks across ranked dep cell lines'
   }
 
   if(method=='AUC'){
@@ -721,7 +721,7 @@ CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl
       a <- rankG[x,colnames(rankCL)[order(rankCL[x,])]]
       sum(a)
     }))
-    Label = "AUC of gene ranks across ranked dep cell lines"
+    Label = 'AUC of gene ranks across ranked dep cell lines'
   }
 
   cc<-c(rgb(0,200,100,alpha = 180,maxColorValue = 255),
@@ -736,7 +736,7 @@ CoRe.VisCFness<-function(depMat,gene,percentile=0.9,posControl='RPL8',negControl
   abline(v = LeastDependentdf[posControl],lwd=4,col=rgb(0,200,100,alpha = 180,maxColorValue = 255))
   abline(v = LeastDependentdf[gg],lwd=4,col=rgb(0,0,100,alpha = 180,maxColorValue = 255))
 
-  doR <- density(LeastDependentdf, bw = "nrd0")
+  doR <- density(LeastDependentdf, bw = 'nrd0')
 
   localmin <- which(diff(-1*sign(diff(doR$y)))==-2)[1]+1
   myranks<- doR$x
