@@ -23,11 +23,11 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungdepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
+LungDepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
 
 ## Compute as core-fitness genes those that are fitness
 ## in at least 20 Non-Small Cell Lung Carcinoma cell lines
-cfgenes <- CoRe.coreFitnessGenes(depMat=LungdepMat,crossoverpoint=20)
+cfgenes <- CoRe.coreFitnessGenes(depMat=LungDepMat,crossoverpoint=20)
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
