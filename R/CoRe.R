@@ -487,7 +487,7 @@ CoRe.CS_ADaM<-function(pancan_depMat,
                    verbose=verbose,TruePositives = TruePositives))
 }
 
-## Execute ADaM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
+## Execute ADaM tissue by tissue then at the pancancer level to compute pancancer core fitness genes
 CoRe.PanCancer_ADaM<-function(pancan_depMat,
                               tissues_ctypes,
                               clannotation = NULL,
