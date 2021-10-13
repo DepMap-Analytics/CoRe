@@ -230,7 +230,7 @@ CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'
   print('Done')
   print('Selecting overall lowly expressed genes...')
 
-  LowlyExpr<-CoRe.PercentileCF(depMat = numdata,percentile = 0.9,display = FALSE)$cfgenes
+  LowlyExpr<-CoRe.FiPer(depMat = numdata,percentile = 0.9,display = FALSE)$cfgenes
 
   LowlyExpr<-strsplit(LowlyExpr,'[..]')
 
