@@ -20,7 +20,6 @@ export(CoRe.VisCFness)
 
 import(magrittr)
 import(pheatmap)
-importFrom("RCurl", "url.exists")
 importFrom("stringr","str_replace_all","str_replace","str_sub")
 importFrom("readr","read_csv")
 importFrom("grDevices", "dev.off", "jpeg")
