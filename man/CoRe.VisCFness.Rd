@@ -1,10 +1,11 @@
 \name{CoRe.VisCFness}
 \alias{CoRe.VisCFness}
 \title{Common-essentiality tendency visualisation}
-\usage{CoRe.VisCFness(depMat,gene,method='fixed',
+\usage{CoRe.VisCFness(depMat, gene,
                       percentile=0.9,
                       posControl='RPL8',
-                      negControl='MAP2K1')}
+                      negControl='MAP2K1',
+                      method='fixed')}
 \arguments{
 \item{depMat}{Quantitative Dependency Matrix containing Pan-cancer or tissue/cancer-types specific gene fitness/dependency scores across cell-lines/samples. The value in position \eqn{[i,j]} of such matrix quantifies the fitness/dependency score of the \eqn{i}-th gene in the \eqn{j}-th cell line.}
 \item{gene}{Character, name of the gene whose common-essentiality tendency should be visualised.}
