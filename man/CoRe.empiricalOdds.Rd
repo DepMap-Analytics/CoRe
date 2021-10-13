@@ -27,15 +27,15 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMap<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
+LungdepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
 
 ## Computing number of fitness genes across fixed numbers
 ## of cell lines and its cumulative sums
-observed <- CoRe.panessprofile(depMat = LungDepMap)
+observed <- CoRe.panessprofile(depMat = LungdepMat)
 
 ## Simulating Null model for the number of fitness genes
 ## across numbers of cell lines and their cumulative sums
-null_m<-CoRe.generateNullModel(depMat = LungDepMap)
+null_m<-CoRe.generateNullModel(depMat = LungdepMat)
 
 ## Computing empirical odds of number of fitness genes per number of cell lines
 logOdds <- CoRe.empiricalOdds(observedCumSum=observed$CUMsums,simulatedCumSum=null_m$nullCumSUM)

@@ -31,7 +31,7 @@ BinDepMat<-CoRe.download_BinaryDepMatrix()
 
 ## Extracting dependency submatrix for
 ## Non-Small Cell Lung Carcinoma cell lines only
-LungDepMap<-CoRe.extract_tissueType_SubMatrix(BinDepMat)
+LungdepMat<-CoRe.extract_tissueType_SubMatrix(BinDepMat, tissue_type="Non-Small Cell Lung Carcinoma")
 
 ## Computing number of fitness genes across fixed numbers
 ## of cell lines and its cumulative sums
