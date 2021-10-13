@@ -393,21 +393,18 @@ CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
 
 ## Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/binaryDepScores.tsv.zip'){
-  if(url.exists(URL)){
-    temp <- tempfile()
-    download.file(URL,temp)
-    X <- read.table(unz(temp,'binaryDepScores.tsv'),stringsAsFactors = FALSE,sep='\t',header=TRUE,row.names = 1)
-    colnames(X)<-str_replace_all(colnames(X),'[.]','-')
-    colnames(X)<-unlist(lapply(colnames(X),function(x){
-      if(str_sub(x,1,1)=='X'){
-        x<-str_replace(x,'X','')
-      }else{
-        x
-      }
-    }))
-  }else{
-    X <- NULL
-  }
+  temp <- tempfile()
+  download.file(URL,temp)
+  X <- read.table(unz(temp,'binaryDepScores.tsv'),stringsAsFactors = FALSE,sep='\t',header=TRUE,row.names = 1)
+  colnames(X)<-str_replace_all(colnames(X),'[.]','-')
+  colnames(X)<-unlist(lapply(colnames(X),function(x){
+    if(str_sub(x,1,1)=='X'){
+      x<-str_replace(x,'X','')
+    }else{
+      x
+    }
+  }))
+
   return(X)
 }
 
@@ -415,11 +412,7 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 
 ## Downloading Cell Passport models annotation file
 CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
-  if(url.exists(URL)){
-    X <- read_csv(URL)
-  }else{
-    X <- NULL
-  }
+  X <- read_csv(URL)
   return(X)
 }
 
@@ -429,43 +422,39 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
                                   ess=NULL,
                                   noness=NULL){
 
-  if(url.exists(URL)){
-    dir.create(tmp <- tempfile())
-    dir.create(file.path(tmp, 'mydir'))
-    print('Downloading zipped essentiality matrices from Project Score...')
-    download.file(URL,file.path(tmp, 'mydir','essentiality_matrices.zip'))
-    print('...done')
+  dir.create(tmp <- tempfile())
+  dir.create(file.path(tmp, 'mydir'))
+  print('Downloading zipped essentiality matrices from Project Score...')
+  download.file(URL,file.path(tmp, 'mydir','essentiality_matrices.zip'))
+  print('...done')
 
-    dir(file.path(tmp,'mydir'))
+  dir(file.path(tmp,'mydir'))
 
-    print('Uncompressing zipped essentiality...')
-    unzip(file.path(tmp,'mydir','essentiality_matrices.zip'),exdir = file.path(tmp,'mydir'))
-    print('...done')
+  print('Uncompressing zipped essentiality...')
+  unzip(file.path(tmp,'mydir','essentiality_matrices.zip'),exdir = file.path(tmp,'mydir'))
+  print('...done')
 
-    print('Reading CRIPRcleanR corrected essentiality logFCs...')
-    X <- read.table(file.path(tmp,'mydir','EssentialityMatrices','01_corrected_logFCs.tsv'),
-                    stringsAsFactors = FALSE,
-                    sep='\t',
-                    header=TRUE,
-                    row.names = 1)
+  print('Reading CRIPRcleanR corrected essentiality logFCs...')
+  X <- read.table(file.path(tmp,'mydir','EssentialityMatrices','01_corrected_logFCs.tsv'),
+                  stringsAsFactors = FALSE,
+                  sep='\t',
+                  header=TRUE,
+                  row.names = 1)
 
-    colnames(X)<-str_replace_all(colnames(X),'[.]','-')
-    colnames(X)<-unlist(lapply(colnames(X),function(x){
-      if(str_sub(x,1,1)=='X'){
-        x<-str_replace(x,'X','')
-      }else{
-        x
-      }
-    }))
-    print('...done')
-
-    if(scaled){
-      X<-scale_to_essentials(X,ess,noness)
+  colnames(X)<-str_replace_all(colnames(X),'[.]','-')
+  colnames(X)<-unlist(lapply(colnames(X),function(x){
+    if(str_sub(x,1,1)=='X'){
+      x<-str_replace(x,'X','')
+    }else{
+      x
     }
+  }))
+  print('...done')
 
-  }else{
-    X <- NULL
+  if(scaled){
+    X<-scale_to_essentials(X,ess,noness)
   }
+
   return(X)
 }
 
