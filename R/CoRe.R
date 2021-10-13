@@ -191,9 +191,9 @@ CoRe.ADaM<-function(depMat,display=TRUE,
   return (coreFitnessGenes)
 }
 
-#--- Assemble expression based false positives
+## Assemble expression based false positives
 CoRe.AssembleFPs<-function(URL='https://ndownloader.figshare.com/files/26261476'){
-  options(timeout=200)
+  options(timeout=1000)
 
   dir.create(tmp <- tempfile())
   dir.create(file.path(tmp, "mydir"))
@@ -391,7 +391,7 @@ CoRe.coreFitnessGenes<-function(depMat,crossoverpoint){
 
 ## not Documented
 
-#--- Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
+## Downloading Binary Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/binaryDepScores.tsv.zip'){
   if(url.exists(URL)){
     temp <- tempfile()
@@ -413,7 +413,7 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
 
 ## Non Documented
 
-#--- Downloading Cell Passport models annotation file
+## Downloading Cell Passport models annotation file
 CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
   if(url.exists(URL)){
     X <- read_csv(URL)
@@ -423,7 +423,7 @@ CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
   return(X)
 }
 
-#--- Downloading and scaling Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
+## Downloading and scaling Quantitative Dependency Matrix (introduced in Behan 2019) from Project Score
 CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/essentiality_matrices.zip',
                                   scaled=FALSE,
                                   ess=NULL,
@@ -469,8 +469,8 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   return(X)
 }
 
-#--- Extracting Dependency SubMatrix for a given tissue or cancer type, among those included
-#--- in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
+## Extracting Dependency SubMatrix for a given tissue or cancer type, among those included
+## in the latest model annotation file on the cell model passports (cite Donny's paper and website URL)
 CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Cell Lung Carcinoma"){
   cmp<-read_csv('https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz')
   cls<-cmp$model_name[which(cmp$tissue==tissue_type | cmp$cancer_type==tissue_type)]
@@ -478,7 +478,7 @@ CoRe.extract_tissueType_SubMatrix<-function(fullDepMat,tissue_type="Non-Small Ce
   return(fullDepMat[,cls])
 }
 
-#--- Execute ADaM on tissue or cancer type specifc dependency submatrix
+## Execute ADaM on tissue or cancer type specifc dependency submatrix
 CoRe.CS_ADaM<-function(pancan_depMat,
                        tissue_ctype = 'Non-Small Cell Lung Carcinoma',
                        clannotation = NULL,
@@ -498,7 +498,7 @@ CoRe.CS_ADaM<-function(pancan_depMat,
                    verbose=verbose,TruePositives = TruePositives))
 }
 
-#--- Execute ADaM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
+## Execute ADaM tissue by tissue then at the pancancer level to compute pancancer core fintess genes
 CoRe.PanCancer_ADaM<-function(pancan_depMat,
                               tissues_ctypes,
                               clannotation = NULL,
@@ -531,8 +531,8 @@ CoRe.PanCancer_ADaM<-function(pancan_depMat,
 
 }
 
-#--- Computes recall and other ROC indicators for identified core fitness genes
-#--- with respect to pre-defined signatures of essential genes
+## Computes recall and other ROC indicators for identified core fitness genes
+## with respect to pre-defined signatures of essential genes
 CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePositives,displayBar=TRUE){
   priorKnownSignatures<-lapply(priorKnownSignatures,function(x){intersect(x,background)})
   falsePositives<-intersect(falsePositives,background)
@@ -584,8 +584,8 @@ CoRe.CF_Benchmark<-function(testedGenes,background,priorKnownSignatures,falsePos
   return(list(TPRs=data.frame(Recall=TPRs,EnrichPval=ps),PPV=PPV,FPR=FPR))
 }
 
-#--- Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
-#--- Quantative knockout screen dependency matrix.
+## Calculate the Core Fitness genes using the  90th-percentile least dependent cell line from
+## Quantitative knockout screen dependency matrix.
 CoRe.FiPer<-function(depMat,display=TRUE,percentile=0.9,method='AUC'){
 
   depMat<-as.matrix(depMat)
