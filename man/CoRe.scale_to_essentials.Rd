@@ -7,7 +7,6 @@ CoRe.scale_to_essentials(ge_fit,
                          noness_genes)
 }
 \arguments{
-  \item{x}{
 \item{ge_fit}{Dependency matrix, rows are genes and columns are samples (screens, cell-cell lines).}
 
 \item{ess_genes}{Character vector, list of reference essential genes.}
