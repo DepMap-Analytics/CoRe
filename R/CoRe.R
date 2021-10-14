@@ -1,6 +1,6 @@
 ## Apply CERES scaling on cell line fold change scores using two reference sets of essential and non-essential
 ## genes
-scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
+CoRe.scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
   essential_indices <- which(row.names(ge_fit) %in% ess_genes)
   nonessential_indices <- which(row.names(ge_fit) %in% noness_genes)
 
@@ -452,7 +452,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   print('...done')
 
   if(scaled){
-    X<-scale_to_essentials(X,ess,noness)
+    X<-CoRe.scale_to_essentials(X,ess,noness)
   }
 
   return(X)
