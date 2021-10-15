@@ -10,10 +10,10 @@
 # IMPORTING #
 
 from paths import path, curated_data_path, object_path
-from data_preparation.objects import Gene, Sanger, Broad, Integrated
-from data_preparation.objects import deserialisation_project, deserialisation_gene
-from data_preparation.curation import essentiality
-from data_preparation.curation import BEG, BNEG, adam_core, adam_context, stem_core, known_core, only_stem
+from objects import Gene, Sanger, Broad, Integrated
+from objects import deserialisation_project, deserialisation_gene
+from curation import essentiality
+from curation import BEG, BNEG, adam_core, adam_context, stem_core, known_core, only_stem
 
 import os, pandas, networkx, pickle, matplotlib, numpy, sklearn, argparse
 from sklearn.linear_model import LogisticRegression
@@ -122,7 +122,7 @@ def construct_lr_model(df, project, gene_object, result_path):
     # BINARISE THE DATA FRAME FOR LR
 
     # 0 for Non-Essential and 1 for Essential Genes (Success in lR)
-    gold_df["Binarised"] = label_binarize(gold_df.loc[:, ["Category"]].values, ["NEG", "EG"])
+    gold_df["Binarised"] = label_binarize(gold_df.loc[:, ["Category"]].values, classes=["NEG", "EG"])
 
     # MELT THE DATA FRAME
 
@@ -326,8 +326,10 @@ def apply_models(model, df, gene_object):
 
 def main_lr(**args):
 
-    # GENE OBJECT
+    bin_number = args['BIN_NUMBER']
 
+    # GENE OBJECT
+    
     initial_gene_obj = deserialisation_gene(args["GENE_PROJECT"])
 
     # RESULT PATH
@@ -422,12 +424,7 @@ def deserialisation_cen_gene(project):
 ########################################################################################################################
 
 # Run from command line
-gene_project = 'CUSTOM'
-project = 'INTEGRATED'
-bin_number = 20
-model_application = True
-
-essentiality_df = essentiality(project, "FC")
+essentiality_df = essentiality('INTEGRATED', "FC")
 
 GenesDict = {}
 

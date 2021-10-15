@@ -5,7 +5,7 @@
                           background,
                           priorKnownSignatures,
                           falsePositives,
-                          displayBar=FALSE)}
+                          displayBar=TRUE)}
 \arguments{
 \item{testedGenes}{Vector of gene symbols that have been identified as tissue-specific or Pan-cancer core fitness genes.}
 \item{background}{Vector of gene symbols included in the Dependency Matrix used to make the prediction (the background population).}
@@ -86,7 +86,9 @@ ADaMperf<-CoRe.CF_Benchmark(PanCancer_CF_genes,
   signatures,falsePositives=FPs)
 
 ## Inspecting TPRs, PPV and FPR
-ADaMper$
+ADaMperf$TPRs
+ADaMperf$PPV
+ADaMperf$FPR
 
 }
 \references{

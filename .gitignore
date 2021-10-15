@@ -1,4 +1,8 @@
+.DS_Store
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+renv 
+renv.lock
+.Rprofile

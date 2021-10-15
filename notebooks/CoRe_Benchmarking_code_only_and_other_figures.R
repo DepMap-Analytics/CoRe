@@ -14,7 +14,11 @@ library(stringr)
 data('curated_BAGEL_essential')
 data('curated_BAGEL_nonEssential')
 
-
+url <- 'https://www.depmap.org/broad-sanger/integrated_Sanger_Broad_essentiality_matrices_20201201.zip'
+temp <- tempfile()
+download.file(url, temp, mode="wb")
+unzip(temp, exdir = 'integrated_dataset')
+unlink(temp)
 
 depFC <- read.table('integrated_dataset/integrated_Sanger_Broad_essentiality_matrices_20201201/CERES_FC.txt',
                     row.names = 1, sep = '\t', header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
@@ -95,7 +99,7 @@ load('data/preComputed/FiPer_outputs.RData')
 #                       display=FALSE,
 #                       method = 'AUC')$cfgenes
 
-## consensual core-fitness genes across the three less stringent variants
+## consensus core-fitness genes across the three less stringent variants
 #Perc_Consensus <- Reduce(intersect,list(Perc_fixed,Perc_slope,Perc_AUC))
 
 #print('Done')
@@ -166,7 +170,7 @@ names(CFs_sets)<-c('Hart 2014',
                    'CEN-tools',
                    'ADaM',
                    'FiPer Average',
-                   'FiPer Consensual',
+                   'FiPer Consensus',
                    'FiPer Slope',
                    'FiPer AUC',
                    'FiPer Fixed')
@@ -203,8 +207,8 @@ print('Unsupervised method novel hits:')
 print(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')])
 print(median(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')]))
 
-print(paste('FiPer consensual n.genes (total): ',length(CFs_sets$`FiPer Consensual`)))
-print(paste('FiPer consensual n.genes (novel hits):',length(novelCFs_sets$`FiPer Consensual`)))
+print(paste('FiPer consensus n.genes (total): ',length(CFs_sets$`FiPer Consensus`)))
+print(paste('FiPer consensus n.genes (novel hits):',length(novelCFs_sets$`FiPer Consensus`)))
 
 par(mar=c(4,12,2,2))
 barplot(rbind(novelGeneLengths,GeneLengths-novelGeneLengths),
@@ -898,7 +902,7 @@ NN<-names(CFs_sets_plus_training)
 significantOnly<-lapply(NN,function(nn){
   print(nn)
   #pdf(paste('../../../Other Paper Results/plots/',nn,'_GF_enr.pdf',sep=''),11,15)
-  p# par(mar=c(5,25,4,6))
+  # par(mar=c(5,25,4,6))
   # par(xpd=TRUE)
   #
   x<-GFs[[nn]]
@@ -960,7 +964,7 @@ rownames(RecallOfEnrichedFamilies_CEGs)<-always_enriched_CEGs
 colnames(RecallOfEnrichedFamilies_CEGs)<-names(CFs_sets_plus_training)
 
 ## Plotting results
-pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Unsupervised.pdf')
+#pdf('../../../Other Paper Results/plots/Gene_Families_enrichment_Unsupervised.pdf')
 load(file='data/col_57_distinct.RData')
 par(mar=c(17,4,6,2), pty = "s")
 par(xpd=TRUE)
@@ -971,11 +975,10 @@ par(mar=c(4,2,3,2))
 plot(0,0,col=NA,frame.plot=FALSE,xlab='',ylab='',xaxt='n',yaxt='n')
 legend('center',rownames(RecallOfEnrichedFamilies_CEGs),cex=0.55,
        fill=col_57_distinct,title='gene families always enriched in CEGs (FDR < 5%)',border = NA)
-dev.off()
+#dev.off()
 
 
 ##############
-
 load('data/early_ess.RData')
 load('data/mid_ess.RData')
 load('data/late_ess.RData')
