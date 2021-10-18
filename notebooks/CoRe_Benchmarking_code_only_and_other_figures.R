@@ -308,7 +308,7 @@ load("data/Kegg.Ribosome.Rdata")
 load("data/Kegg.Proteasome.Rdata")
 load("data/Kegg.Spliceosome.Rdata")
 load("data/Kegg.RNApoly.Rdata")
-load("data/Histones.Rdata")
+load("data/histones.RData")
 
 positiveControls<-c(EssGenes.DNA_REPLICATION_cons,
                     EssGenes.KEGG_rna_polymerase,
