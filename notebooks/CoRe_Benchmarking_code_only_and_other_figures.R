@@ -180,10 +180,10 @@ CFs_sets<-list(Hart_2014,
                Perc_AUC,
                Perc_fixed)
 
-names(CFs_sets)<-c('Hart 2014',
-                   'Hart 2017',
-                   'ADaM (Behan 2019)',
-                   'CEN-tools (Sharma 2020)',
+names(CFs_sets)<-c('Hart2014',
+                   'Hart2017',
+                   'Behan2019',
+                   'Sharma2020',
                    'CEN-tools',
                    'ADaM',
                    'FiPer Average',
@@ -205,7 +205,7 @@ TrainingSets<-unique(c(BAGEL_essential,
 print(paste(length(TrainingSets),'genes used for training by at least one method'))
 
 novelCFs_sets<-lapply(CFs_sets,function(x){
-  setdiff(x,TrainingSets)
+  base::setdiff(x, TrainingSets)
 })
 
 GeneLengths<-unlist(lapply(CFs_sets,length))
@@ -222,8 +222,8 @@ print('Unsupervised method novel hits:')
 print(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')])
 print(median(novelGeneLengths[c('FiPer Average','FiPer Slope','FiPer AUC','FiPer Fixed')]))
 
-print(paste('FiPer consensus n.genes (total): ',length(CFs_sets$`FiPer consensus`)))
-print(paste('FiPer consensus n.genes (novel hits):',length(novelCFs_sets$`FiPer consensus`)))
+print(paste('FiPer consensus n.genes (total): ',length(CFs_sets$`FiPer Consensus`)))
+print(paste('FiPer consensus n.genes (novel hits):',length(novelCFs_sets$`FiPer Consensus`)))
 
 par(mar=c(4,12,2,2))
 barplot(rbind(novelGeneLengths,GeneLengths-novelGeneLengths),
@@ -235,25 +235,25 @@ legend('bottomright',legend = c('Training sets','(Hart2017 + curated Hart2014)')
 
 
 Recall_Hart2014<-unlist(lapply(CFs_sets,function(x){
-  100*length(intersect(x,CFs_sets$`Hart 2014`))/length(CFs_sets$`Hart 2014`)
+  100*length(base::intersect(x,CFs_sets$Hart2014))/length(CFs_sets$Hart2014)
 }))
 
 Recall_Hart2017<-unlist(lapply(CFs_sets,function(x){
-  100*length(intersect(x,CFs_sets$`Hart 2017`))/length(CFs_sets$`Hart 2017`)
+  100*length(base::intersect(x,CFs_sets$Hart2017))/length(CFs_sets$Hart2017)
 }))
 
 Recall_Behan2019<-unlist(lapply(CFs_sets,function(x){
-  100*length(intersect(x,CFs_sets$`ADaM (Behan 2019)`))/length(CFs_sets$`ADaM (Behan 2019)`)
+  100*length(base::intersect(x,CFs_sets$Behan2019))/length(CFs_sets$Behan2019)
 }))
 
 Recall_Sharma2020<-unlist(lapply(CFs_sets,function(x){
-  100*length(intersect(x,CFs_sets$`CEN-tools (Sharma 2020)`))/length(CFs_sets$`CEN-tools (Sharma 2020)`)
+  100*length(base::intersect(x,CFs_sets$Sharma2020))/length(CFs_sets$Sharma2020)
 }))
-
 
 
 Recalls<-rbind(Recall_Hart2014[6:11],Recall_Hart2017[6:11],Recall_Behan2019[6:11],Recall_Sharma2020[6:11])
 rownames(Recalls)<-c('Hart2014','Hart2017','Behan2019','Sharma2020')
+
 ## creating some space for displaying the legend
 Recalls<-rbind(Recalls,rep(NA,6))
 Recalls<-rbind(Recalls,rep(NA,6))
@@ -270,8 +270,8 @@ print(paste('FiPer median Recall across prior known sets avg across variants:',
 
 
 CFs_sets_plus_training<-CFs_sets
-CFs_sets_plus_training$`CEN-tools (Sharma 2020)`<-
-  union(CFs_sets_plus_training$`CEN-tools (Sharma 2020)`,BAGEL_essential)
+CFs_sets_plus_training$Sharma2020 <-
+  union(CFs_sets_plus_training$Sharma2020,BAGEL_essential)
 
 CFs_sets_plus_training$`CEN-tools`<-
   union(CFs_sets_plus_training$`CEN-tools`,curated_BAGEL_essential)
@@ -283,8 +283,8 @@ rownames(membMat)<-names(CFs_sets)
 colnames(membMat)<-allEss
 membMat<-membMat+0
 
-rownames(membMat)[which(rownames(membMat)=="CEN-tools (Sharma 2020)")]<-"CEN-tools (Sharma 2020) + Hart 2017"
-rownames(membMat)[which(rownames(membMat)=="CEN-tools")]<-"CEN-tools (Sharma 2020) + curated Hart 2014"
+rownames(membMat)[which(rownames(membMat)=="Sharma2020")]<-"Sharma2020 + Hart 2017"
+rownames(membMat)[which(rownames(membMat)=="CEN-tools")]<-"CEN-tools + curated Hart 2014"
 
 pheatmap(membMat,show_colnames = FALSE,clustering_distance_rows = 'binary',cluster_cols = FALSE,border_color = NA,
          main = 'Similarity across sets',col=c('white','blue'),legend_labels = c('out','in'),legend_breaks = c(0,1))
@@ -507,10 +507,10 @@ boxplot(lapply(bsexp,function(x){log(x+1)}),las=2,col=col[names(bsexp)],ylab='gr
         main='basal expression in normal tissues')
 
 
-names(CFs_sets_plus_training)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
+names(CFs_sets_plus_training)[4]<-'Sharma2020 + Hart2017'
 names(CFs_sets_plus_training)[5]<-'CEN-tools + curated Hart2014'
 col_includingTraining<-col
-names(col_includingTraining)[4]<-'CEN-tools (Sharma 2020) + Hart2017'
+names(col_includingTraining)[4]<-'Sharma2020 + Hart2017'
 names(col_includingTraining)[5]<-'CEN-tools + curated Hart2014'
 col<-c(col,col_includingTraining)
 
