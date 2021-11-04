@@ -29,7 +29,7 @@ data('curated_BAGEL_nonEssential')
 DepMat<-CoRe.download_DepMatrix()
 scaled_DepMat<-CoRe.scale_to_essentials(DepMat,
                                         curated_BAGEL_essential,
-                                        curated_BAGEL_nonessential)
+                                        curated_BAGEL_nonEssential)
 }
 \references{
 [1] J. M. Dempster et al., Agreement between two large pan-cancer CRISPR-Cas9 gene dependency data sets., Nat. Commun., vol. 10, no. 1, p. 5817, 2019, doi: 10.1038/s41467-019-13805-y.

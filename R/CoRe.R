@@ -15,7 +15,7 @@ FDR_Threshold<-function(FCsprofile,
   COORS<-coords(RES,'all',ret = c('threshold','ppv'),transpose = TRUE)
 
   FDRpercTh<-max(COORS['threshold',which(COORS['ppv',]>=(1-FDRth))])
-  threshold<-COORS['threshold',min(which(COORS['threshold',]<=FDR5percTh))]
+  threshold<-COORS['threshold',min(which(COORS['threshold',]<=FDRpercTh))]
 
   return(threshold)
 }
@@ -41,7 +41,7 @@ CoRe.Binarize_Matrix<-function(depMat,
   }
 
   if (Bayes_Factor){
-    if (scale){
+    if (scaled){
       warning('Cannot apply scaling when Bayes_Factor is TRUE')
     }
 
@@ -62,7 +62,7 @@ CoRe.Binarize_Matrix<-function(depMat,
     }
 
   } else {
-    if (scale){
+    if (scaled){
       depMat<-CoRe.scale_to_essentials(depMat, ess_genes, noness_genes)
     }
 
@@ -524,7 +524,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   unzip(file.path(tmp,'mydir','essentiality_matrices.zip'),exdir = file.path(tmp,'mydir'))
   print('...done')
 
-  print('Reading CRIPRcleanR corrected essentiality logFCs...')
+  print('Reading CRISPRcleanR corrected essentiality logFCs...')
   X <- read.table(file.path(tmp,'mydir','EssentialityMatrices','01_corrected_logFCs.tsv'),
                   stringsAsFactors = FALSE,
                   sep='\t',

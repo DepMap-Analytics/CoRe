@@ -44,7 +44,7 @@ BinDepMat<-CoRe.Binarize_Matrix(depMat,
                                 method='fdr',
                                 ess_genes=curated_BAGEL_essential,
                                 noness_genes=curated_BAGEL_nonEssential,
-                                scale=TRUE)
+                                scaled=TRUE)
 head(BinDepMat)
 
 ## Binarization of logFC matrix using the threshold method, and
@@ -53,7 +53,7 @@ BinDepMat<-CoRe.Binarize_Matrix(depMat,
                                 method='thr',
                                 ess_genes=curated_BAGEL_essential,
                                 noness_genes=curated_BAGEL_nonEssential,
-                                scale=TRUE,
+                                scaled=TRUE,
                                 threshold = -0.5)
 head(BinDepMat)
 }
