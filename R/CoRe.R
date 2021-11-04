@@ -1,3 +1,95 @@
+## Compute threshold, at a certain % of FDR, given a genome-wide essentiality profile of a cell line
+## based on two reference sets of essential and non-essential genes
+FDR_Threshold<-function(FCsprofile,
+                        ess_genes,
+                        noness_genes,
+                        FDRth=0.05){
+
+  FCsprofile<-FCsprofile[intersect(c(ess_genes,noness_genes),names(FCsprofile))]
+
+  predictions<-FCsprofile
+  observations<-is.element(names(FCsprofile),ess_genes)+0
+  names(observations)<-names(predictions)
+
+  RES<-roc(observations,predictions,direction = '>',quiet = TRUE)
+  COORS<-coords(RES,'all',ret = c('threshold','ppv'),transpose = TRUE)
+
+  FDRpercTh<-max(COORS['threshold',which(COORS['ppv',]>=(1-FDRth))])
+  threshold<-COORS['threshold',min(which(COORS['threshold',]<=FDRpercTh))]
+
+  return(threshold)
+}
+
+## Binarize matrix of logFCs/Bayesian Factors to be used as input for ADaM
+CoRe.Binarize_Matrix<-function(depMat,
+                               method=c('fdr', 'thr'),
+                               ess_genes=NULL,
+                               noness_genes=NULL,
+                               scaled=FALSE,
+                               Bayes_Factor=FALSE,
+                               FDRth=0.05,
+                               threshold=NULL){
+
+  method = match.arg(method)
+
+  if (method == 'fdr'){
+    if (is.null(ess_genes) || is.null(noness_genes)){
+      stop('ess_genes or noness_genes vectors are NULL: please specify\n
+           character vector of gene names for both parameters when choosing\n
+           the "fdr" method')
+    }
+  }
+
+  if (Bayes_Factor){
+    if (scaled){
+      warning('Cannot apply scaling when Bayes_Factor is TRUE')
+    }
+
+    if (length(threshold) > 0){
+      stop('Cannot apply "thr" method when Bayes_Factor is TRUE')
+    }
+
+    sig_thrs <- sapply(1:ncol(depMat),function(x){
+      FC <- -depMat[,x]
+      names(FC) <- rownames(depMat)
+      -FDR_Threshold(FC,ess_genes,noness_genes,FDRth=FDRth)
+    })
+
+    bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
+
+    for (i in 1:ncol(depMat)){
+      bdep[which(depMat[,i] < sig_thrs[i]),i] <- 1
+    }
+
+  } else {
+    if (scaled){
+      depMat<-CoRe.scale_to_essentials(depMat, ess_genes, noness_genes)
+    }
+
+    if (method == 'fdr'){
+      sig_thrs <- sapply(1:ncol(depMat),function(x){
+        FC <- depMat[,x]
+        names(FC) <- rownames(depMat)
+        FDR_Threshold(FC,ess_genes,noness_genes,FDRth=FDRth)
+      })
+    } else {
+      if (is.null(threshold)){
+        stop('Threshold is NULL: please specify a value\n
+             when choosing the "thr" method')
+      }
+      sig_thrs <- rep(threshold, ncol(depMat))
+    }
+
+    bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
+
+    for (i in 1:ncol(depMat)){
+      bdep[which(depMat[,i] < sig_thrs[i]),i] <- 1
+    }
+  }
+
+  return(bdep)
+}
+
 ## Apply CERES scaling on cell line fold change scores using two reference sets of essential and non-essential
 ## genes
 CoRe.scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
@@ -14,7 +106,7 @@ CoRe.scale_to_essentials <- function(ge_fit,ess_genes,noness_genes){
   return(scaled_ge_fit)
 }
 
-## This function implements an heuristic algrorithm that takes in input a sparse binary matrix and sorts its rows
+## This function implements an heuristic algorithm that takes in input a sparse binary matrix and sorts its rows
 ## and column in a way that the patterns of non null entries have a minimal overlap across rows.
 HeuristicMutExSorting<-function(mutPatterns){
 
@@ -408,8 +500,6 @@ CoRe.download_BinaryDepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/downlo
   return(X)
 }
 
-## Non Documented
-
 ## Downloading Cell Passport models annotation file
 CoRe.download_AnnotationModel<-function(URL='https://cog.sanger.ac.uk/cmp/download/model_list_latest.csv.gz'){
   X <- read_csv(URL)
@@ -434,7 +524,7 @@ CoRe.download_DepMatrix<-function(URL='https://cog.sanger.ac.uk/cmp/download/ess
   unzip(file.path(tmp,'mydir','essentiality_matrices.zip'),exdir = file.path(tmp,'mydir'))
   print('...done')
 
-  print('Reading CRIPRcleanR corrected essentiality logFCs...')
+  print('Reading CRISPRcleanR corrected essentiality logFCs...')
   X <- read.table(file.path(tmp,'mydir','EssentialityMatrices','01_corrected_logFCs.tsv'),
                   stringsAsFactors = FALSE,
                   sep='\t',

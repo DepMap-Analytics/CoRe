@@ -26,11 +26,16 @@ If the URL points to a valid online location this function downloads a quantitat
 data(curated_BAGEL_essential)
 data(curated_BAGEL_nonEssential)
 
-## Downloading and scaling Quantitative Dependency Matrix
+## Downloading unscaled Quantitative Dependency Matrix
 ## for > 300 cancer cell lines from [1]
-DepMat<-CoRe.download_DepMatrix(ess = curated_BAGEL_essential, noness = curated_BAGEL_nonEssential)
+DepMat<-CoRe.download_DepMatrix()
 
 head(DepMat)
+
+## Downloading and scaling Quantitative Dependency Matrix
+DepMat_scaled<-CoRe.download_DepMatrix(scaled=TRUE, ess = curated_BAGEL_essential, noness = curated_BAGEL_nonEssential)
+
+head(DepMat_scaled)
 }
 \references{
 [1] Behan FM, Iorio F, Picco G, Gonçalves E, Beaver CM, Migliardi G, et al. Prioritization of cancer therapeutic targets using CRISPR-Cas9 screens. Nature. 2019;568:511–6.
