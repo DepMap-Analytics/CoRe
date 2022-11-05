@@ -54,13 +54,7 @@ CoRe.Binarize_Matrix<-function(depMat,
       names(FC) <- rownames(depMat)
       -FDR_Threshold(FC,ess_genes,noness_genes,FDRth=FDRth)
     })
-
-    bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
-
-    for (i in 1:ncol(depMat)){
-      bdep[which(depMat[,i] < sig_thrs[i]),i] <- 1
-    }
-
+    
   } else {
     if (scaled){
       depMat<-CoRe.scale_to_essentials(depMat, ess_genes, noness_genes)
@@ -79,14 +73,11 @@ CoRe.Binarize_Matrix<-function(depMat,
       }
       sig_thrs <- rep(threshold, ncol(depMat))
     }
-
-    bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
-
-    for (i in 1:ncol(depMat)){
-      bdep[which(depMat[,i] < sig_thrs[i]),i] <- 1
-    }
   }
 
+  bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
+
+  bdep[,] <- as.integer(depMat[,] < sig_thrs[])
   return(bdep)
 }
 
