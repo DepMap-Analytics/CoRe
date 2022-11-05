@@ -77,10 +77,7 @@ CoRe.Binarize_Matrix<-function(depMat,
 
   bdep <- matrix(0, ncol = ncol(depMat), nrow = nrow(depMat), dimnames = dimnames(depMat))
 
-  for (i in 1:ncol(depMat)){
-    bdep[which(depMat[,i] < sig_thrs[i]),i] <- 1
-  }
-  
+  bdep[,] <- as.integer(depMat[,] < sig_thrs[])
   return(bdep)
 }
 
